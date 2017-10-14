@@ -70,14 +70,14 @@ public class MIDITimeTableMeasureLayer: CALayer {
   public override func layoutSublayers() {
     super.layoutSublayers()
     // Text layer
-    textLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height/2)
+    textLayer.frame = CGRect(x: 2, y: 0, width: frame.width, height: frame.height/2)
     textLayer.fontSize = frame.height/2
     textLayer.foregroundColor = UIColor.black.cgColor
     textLayer.contentsScale = UIScreen.main.scale
     textLayer.alignmentMode = kCAAlignmentLeft
     textLayer.string = showsBarNumber ? "\(barNumber)" : ""
     // Shape layer
-    shapeLayer.frame = CGRect(x: 0, y: frame.height/2, width: frame.width, height: frame.height/2)
+    shapeLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
     let path = UIBezierPath()
     let width = frame.width / CGFloat(beatCount * 4)
     var currentX: CGFloat = width
