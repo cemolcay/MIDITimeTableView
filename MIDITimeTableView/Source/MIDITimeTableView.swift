@@ -165,7 +165,7 @@ public class MIDITimeTableView: UIScrollView {
 
   private var measureView = MIDITimeTableMeasureView()
   private var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
-  private var cellViews = [MIDITimeTableCellView]()
+  private var cellViews = [[MIDITimeTableCellView]]()
 
   public weak var dataSource: MIDITimeTableViewDataSource?
   public weak var timeTableDelegate: MIDITimeTableViewDelegate?
@@ -208,7 +208,7 @@ public class MIDITimeTableView: UIScrollView {
     for i in 0..<(dataSource?.numberOfRows(in: self) ?? 0) {
       guard let row = dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
       for (index, cell) in row.cells.enumerated() {
-        let cellView = cellViews[index]
+        let cellView = cellViews[i][index]
         let startX = beatWidth * CGFloat(cell.position)
         let width = beatWidth * CGFloat(cell.duration)
         let currentBar = Int(ceil(cell.position + cell.duration)) / measureView.beatCount
@@ -236,7 +236,7 @@ public class MIDITimeTableView: UIScrollView {
   public func reloadData() {
     rowHeaderCellViews.forEach({ $0.removeFromSuperview() })
     rowHeaderCellViews = []
-    cellViews.forEach({ $0.removeFromSuperview() })
+    cellViews.flatMap({ $0 }).forEach({ $0.removeFromSuperview() })
     cellViews = []
 
     let numberOfRows = dataSource?.numberOfRows(in: self) ?? 0
@@ -249,11 +249,13 @@ public class MIDITimeTableView: UIScrollView {
       rowHeaderCellViews.append(rowHeaderCell)
       addSubview(rowHeaderCell)
 
+      var cells = [MIDITimeTableCellView]()
       for cell in row.cells {
         let cellView = row.cellView(cell)
-        cellViews.append(cellView)
+        cells.append(cellView)
         addSubview(cellView)
       }
+      cellViews.append(cells)
     }
   }
 }

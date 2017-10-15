@@ -74,25 +74,10 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   var rowData: [MIDITimeTableRowData] = [
     MIDITimeTableRowData(
       cells: [
-        MIDITimeTableCellData(data: "C7", position: 0, duration: 1),
-        MIDITimeTableCellData(data: "C7", position: 1, duration: 1),
-        MIDITimeTableCellData(data: "C7", position: 2, duration: 1),
-        MIDITimeTableCellData(data: "C7", position: 3, duration: 1),
-
-        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 1),
-        MIDITimeTableCellData(data: "Dm7", position: 5, duration: 1),
-        MIDITimeTableCellData(data: "Dm7", position: 6, duration: 1),
-        MIDITimeTableCellData(data: "Dm7", position: 7, duration: 1),
-
-        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 1),
-        MIDITimeTableCellData(data: "G7b5", position: 9, duration: 1),
-        MIDITimeTableCellData(data: "G7b5", position: 10, duration: 1),
-        MIDITimeTableCellData(data: "G7b5", position: 11, duration: 1),
-
-        MIDITimeTableCellData(data: "C7", position: 12, duration: 1),
-        MIDITimeTableCellData(data: "C7", position: 13, duration: 1),
-        MIDITimeTableCellData(data: "C7", position: 14, duration: 1),
-        MIDITimeTableCellData(data: "C7", position: 15, duration: 1),
+        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
+        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
+        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
+        MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
       ],
       headerCellView: HeaderCellView(title: "Chords"),
       cellView: { cellData in
