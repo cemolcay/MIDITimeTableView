@@ -113,7 +113,54 @@ public class MIDITimeTableMeasureView: UIView {
 }
 
 public class MIDITimeTableCellView: UIView {
+  public private(set) var resizeView = UIView()
+  private var resizeViewWidthConstraint: NSLayoutConstraint?
+  public var resizePanThreshold: CGFloat = 10
 
+  public override init(frame: CGRect) {
+    super.init(frame: frame)
+    commonInit()
+  }
+
+  public required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    commonInit()
+  }
+
+  private func commonInit() {
+    addSubview(resizeView)
+    resizeView.translatesAutoresizingMaskIntoConstraints = false
+    resizeView.pinRight(to: self)
+    resizeView.fillVertical(to: self)
+    resizeViewWidthConstraint = NSLayoutConstraint(
+      item: resizeView,
+      attribute: .width,
+      relatedBy: .equal,
+      toItem: nil,
+      attribute: .notAnAttribute,
+      multiplier: 1,
+      constant: resizePanThreshold)
+    resizeView.addConstraint(resizeViewWidthConstraint!)
+
+    let moveGesture = UIPanGestureRecognizer(target: self, action: #selector(didMove(pan:)))
+    addGestureRecognizer(moveGesture)
+
+    let resizeGesture = UIPanGestureRecognizer(target: self, action: #selector(didResize(pan:)))
+    resizeView.addGestureRecognizer(resizeGesture)
+  }
+
+  public override func layoutSubviews() {
+    super.layoutSubviews()
+    resizeViewWidthConstraint?.constant = resizePanThreshold
+  }
+
+  @objc public func didMove(pan: UIPanGestureRecognizer) {
+    print("did move")
+  }
+
+  @objc public func didResize(pan: UIPanGestureRecognizer) {
+    print("did resize")
+  }
 }
 
 public class MIDITimeTableHeaderCellView: UIView {
@@ -332,6 +379,7 @@ public class MIDITimeTableView: UIScrollView {
         let cellView = cellViews[i][index]
         let startX = beatWidth * CGFloat(cell.position)
         let width = beatWidth * CGFloat(cell.duration)
+        print("current bar: \(Int(cell.position + cell.duration) / measureView.beatCount) ceil: \(Int(ceil(cell.position + cell.duration)) / measureView.beatCount) floor: \(Int(floor(cell.position + cell.duration)) / measureView.beatCount)")
         let currentBar = Int(ceil(cell.position + cell.duration)) / measureView.beatCount
         barCount = currentBar > barCount ? currentBar : barCount
         cellView.frame = CGRect(

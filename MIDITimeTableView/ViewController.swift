@@ -60,7 +60,6 @@ class CellView: MIDITimeTableCellView {
     addSubview(titleLabel)
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.textAlignment = .center
-    titleLabel.font = UIFont.boldSystemFont(ofSize: 15)
     titleLabel.fill(to: self, insets: UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0))
     titleLabel.backgroundColor = .white
     titleLabel.layer.borderColor = UIColor.black.cgColor
@@ -107,6 +106,8 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         MIDITimeTableCellData(data: "C", position: 13, duration: 1),
         MIDITimeTableCellData(data: "C", position: 14, duration: 1),
         MIDITimeTableCellData(data: "C", position: 15, duration: 1),
+
+        MIDITimeTableCellData(data: "C", position: 16, duration: 1),
         ],
       headerCellView: HeaderCellView(title: "Melody"),
       cellView: { cellData in
@@ -120,6 +121,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     super.viewDidLoad()
     timeTableView?.dataSource = self
     timeTableView?.timeTableDelegate = self
+    timeTableView?.gridLayer.showsSubbeatLines = false
     timeTableView?.reloadData()
   }
 
