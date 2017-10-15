@@ -112,10 +112,16 @@ public class MIDITimeTableMeasureView: UIView {
   }
 }
 
+public protocol MIDITimeTableCellViewDelegate: class {
+  func midiTimeTableCellViewDidMove(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer)
+  func midiTimeTableCellViewDidResize(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer)
+}
+
 public class MIDITimeTableCellView: UIView {
-  public private(set) var resizeView = UIView()
+  private var resizeView = UIView()
   private var resizeViewWidthConstraint: NSLayoutConstraint?
   public var resizePanThreshold: CGFloat = 10
+  public weak var delegate: MIDITimeTableCellViewDelegate?
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -155,11 +161,11 @@ public class MIDITimeTableCellView: UIView {
   }
 
   @objc public func didMove(pan: UIPanGestureRecognizer) {
-    print("did move")
+    delegate?.midiTimeTableCellViewDidMove(self, pan: pan)
   }
 
   @objc public func didResize(pan: UIPanGestureRecognizer) {
-    print("did resize")
+    delegate?.midiTimeTableCellViewDidResize(self, pan: pan)
   }
 }
 
@@ -323,7 +329,7 @@ public class MIDITimeTableGridLayer: CALayer {
   }
 }
 
-public class MIDITimeTableView: UIScrollView {
+public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   public var showsMeasure: Bool = true
   public var showsHeaders: Bool = true
   public var showsGrid: Bool = true
@@ -431,10 +437,21 @@ public class MIDITimeTableView: UIScrollView {
       var cells = [MIDITimeTableCellView]()
       for cell in row.cells {
         let cellView = row.cellView(cell)
+        cellView.delegate = self
         cells.append(cellView)
         addSubview(cellView)
       }
       cellViews.append(cells)
     }
+  }
+
+  // MARK: MIDITimeTableCellViewDelegate
+
+  public func midiTimeTableCellViewDidMove(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer) {
+    print("did move")
+  }
+
+  public func midiTimeTableCellViewDidResize(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer) {
+    print("did resize")
   }
 }
