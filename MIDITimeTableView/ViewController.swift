@@ -62,6 +62,7 @@ class CellView: MIDITimeTableCellView {
     titleLabel.textAlignment = .center
     titleLabel.font = UIFont.boldSystemFont(ofSize: 15)
     titleLabel.fill(to: self, insets: UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0))
+    titleLabel.backgroundColor = .white
     titleLabel.layer.borderColor = UIColor.black.cgColor
     titleLabel.layer.borderWidth = 1
     titleLabel.layer.cornerRadius = 5

@@ -158,12 +158,130 @@ public protocol MIDITimeTableViewDelegate: class {
   func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat
 }
 
+public class MIDITimeTableGridLayer: CALayer {
+  private var rowLineLayer = CAShapeLayer()
+  private var barLineLayer = CAShapeLayer()
+  private var beatLineLayer = CAShapeLayer()
+  private var subbeatLineLayer = CAShapeLayer()
+
+  public var showsRowLines = true
+  public var showsBarLines = true
+  public var showsBeatLines = true
+  public var showsSubbeatLines = true
+
+  public var rowLineColor: UIColor = .darkGray
+  public var barLineColor: UIColor = .darkGray
+  public var beatLineColor: UIColor = .gray
+  public var subbeatLineColor: UIColor = .lightGray
+
+  public var rowLineWidth: CGFloat = 1
+  public var barLineWidth: CGFloat = 2
+  public var beatLineWidth: CGFloat = 1
+  public var subbeatLineWidth: CGFloat = 0.5
+
+  public var rowCount: Int = 0
+  public var barCount: Int = 0
+  public var rowHeight: CGFloat = 0
+  public var rowHeaderWidth: CGFloat = 0
+  public var measureWidth: CGFloat = 0
+  public var measureHeight: CGFloat = 0
+  public var beatCount: Int = 0
+
+  public override init() {
+    super.init()
+    commonInit()
+  }
+
+  public override init(layer: Any) {
+    super.init(layer: layer)
+    commonInit()
+  }
+
+  public required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    commonInit()
+  }
+
+  private func commonInit() {
+    addSublayer(rowLineLayer)
+    addSublayer(barLineLayer)
+    addSublayer(beatLineLayer)
+    addSublayer(subbeatLineLayer)
+  }
+
+  public override func layoutSublayers() {
+    super.layoutSublayers()
+
+    // Row lines
+    let rowPath = UIBezierPath()
+    rowPath.move(to: CGPoint(x: 0, y: measureHeight))
+    rowPath.addLine(to: CGPoint(x: frame.size.width, y: measureHeight))
+    rowPath.close()
+    for i in 0..<rowCount {
+      rowPath.move(to: CGPoint(x: 0, y: measureHeight + rowHeight + (CGFloat(i) * rowHeight)))
+      rowPath.addLine(to: CGPoint(x: frame.size.width, y: measureHeight + rowHeight + (CGFloat(i) * rowHeight)))
+      rowPath.close()
+    }
+    rowLineLayer.path = rowPath.cgPath
+    rowLineLayer.strokeColor = rowLineColor.cgColor
+    rowLineLayer.lineWidth = rowLineWidth
+    rowLineLayer.isHidden = !showsRowLines
+
+    // Bar lines
+    let barPath = UIBezierPath()
+    for i in 0..<barCount {
+      barPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth), y: 0))
+      barPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth), y: frame.height))
+      barPath.close()
+    }
+    barPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(barCount) * measureWidth), y: 0))
+    barPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(barCount) * measureWidth), y: frame.height))
+    barPath.close()
+    barLineLayer.path = barPath.cgPath
+    barLineLayer.strokeColor = barLineColor.cgColor
+    barLineLayer.lineWidth = barLineWidth
+    barLineLayer.isHidden = !showsBarLines
+
+    // Beat lines
+    let beatPath = UIBezierPath()
+    for i in 0..<barCount*beatCount {
+      beatPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / CGFloat(beatCount)), y: measureHeight))
+      beatPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / CGFloat(beatCount)), y: frame.height))
+      beatPath.close()
+    }
+    beatLineLayer.path = beatPath.cgPath
+    beatLineLayer.strokeColor = beatLineColor.cgColor
+    beatLineLayer.lineWidth = beatLineWidth
+    beatLineLayer.isHidden = !showsBeatLines
+
+    // Subbeat lines
+    let subbeatPath = UIBezierPath()
+    for i in 0..<barCount*beatCount*4 {
+      subbeatPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / (CGFloat(beatCount) * 4)), y: measureHeight))
+      subbeatPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / (CGFloat(beatCount) * 4)), y: frame.height))
+      subbeatPath.close()
+    }
+    subbeatLineLayer.path = subbeatPath.cgPath
+    subbeatLineLayer.strokeColor = subbeatLineColor.cgColor
+    subbeatLineLayer.lineWidth = subbeatLineWidth
+    subbeatLineLayer.isHidden = !showsSubbeatLines
+
+    // Layout grids
+    rowLineLayer.frame = bounds
+    barLineLayer.frame = bounds
+    beatLineLayer.frame = bounds
+    subbeatLineLayer.frame = bounds
+  }
+}
+
 public class MIDITimeTableView: UIScrollView {
   public var showsMeasure: Bool = true
   public var showsHeaders: Bool = true
+  public var showsGrid: Bool = true
   public var measureWidth: CGFloat = 200
 
-  private var measureView = MIDITimeTableMeasureView()
+  public private(set) var gridLayer = MIDITimeTableGridLayer()
+  public private(set) var measureView = MIDITimeTableMeasureView()
   private var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
   private var cellViews = [[MIDITimeTableCellView]]()
 
@@ -184,6 +302,7 @@ public class MIDITimeTableView: UIScrollView {
 
   private func commonInit() {
     addSubview(measureView)
+    layer.insertSublayer(gridLayer, at: 0)
   }
 
   // MARK: Lifecycle
@@ -231,6 +350,16 @@ public class MIDITimeTableView: UIScrollView {
     contentSize = CGSize(
       width: headerCellWidth + measureView.frame.width,
       height: measureView.frame.height + (rowHeight * CGFloat(rowHeaderCellViews.count)))
+
+    gridLayer.rowCount = rowHeaderCellViews.count
+    gridLayer.barCount = barCount
+    gridLayer.rowHeight = rowHeight
+    gridLayer.rowHeaderWidth = headerCellWidth
+    gridLayer.measureWidth = measureWidth
+    gridLayer.measureHeight = measureHeight
+    gridLayer.beatCount = measureView.beatCount
+    gridLayer.isHidden = !showsGrid
+    gridLayer.frame = CGRect(x: 0, y: 0, width: contentSize.width, height: frame.size.height)
   }
 
   public func reloadData() {
