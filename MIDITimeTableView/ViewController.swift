@@ -7,14 +7,167 @@
 //
 
 import UIKit
+import ALKit
 
-class ViewController: UIViewController {
-  @IBOutlet weak var measureView: MIDITimeTableMeasureView?
+class HeaderCellView: MIDITimeTableHeaderCellView {
+  var titleLabel = UILabel()
 
-  override func viewDidLoad() {
-    super.viewDidLoad()
-    measureView?.barCount = 4
-    measureView?.setNeedsLayout()
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    commonInit()
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    commonInit()
+  }
+
+  convenience init(title: String) {
+    self.init(frame: .zero)
+    commonInit()
+    titleLabel.text = title
+  }
+
+  func commonInit() {
+    addSubview(titleLabel)
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    titleLabel.textAlignment = .center
+    titleLabel.font = UIFont.boldSystemFont(ofSize: 15)
+    titleLabel.fill(to: self)
   }
 }
 
+class CellView: MIDITimeTableCellView {
+  var titleLabel = UILabel()
+
+  override init(frame: CGRect) {
+    super.init(frame: frame)
+    commonInit()
+  }
+
+  required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    commonInit()
+  }
+
+  convenience init(title: String) {
+    self.init(frame: .zero)
+    commonInit()
+    titleLabel.text = title
+  }
+
+  func commonInit() {
+    addSubview(titleLabel)
+    titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    titleLabel.textAlignment = .center
+    titleLabel.font = UIFont.boldSystemFont(ofSize: 15)
+    titleLabel.fill(to: self)
+  }
+}
+
+class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTableViewDelegate {
+  @IBOutlet weak var timeTableView: MIDITimeTableView?
+
+  var rowData: [MIDITimeTableRowData] = [
+    MIDITimeTableRowData(
+      cells: [
+        MIDITimeTableCellData(data: "C7", position: 0, duration: 1),
+        MIDITimeTableCellData(data: "C7", position: 1, duration: 1),
+        MIDITimeTableCellData(data: "C7", position: 2, duration: 1),
+        MIDITimeTableCellData(data: "C7", position: 3, duration: 1),
+
+        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 1),
+        MIDITimeTableCellData(data: "Dm7", position: 5, duration: 1),
+        MIDITimeTableCellData(data: "Dm7", position: 6, duration: 1),
+        MIDITimeTableCellData(data: "Dm7", position: 7, duration: 1),
+
+        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 1),
+        MIDITimeTableCellData(data: "G7b5", position: 9, duration: 1),
+        MIDITimeTableCellData(data: "G7b5", position: 10, duration: 1),
+        MIDITimeTableCellData(data: "G7b5", position: 11, duration: 1),
+
+        MIDITimeTableCellData(data: "C7", position: 12, duration: 1),
+        MIDITimeTableCellData(data: "C7", position: 13, duration: 1),
+        MIDITimeTableCellData(data: "C7", position: 14, duration: 1),
+        MIDITimeTableCellData(data: "C7", position: 15, duration: 1),
+      ],
+      headerCellView: HeaderCellView(title: "Chords"),
+      cellView: { cellData in
+        let title = cellData.data as? String ?? ""
+        return CellView(title: title)
+      }),
+
+    MIDITimeTableRowData(
+      cells: [
+        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 1, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 2, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 3, duration: 1),
+
+        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
+        MIDITimeTableCellData(data: "D", position: 5, duration: 1),
+        MIDITimeTableCellData(data: "D", position: 6, duration: 1),
+        MIDITimeTableCellData(data: "D", position: 7, duration: 1),
+
+        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
+        MIDITimeTableCellData(data: "G", position: 9, duration: 1),
+        MIDITimeTableCellData(data: "G", position: 10, duration: 1),
+        MIDITimeTableCellData(data: "G", position: 11, duration: 1),
+
+        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 13, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 14, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 15, duration: 1),
+        ],
+      headerCellView: HeaderCellView(title: "Melody"),
+      cellView: { cellData in
+        let title = cellData.data as? String ?? ""
+        return CellView(title: title)
+    })
+
+  ]
+
+  override func viewDidLoad() {
+    super.viewDidLoad()
+    timeTableView?.dataSource = self
+    timeTableView?.timeTableDelegate = self
+    timeTableView?.reloadData()
+  }
+
+  // MARK: MIDITimeTableViewDataSource
+
+  func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int {
+    return rowData.count
+  }
+
+  func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature {
+    return MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
+  }
+
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData {
+    let row = rowData[index]
+    return row
+  }
+
+  // MARK: MIDITimeTableViewDelegate
+
+  func midiTimeTableViewHeightForRows(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
+    return 60
+  }
+
+  func midiTimeTableViewHeightForMeasureView(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
+    return 30
+  }
+
+  func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
+    return 100
+  }
+
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAtRow: Int, index: Int) {
+    // update data source
+  }
+
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAtRow: Int, index: Int, newCellRow: Int, newCellData: MIDITimeTableCellData) {
+    // update data source
+  }
+}

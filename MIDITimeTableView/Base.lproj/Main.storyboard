@@ -17,17 +17,22 @@
                         <rect key="frame" x="0.0" y="0.0" width="375" height="667"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
-                            <view contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="Nyx-im-krO" customClass="MIDITimeTableMeasureView" customModule="MIDITimeTableView" customModuleProvider="target">
-                                <rect key="frame" x="0.0" y="0.0" width="375" height="23"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                            <view contentMode="scaleToFill" translatesAutoresizingMaskIntoConstraints="NO" id="eJE-Te-4rW" customClass="MIDITimeTableView" customModule="MIDITimeTableView" customModuleProvider="target">
+                                <rect key="frame" x="0.0" y="20" width="375" height="647"/>
                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="custom" customColorSpace="genericGamma22GrayColorSpace"/>
                             </view>
                         </subviews>
                         <color key="backgroundColor" red="1" green="1" blue="1" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                        <constraints>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="trailing" secondItem="eJE-Te-4rW" secondAttribute="trailing" id="76O-gT-Q25"/>
+                            <constraint firstItem="eJE-Te-4rW" firstAttribute="top" secondItem="6Tk-OE-BBY" secondAttribute="top" id="DYp-in-EUA"/>
+                            <constraint firstItem="6Tk-OE-BBY" firstAttribute="bottom" secondItem="eJE-Te-4rW" secondAttribute="bottom" id="GzT-w0-oyr"/>
+                            <constraint firstItem="eJE-Te-4rW" firstAttribute="leading" secondItem="6Tk-OE-BBY" secondAttribute="leading" id="doS-Fa-Lip"/>
+                        </constraints>
                         <viewLayoutGuide key="safeArea" id="6Tk-OE-BBY"/>
                     </view>
                     <connections>
-                        <outlet property="measureView" destination="Nyx-im-krO" id="g7E-yI-JHy"/>
+                        <outlet property="timeTableView" destination="eJE-Te-4rW" id="kqG-qm-GEA"/>
                     </connections>
                 </viewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="dkx-z0-nzr" sceneMemberID="firstResponder"/>

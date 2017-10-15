@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import ALKit
 
 public enum MIDITimeTableNoteValue: Int {
   case whole = 1
@@ -21,22 +22,10 @@ public enum MIDITimeTableNoteValue: Int {
 public struct MIDITimeTableTimeSignature {
   public var beats: Int
   public var noteValue: MIDITimeTableNoteValue
-}
 
-public enum MIDITimeTableSubbeat {
-  case empty
-  case midi(data: Any)
-}
-
-public struct MIDITimeTableBeat {
-  public var subbeats: [MIDITimeTableSubbeat] = [.empty, .empty, .empty, .empty]
-}
-
-public struct MIDITimeTableBar {
-  public var beats: [MIDITimeTableBeat]
-
-  public init(timeSignature: MIDITimeTableTimeSignature) {
-    beats = (0..<timeSignature.beats).map({ _ in MIDITimeTableBeat() })
+  public init(beats: Int, noteValue: MIDITimeTableNoteValue) {
+    self.beats = beats
+    self.noteValue = noteValue
   }
 }
 
@@ -131,28 +120,139 @@ public class MIDITimeTableHeaderCellView: UIView {
 
 }
 
+public struct MIDITimeTableCellData {
+  public var data: Any
+  public var position: Double
+  public var duration: Double
+
+  public init(data: Any, position: Double, duration: Double) {
+    self.data = data
+    self.position = position
+    self.duration = duration
+  }
+}
+
+public struct MIDITimeTableRowData {
+  public var cells: [MIDITimeTableCellData]
+  public var headerCellView: MIDITimeTableHeaderCellView
+  public var cellView: (MIDITimeTableCellData) -> MIDITimeTableCellView
+
+  public init(cells: [MIDITimeTableCellData], headerCellView: MIDITimeTableHeaderCellView, cellView: @escaping (MIDITimeTableCellData) -> MIDITimeTableCellView) {
+    self.cells = cells
+    self.headerCellView = headerCellView
+    self.cellView = cellView
+  }
+}
+
 public protocol MIDITimeTableViewDataSource: class {
   func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int
-  func numberOfBars(in midiTimeTableView: MIDITimeTableView) -> Int
   func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature
-//  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, cellForRow: Int, position: MIDITimeTablePosition) -> MIDITimeTableCellView
-//  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, headerCellForRow: Int) -> MIDITimeTableHeaderCellView?
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData
 }
 
 public protocol MIDITimeTableViewDelegate: class {
-//  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAtRow: Int, position: MIDITimeTablePosition, newRow: Int, newPosition: MIDITimeTablePosition, newDuration: MIDITimeTableDuration)
-//  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAtRow: Int, position: MIDITimeTablePosition)
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAtRow: Int, index: Int, newCellRow: Int, newCellData: MIDITimeTableCellData)
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAtRow: Int, index: Int)
+  func midiTimeTableViewHeightForMeasureView(_ midiTimeTableView: MIDITimeTableView) -> CGFloat
+  func midiTimeTableViewHeightForRows(_ midiTimeTableView: MIDITimeTableView) -> CGFloat
+  func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat
 }
 
 public class MIDITimeTableView: UIScrollView {
   public var showsMeasure: Bool = true
   public var showsHeaders: Bool = true
+  public var measureWidth: CGFloat = 100
+
+  private var measureView = MIDITimeTableMeasureView()
+  private var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
+  private var cellViews = [MIDITimeTableCellView]()
+
+  public weak var dataSource: MIDITimeTableViewDataSource?
+  public weak var timeTableDelegate: MIDITimeTableViewDelegate?
+
+  // MARK: Init
+
+  public override init(frame: CGRect) {
+    super.init(frame: frame)
+    commonInit()
+  }
+
+  public required init?(coder aDecoder: NSCoder) {
+    super.init(coder: aDecoder)
+    commonInit()
+  }
+
+  private func commonInit() {
+    addSubview(measureView)
+  }
+
+  // MARK: Lifecycle
 
   public override func layoutSubviews() {
     super.layoutSubviews()
+
+    let rowHeight = timeTableDelegate?.midiTimeTableViewHeightForRows(self) ?? 60
+    let headerCellWidth = showsHeaders ? timeTableDelegate?.midiTimeTableViewWidthForRowHeaderCells(self) ?? 120 : 0
+    let measureHeight = showsMeasure ? timeTableDelegate?.midiTimeTableViewHeightForMeasureView(self) ?? 30 : 0
+
+    for (index, row) in rowHeaderCellViews.enumerated() {
+      row.frame = CGRect(
+        x: 0,
+        y: measureHeight + (CGFloat(index) * rowHeight),
+        width: headerCellWidth,
+        height: rowHeight)
+    }
+
+    let beatWidth = measureWidth / CGFloat(measureView.beatCount)
+    var foremostCell = CGFloat(0)
+    for i in 0..<(dataSource?.numberOfRows(in: self) ?? 0) {
+      guard let row = dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
+      for (index, cell) in row.cells.enumerated() {
+        let cellView = cellViews[index]
+        let startX = beatWidth * CGFloat(cell.position)
+        let width = beatWidth * CGFloat(cell.duration)
+        foremostCell = (startX + width) > foremostCell ? startX + width : foremostCell
+        cellView.frame = CGRect(
+          x: headerCellWidth + startX,
+          y: measureHeight + (CGFloat(i) * rowHeight),
+          width: width,
+          height: rowHeight)
+      }
+    }
+
+    measureView.frame = CGRect(
+      x: headerCellWidth,
+      y: 0,
+      width: ceil(foremostCell) * measureWidth,
+      height: measureHeight)
+    measureView.barCount = Int(ceil(foremostCell))
+
+    contentSize = CGSize(
+      width: measureView.frame.width,
+      height: measureView.frame.height + (rowHeight * CGFloat(rowHeaderCellViews.count)))
   }
 
   public func reloadData() {
+    rowHeaderCellViews.forEach({ $0.removeFromSuperview() })
+    rowHeaderCellViews = []
+    cellViews.forEach({ $0.removeFromSuperview() })
+    cellViews = []
 
+    let numberOfRows = dataSource?.numberOfRows(in: self) ?? 0
+    let timeSignature = dataSource?.timeSignature(of: self) ?? MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
+    measureView.beatCount = timeSignature.beats
+
+    for i in 0..<numberOfRows {
+      guard let row = dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
+      let rowHeaderCell = row.headerCellView
+      rowHeaderCellViews.append(rowHeaderCell)
+      addSubview(rowHeaderCell)
+
+      for cell in row.cells {
+        let cellView = row.cellView(cell)
+        cellViews.append(cellView)
+        addSubview(cellView)
+      }
+    }
   }
 }
