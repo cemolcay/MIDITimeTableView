@@ -245,6 +245,7 @@ public class MIDITimeTableGridLayer: CALayer {
     // Beat lines
     let beatPath = UIBezierPath()
     for i in 0..<barCount*beatCount {
+      if i%beatCount == 0 { continue }
       beatPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / CGFloat(beatCount)), y: measureHeight))
       beatPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / CGFloat(beatCount)), y: frame.height))
       beatPath.close()
@@ -257,6 +258,7 @@ public class MIDITimeTableGridLayer: CALayer {
     // Subbeat lines
     let subbeatPath = UIBezierPath()
     for i in 0..<barCount*beatCount*4 {
+      if i%4 == 0 { continue }
       subbeatPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / (CGFloat(beatCount) * 4)), y: measureHeight))
       subbeatPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / (CGFloat(beatCount) * 4)), y: frame.height))
       subbeatPath.close()
