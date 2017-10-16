@@ -31,17 +31,17 @@ You need a data object to store each row and its cells data.
 ``` swift
 var rowData: [MIDITimeTableRowData] = [
   MIDITimeTableRowData(
-	  cells: [
-	    MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
-	    MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
-	    MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
-	    MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
-	  ],
-	  headerCellView: HeaderCellView(title: "Chords"),
-	  cellView: { cellData in
-	    let title = cellData.data as? String ?? ""
-	    return CellView(title: title)
-	  }),
+    cells: [
+      MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
+      MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
+      MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
+      MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
+    ],
+    headerCellView: HeaderCellView(title: "Chords"),
+    cellView: { cellData in
+      let title = cellData.data as? String ?? ""
+      return CellView(title: title)
+    }),
 ]
 ```
 
@@ -49,16 +49,16 @@ var rowData: [MIDITimeTableRowData] = [
 
 ``` swift
 func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int {
-	return rowData.count
+  return rowData.count
 }
 
 func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature {
-	return MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
+  return MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData {
-	let row = rowData[index]
-	return row
+  let row = rowData[index]
+  return row
 }
 ```
   
