@@ -8,27 +8,83 @@
 
 import UIKit
 
+/// Populates the `MIDITimeTableView` with the datas of rows and cells.
 public protocol MIDITimeTableViewDataSource: class {
+  /// Number of rows in the time table.
+  ///
+  /// - Parameter midiTimeTableView: Time table to populate rows.
+  /// - Returns: Number of rows populate.
   func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int
+
+  /// Time signature of the time table.
+  ///
+  /// - Parameter midiTimeTableView: Time table to set time signature.
+  /// - Returns: Time signature of the time table.
   func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature
+
+  /// Row data for each row in the time table.
+  ///
+  /// - Parameters:
+  ///   - midiTimeTableView: Time table that populates row data.
+  ///   - index: Index of row to populate data.
+  /// - Returns: Row data of time table for an index.
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData
 }
 
+/// Delegate functions to inform about editing cells and sizing of the time table.
 public protocol MIDITimeTableViewDelegate: class {
+  /// Informs about the cell is either moved to another position, changed duration or changed position in a current or a new row.
+  ///
+  /// - Parameters:
+  ///   - midiTimeTableView: Time table that performed changes on.
+  ///   - row: Initial row index of the edited cell.
+  ///   - index: Index of the cell in the initial row index.
+  ///   - newCellRow: Last row index of cell after editing.
+  ///   - newCellPosition: Last position of cell after editing.
+  ///   - newCellDuration: Last duration of cell after editing.
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAt row: Int, index: Int, newCellRow: Int, newCellPosition: Double, newCellDuration: Double)
+
+  /// Informs about the cell is being deleted.
+  ///
+  /// - Parameters:
+  ///   - midiTimeTableView: Time table that performed changes on.
+  ///   - row: Row index of the cell.
+  ///   - index: Index of the cell in the row.
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAt row: Int, index: Int)
+
+  /// Measure view height in the time table.
+  ///
+  /// - Parameter midiTimeTableView: Time table to set its measure view's height.
+  /// - Returns: Height of measure view.
   func midiTimeTableViewHeightForMeasureView(_ midiTimeTableView: MIDITimeTableView) -> CGFloat
+
+  /// Height of each row in the time table.
+  ///
+  /// - Parameter midiTimeTableView: Time table to set its rows height.
+  /// - Returns: Height of each row.
   func midiTimeTableViewHeightForRows(_ midiTimeTableView: MIDITimeTableView) -> CGFloat
+
+  /// Width of header cells in each row.
+  ///
+  /// - Parameter midiTimeTableView: Time table to set its header cells widths in each row.
+  /// - Returns: Width of header cell in each row.
   func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat
 }
 
+/// Draws time table with multiple rows and editable cells. Heavily customisable.
 public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
+  /// Property to show measure bar. Defaults true.
   public var showsMeasure: Bool = true
+  /// Property to show header cells in each row. Defaults true.
   public var showsHeaders: Bool = true
+  /// Property to show grid. Defaults true.
   public var showsGrid: Bool = true
 
+  /// Maximum width of a measure bar after zooming in. Defaults 500.
   public var maxMeasureWidth: CGFloat = 500
+  /// Minimum width of a measure bar after zooming out. Defaults 100.
   public var minMeasureWidth: CGFloat = 100
+  /// Initial width of a measure bar. Defaults 200.
   public var measureWidth: CGFloat = 200 {
     didSet {
       if measureWidth >= maxMeasureWidth {
@@ -39,13 +95,18 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
     }
   }
 
+  /// Grid layer to set its customisable properties like drawing rules, colors or line widths.
   public private(set) var gridLayer = MIDITimeTableGridLayer()
+  /// Measure view that draws measure bars on it. You can customise its style.
   public private(set) var measureView = MIDITimeTableMeasureView()
+
   private var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
   private var cellViews = [[MIDITimeTableCellView]]()
   private var editingCellRow: Int?
 
+  /// Data source object of the time table to populate its data.
   public weak var dataSource: MIDITimeTableViewDataSource?
+  /// Delegate object of the time table to inform about changes and customise sizing.
   public weak var timeTableDelegate: MIDITimeTableViewDelegate?
 
   private var rowHeight: CGFloat {
@@ -87,15 +148,6 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
       target: self,
       action: #selector(didPinch(pinch:)))
     addGestureRecognizer(pinch)
-  }
-
-  // MARK: Pinch Gesture
-
-  private var lastScale: CGFloat = 0
-  @objc func didPinch(pinch: UIPinchGestureRecognizer) {
-    measureWidth += (lastScale < pinch.scale ? 1 : -1) * pinch.scale
-    lastScale = pinch.scale
-    setNeedsLayout()
   }
 
   // MARK: Lifecycle
@@ -149,6 +201,7 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
     gridLayer.frame = CGRect(x: 0, y: 0, width: contentSize.width, height: frame.size.height)
   }
 
+  /// Populates row and cell datas from its data source and redraws time table.
   public func reloadData() {
     rowHeaderCellViews.forEach({ $0.removeFromSuperview() })
     rowHeaderCellViews = []
@@ -174,6 +227,15 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
       }
       cellViews.append(cells)
     }
+  }
+
+  // MARK: Zooming
+
+  private var lastScale: CGFloat = 0
+  @objc func didPinch(pinch: UIPinchGestureRecognizer) {
+    measureWidth += (lastScale < pinch.scale ? 1 : -1) * pinch.scale
+    lastScale = pinch.scale
+    setNeedsLayout()
   }
 
   // MARK: MIDITimeTableCellViewDelegate
