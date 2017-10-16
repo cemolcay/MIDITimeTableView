@@ -88,6 +88,19 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     MIDITimeTableRowData(
       cells: [
         MIDITimeTableCellData(data: "C", position: 0, duration: 1),
+        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
+        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
+        ],
+      headerCellView: HeaderCellView(title: "Bass"),
+      cellView: { cellData in
+        let title = cellData.data as? String ?? ""
+        return CellView(title: title)
+      }),
+
+    MIDITimeTableRowData(
+      cells: [
+        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
         MIDITimeTableCellData(data: "C", position: 1, duration: 1),
         MIDITimeTableCellData(data: "C", position: 2, duration: 1),
         MIDITimeTableCellData(data: "C", position: 3, duration: 1),
@@ -111,8 +124,27 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
         return CellView(title: title)
-    })
+    }),
 
+    MIDITimeTableRowData(
+      cells: [
+        MIDITimeTableCellData(data: "C", position: 0, duration: 0.5),
+        MIDITimeTableCellData(data: "C", position: 2, duration: 0.5),
+
+        MIDITimeTableCellData(data: "D", position: 4, duration: 0.5),
+        MIDITimeTableCellData(data: "D", position: 6, duration: 0.5),
+
+        MIDITimeTableCellData(data: "G", position: 8, duration: 0.5),
+        MIDITimeTableCellData(data: "G", position: 10, duration: 0.5),
+
+        MIDITimeTableCellData(data: "C", position: 12, duration: 0.5),
+        MIDITimeTableCellData(data: "C", position: 14, duration: 0.5),
+      ],
+      headerCellView: HeaderCellView(title: "Synths"),
+      cellView: { cellData in
+        let title = cellData.data as? String ?? ""
+        return CellView(title: title)
+    })
   ]
 
   override func viewDidLoad() {
