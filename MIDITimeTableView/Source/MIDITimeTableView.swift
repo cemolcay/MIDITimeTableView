@@ -190,6 +190,15 @@ public struct MIDITimeTableRowData {
   public var headerCellView: MIDITimeTableHeaderCellView
   public var cellView: (MIDITimeTableCellData) -> MIDITimeTableCellView
 
+  public var maxPosition: Double {
+    var max = 0.0
+    for cell in cells {
+      let position = cell.position + cell.duration
+      max = position > max ? position : max
+    }
+    return max
+  }
+
   public init(cells: [MIDITimeTableCellData], headerCellView: MIDITimeTableHeaderCellView, cellView: @escaping (MIDITimeTableCellData) -> MIDITimeTableCellView) {
     self.cells = cells
     self.headerCellView = headerCellView
@@ -417,15 +426,14 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
         height: rowHeight)
     }
 
-    var barCount = 0
+    var maxPosition = 0.0
     for i in 0..<(dataSource?.numberOfRows(in: self) ?? 0) {
       guard let row = dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
+      maxPosition = row.maxPosition > maxPosition ? row.maxPosition : maxPosition
       for (index, cell) in row.cells.enumerated() {
         let cellView = cellViews[i][index]
         let startX = beatWidth * CGFloat(cell.position)
         let width = beatWidth * CGFloat(cell.duration)
-        let currentBar = Int(ceil(cell.position + cell.duration)) / measureView.beatCount
-        barCount = currentBar > barCount ? currentBar : barCount
         cellView.frame = CGRect(
           x: headerCellWidth + startX,
           y: measureHeight + (CGFloat(i) * rowHeight),
@@ -434,19 +442,19 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
       }
     }
 
+    measureView.barCount = Int(ceil(maxPosition / Double(measureView.beatCount))) // Int(ceil(barCount / Double(measureView.beatCount)))
     measureView.frame = CGRect(
       x: headerCellWidth,
       y: 0,
-      width: CGFloat(barCount) * measureWidth,
+      width: CGFloat(measureView.barCount) * measureWidth,
       height: measureHeight)
-    measureView.barCount = barCount
 
     contentSize = CGSize(
       width: headerCellWidth + measureView.frame.width,
       height: measureView.frame.height + (rowHeight * CGFloat(rowHeaderCellViews.count)))
 
     gridLayer.rowCount = rowHeaderCellViews.count
-    gridLayer.barCount = barCount
+    gridLayer.barCount = measureView.barCount
     gridLayer.rowHeight = rowHeight
     gridLayer.rowHeaderWidth = headerCellWidth
     gridLayer.measureWidth = measureWidth

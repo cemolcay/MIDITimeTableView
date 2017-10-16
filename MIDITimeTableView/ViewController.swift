@@ -106,7 +106,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         MIDITimeTableCellData(data: "C", position: 13, duration: 1),
         MIDITimeTableCellData(data: "C", position: 14, duration: 1),
         MIDITimeTableCellData(data: "C", position: 15, duration: 1),
-      ],
+        ],
       headerCellView: HeaderCellView(title: "Melody"),
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
