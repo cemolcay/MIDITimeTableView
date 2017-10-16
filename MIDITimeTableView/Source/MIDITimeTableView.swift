@@ -493,6 +493,15 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   }
 
   public func midiTimeTableCellViewDidResize(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer) {
-    print("did resize")
+    let translation = pan.translation(in: self)
+    bringSubview(toFront: midiTimeTableCellView)
+
+    if translation.x > subbeatWidth, midiTimeTableCellView.frame.maxX < contentSize.width - subbeatWidth { // Increase
+      midiTimeTableCellView.frame.size.width += subbeatWidth
+      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+    } else if translation.x < -subbeatWidth, midiTimeTableCellView.frame.width > subbeatWidth { // Decrease
+      midiTimeTableCellView.frame.size.width -= subbeatWidth
+      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+    }
   }
 }
