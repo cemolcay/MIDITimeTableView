@@ -343,6 +343,26 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   public weak var dataSource: MIDITimeTableViewDataSource?
   public weak var timeTableDelegate: MIDITimeTableViewDelegate?
 
+  private var rowHeight: CGFloat {
+    return timeTableDelegate?.midiTimeTableViewHeightForRows(self) ?? 60
+  }
+
+  private var measureHeight: CGFloat {
+    return showsMeasure ? timeTableDelegate?.midiTimeTableViewHeightForMeasureView(self) ?? 30 : 0
+  }
+
+  private var headerCellWidth: CGFloat {
+    return showsHeaders ? timeTableDelegate?.midiTimeTableViewWidthForRowHeaderCells(self) ?? 120 : 0
+  }
+
+  private var beatWidth: CGFloat {
+    return measureWidth / CGFloat(measureView.beatCount)
+  }
+
+  private var subbeatWidth: CGFloat {
+    return beatWidth / 4
+  }
+
   // MARK: Init
 
   public override init(frame: CGRect) {
@@ -365,10 +385,6 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   public override func layoutSubviews() {
     super.layoutSubviews()
 
-    let rowHeight = timeTableDelegate?.midiTimeTableViewHeightForRows(self) ?? 60
-    let headerCellWidth = showsHeaders ? timeTableDelegate?.midiTimeTableViewWidthForRowHeaderCells(self) ?? 120 : 0
-    let measureHeight = showsMeasure ? timeTableDelegate?.midiTimeTableViewHeightForMeasureView(self) ?? 30 : 0
-
     for (index, row) in rowHeaderCellViews.enumerated() {
       row.frame = CGRect(
         x: 0,
@@ -377,7 +393,6 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
         height: rowHeight)
     }
 
-    let beatWidth = measureWidth / CGFloat(measureView.beatCount)
     var barCount = 0
     for i in 0..<(dataSource?.numberOfRows(in: self) ?? 0) {
       guard let row = dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
@@ -385,7 +400,6 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
         let cellView = cellViews[i][index]
         let startX = beatWidth * CGFloat(cell.position)
         let width = beatWidth * CGFloat(cell.duration)
-        print("current bar: \(Int(cell.position + cell.duration) / measureView.beatCount) ceil: \(Int(ceil(cell.position + cell.duration)) / measureView.beatCount) floor: \(Int(floor(cell.position + cell.duration)) / measureView.beatCount)")
         let currentBar = Int(ceil(cell.position + cell.duration)) / measureView.beatCount
         barCount = currentBar > barCount ? currentBar : barCount
         cellView.frame = CGRect(
@@ -448,7 +462,34 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   // MARK: MIDITimeTableCellViewDelegate
 
   public func midiTimeTableCellViewDidMove(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer) {
-    print("did move")
+    let translation = pan.translation(in: self)
+    bringSubview(toFront: midiTimeTableCellView)
+
+    // Horizontal move
+    if translation.x > subbeatWidth, midiTimeTableCellView.frame.maxX < contentSize.width {
+      midiTimeTableCellView.center = CGPoint(
+        x: midiTimeTableCellView.center.x + subbeatWidth,
+        y: midiTimeTableCellView.center.y)
+      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+    } else if translation.x < -subbeatWidth, midiTimeTableCellView.frame.minX > headerCellWidth {
+      midiTimeTableCellView.center = CGPoint(
+        x: midiTimeTableCellView.center.x - subbeatWidth,
+        y: midiTimeTableCellView.center.y)
+      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+    }
+
+    // Vertical move
+    if translation.y > rowHeight, midiTimeTableCellView.frame.maxY < measureHeight + (rowHeight * CGFloat(cellViews.count)) {
+      midiTimeTableCellView.center = CGPoint(
+        x: midiTimeTableCellView.center.x,
+        y: midiTimeTableCellView.center.y + rowHeight)
+      pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
+    } else if translation.y < -rowHeight, midiTimeTableCellView.frame.minY > measureHeight {
+      midiTimeTableCellView.center = CGPoint(
+        x: midiTimeTableCellView.center.x,
+        y: midiTimeTableCellView.center.y - rowHeight)
+      pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
+    }
   }
 
   public func midiTimeTableCellViewDidResize(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer) {
