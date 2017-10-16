@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import ALKit
 
 /// Delegate functions to inform about editing or deleting cell.
 public protocol MIDITimeTableCellViewDelegate: class {

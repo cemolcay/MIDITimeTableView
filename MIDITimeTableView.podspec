@@ -201,6 +201,6 @@ You can set the `minMeasureWidth` and `maxMeasureWidth` to set zoom levels of th
   s.requires_arc = true
 
   # s.xcconfig = { "HEADER_SEARCH_PATHS" => "$(SDKROOT)/usr/include/libxml2" }
-  # s.dependency "JSONKit", "~> 1.4"
+  s.dependency "ALKit"
 
 end
