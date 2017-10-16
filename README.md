@@ -67,3 +67,8 @@ You can customise the measure bar, the grid, each header and data cell. Check ou
 `MIDITimeTableCellView`'s are editable, you can move around them on the grid, resize their duration or long press to open a delete menu. Also, you need to subclass yourself to present your own data on it.
   
 You can set the `minMeasureWidth` and `maxMeasureWidth` to set zoom levels of the time table.
+
+Documentation
+----
+
+[Full documentation here.](http://cemolcay.github.io/MIDITimeTableView)
