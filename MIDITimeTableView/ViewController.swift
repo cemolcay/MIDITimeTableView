@@ -152,11 +152,20 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     return 100
   }
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAtRow: Int, index: Int) {
-    // update data source
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAt row: Int, index: Int) {
+    rowData[row].cells.remove(at: index)
   }
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAtRow: Int, index: Int, newCellRow: Int, newCellData: MIDITimeTableCellData) {
-    // update data source
-  }
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAt row: Int, index: Int, newCellRow: Int, newCellPosition: Double, newCellDuration: Double) {
+    var cell = rowData[row].cells[index]
+    cell.duration = newCellDuration
+    cell.position = newCellPosition
+
+    if row == newCellRow {
+      rowData[row].cells[index] = cell
+    } else { // move cell to new row
+      rowData[row].cells.remove(at: index)
+      rowData[newCellRow].cells.append(cell)
+    }
+  } 
 }
