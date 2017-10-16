@@ -14,6 +14,15 @@
 		B29FB6B61F923E07006E4EA8 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = B29FB6B51F923E07006E4EA8 /* Assets.xcassets */; };
 		B29FB6B91F923E07006E4EA8 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = B29FB6B71F923E07006E4EA8 /* LaunchScreen.storyboard */; };
 		B29FB6C21F923E31006E4EA8 /* MIDITimeTableView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29FB6C11F923E31006E4EA8 /* MIDITimeTableView.swift */; };
+		B2A5100E1F954394005FE3DB /* MIDITimeTableGridLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A5100D1F954394005FE3DB /* MIDITimeTableGridLayer.swift */; };
+		B2A510101F9543B6005FE3DB /* MIDITimeTableNoteValue.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A5100F1F9543B6005FE3DB /* MIDITimeTableNoteValue.swift */; };
+		B2A510121F9543D5005FE3DB /* MIDITimeTableTimeSignature.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A510111F9543D5005FE3DB /* MIDITimeTableTimeSignature.swift */; };
+		B2A510141F9543FA005FE3DB /* MIDITimeTableMeasureLayer.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A510131F9543FA005FE3DB /* MIDITimeTableMeasureLayer.swift */; };
+		B2A510161F954414005FE3DB /* MIDITimeTableMeasureView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A510151F954414005FE3DB /* MIDITimeTableMeasureView.swift */; };
+		B2A510181F95443A005FE3DB /* MIDITimeTableCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A510171F95443A005FE3DB /* MIDITimeTableCellView.swift */; };
+		B2A5101A1F95445A005FE3DB /* MIDITimeTableHeaderCellView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A510191F95445A005FE3DB /* MIDITimeTableHeaderCellView.swift */; };
+		B2A5101C1F95447F005FE3DB /* MIDITimeTableRowData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A5101B1F95447F005FE3DB /* MIDITimeTableRowData.swift */; };
+		B2A5101E1F95449F005FE3DB /* MIDITimeTableCellData.swift in Sources */ = {isa = PBXBuildFile; fileRef = B2A5101D1F95449F005FE3DB /* MIDITimeTableCellData.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -28,6 +37,15 @@
 		B29FB6B81F923E07006E4EA8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		B29FB6BA1F923E07006E4EA8 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		B29FB6C11F923E31006E4EA8 /* MIDITimeTableView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableView.swift; sourceTree = "<group>"; };
+		B2A5100D1F954394005FE3DB /* MIDITimeTableGridLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableGridLayer.swift; sourceTree = "<group>"; };
+		B2A5100F1F9543B6005FE3DB /* MIDITimeTableNoteValue.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableNoteValue.swift; sourceTree = "<group>"; };
+		B2A510111F9543D5005FE3DB /* MIDITimeTableTimeSignature.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableTimeSignature.swift; sourceTree = "<group>"; };
+		B2A510131F9543FA005FE3DB /* MIDITimeTableMeasureLayer.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableMeasureLayer.swift; sourceTree = "<group>"; };
+		B2A510151F954414005FE3DB /* MIDITimeTableMeasureView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableMeasureView.swift; sourceTree = "<group>"; };
+		B2A510171F95443A005FE3DB /* MIDITimeTableCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableCellView.swift; sourceTree = "<group>"; };
+		B2A510191F95445A005FE3DB /* MIDITimeTableHeaderCellView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableHeaderCellView.swift; sourceTree = "<group>"; };
+		B2A5101B1F95447F005FE3DB /* MIDITimeTableRowData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableRowData.swift; sourceTree = "<group>"; };
+		B2A5101D1F95449F005FE3DB /* MIDITimeTableCellData.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableCellData.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -95,6 +113,15 @@
 			isa = PBXGroup;
 			children = (
 				B29FB6C11F923E31006E4EA8 /* MIDITimeTableView.swift */,
+				B2A5100D1F954394005FE3DB /* MIDITimeTableGridLayer.swift */,
+				B2A5100F1F9543B6005FE3DB /* MIDITimeTableNoteValue.swift */,
+				B2A510111F9543D5005FE3DB /* MIDITimeTableTimeSignature.swift */,
+				B2A510131F9543FA005FE3DB /* MIDITimeTableMeasureLayer.swift */,
+				B2A510151F954414005FE3DB /* MIDITimeTableMeasureView.swift */,
+				B2A510171F95443A005FE3DB /* MIDITimeTableCellView.swift */,
+				B2A510191F95445A005FE3DB /* MIDITimeTableHeaderCellView.swift */,
+				B2A5101B1F95447F005FE3DB /* MIDITimeTableRowData.swift */,
+				B2A5101D1F95449F005FE3DB /* MIDITimeTableCellData.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -228,8 +255,17 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				B2A510161F954414005FE3DB /* MIDITimeTableMeasureView.swift in Sources */,
+				B2A5100E1F954394005FE3DB /* MIDITimeTableGridLayer.swift in Sources */,
+				B2A5101E1F95449F005FE3DB /* MIDITimeTableCellData.swift in Sources */,
 				B29FB6C21F923E31006E4EA8 /* MIDITimeTableView.swift in Sources */,
+				B2A510101F9543B6005FE3DB /* MIDITimeTableNoteValue.swift in Sources */,
+				B2A5101A1F95445A005FE3DB /* MIDITimeTableHeaderCellView.swift in Sources */,
 				B29FB6B11F923E07006E4EA8 /* ViewController.swift in Sources */,
+				B2A510121F9543D5005FE3DB /* MIDITimeTableTimeSignature.swift in Sources */,
+				B2A5101C1F95447F005FE3DB /* MIDITimeTableRowData.swift in Sources */,
+				B2A510181F95443A005FE3DB /* MIDITimeTableCellView.swift in Sources */,
+				B2A510141F9543FA005FE3DB /* MIDITimeTableMeasureLayer.swift in Sources */,
 				B29FB6AF1F923E07006E4EA8 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
