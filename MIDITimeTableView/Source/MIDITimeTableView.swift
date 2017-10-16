@@ -232,13 +232,13 @@ public class MIDITimeTableGridLayer: CALayer {
   public var showsSubbeatLines = true
 
   public var rowLineColor: UIColor = .darkGray
-  public var barLineColor: UIColor = .darkGray
+  public var barLineColor: UIColor = .black
   public var beatLineColor: UIColor = .gray
   public var subbeatLineColor: UIColor = .lightGray
 
   public var rowLineWidth: CGFloat = 1
-  public var barLineWidth: CGFloat = 2
-  public var beatLineWidth: CGFloat = 1
+  public var barLineWidth: CGFloat = 1
+  public var beatLineWidth: CGFloat = 0.5
   public var subbeatLineWidth: CGFloat = 0.5
 
   public var rowCount: Int = 0
@@ -442,7 +442,7 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
       }
     }
 
-    measureView.barCount = Int(ceil(maxPosition / Double(measureView.beatCount))) // Int(ceil(barCount / Double(measureView.beatCount)))
+    measureView.barCount = Int(ceil(maxPosition / Double(measureView.beatCount)))
     measureView.frame = CGRect(
       x: headerCellWidth,
       y: 0,
