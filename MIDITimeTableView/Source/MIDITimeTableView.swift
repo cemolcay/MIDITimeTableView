@@ -333,7 +333,18 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   public var showsMeasure: Bool = true
   public var showsHeaders: Bool = true
   public var showsGrid: Bool = true
-  public var measureWidth: CGFloat = 200
+
+  public var maxMeasureWidth: CGFloat = 500
+  public var minMeasureWidth: CGFloat = 100
+  public var measureWidth: CGFloat = 200 {
+    didSet {
+      if measureWidth >= maxMeasureWidth {
+        measureWidth = maxMeasureWidth
+      } else if measureWidth <= minMeasureWidth {
+        measureWidth = minMeasureWidth
+      }
+    }
+  }
 
   public private(set) var gridLayer = MIDITimeTableGridLayer()
   public private(set) var measureView = MIDITimeTableMeasureView()
@@ -378,6 +389,19 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   private func commonInit() {
     addSubview(measureView)
     layer.insertSublayer(gridLayer, at: 0)
+    let pinch = UIPinchGestureRecognizer(
+      target: self,
+      action: #selector(didPinch(pinch:)))
+    addGestureRecognizer(pinch)
+  }
+
+  // MARK: Pinch Gesture
+
+  private var lastScale: CGFloat = 0
+  @objc func didPinch(pinch: UIPinchGestureRecognizer) {
+    measureWidth += (lastScale < pinch.scale ? 1 : -1) * pinch.scale
+    lastScale = pinch.scale
+    setNeedsLayout()
   }
 
   // MARK: Lifecycle
