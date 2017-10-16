@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MIDITimeTableView Class Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Class/MIDITimeTableView" class="dashAnchor"></a>
+    <a title="MIDITimeTableView Class Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">MIDITimeTableView Docs</a> (82% documented)</p>
+        <p class="header-right"><a href="https://github.com/cemolcay/MIDITimeTableView"><img src="../img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">MIDITimeTableView Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        MIDITimeTableView Class Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTableCellView.html">MIDITimeTableCellView</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTableGridLayer.html">MIDITimeTableGridLayer</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes.html#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableHeaderCellView">MIDITimeTableHeaderCellView</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTableMeasureLayer.html">MIDITimeTableMeasureLayer</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTableMeasureView.html">MIDITimeTableMeasureView</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableViewDelegate.html">MIDITimeTableViewDelegate</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableRowData.html">MIDITimeTableRowData</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableTimeSignature.html">MIDITimeTableTimeSignature</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>MIDITimeTableView</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTableView</span><span class="p">:</span> <span class="kt">UIScrollView</span><span class="p">,</span> <span class="kt"><a href="../Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a></span></code></pre>
+
+                </div>
+              </div>
+            <p>Draws time table with multiple rows and editable cells. Heavily customisable.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC12showsMeasureSbv"></a>
+                    <a name="//apple_ref/swift/Property/showsMeasure" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC12showsMeasureSbv">showsMeasure</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Property to show measure bar. Defaults true.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">showsMeasure</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">true</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC12showsHeadersSbv"></a>
+                    <a name="//apple_ref/swift/Property/showsHeaders" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC12showsHeadersSbv">showsHeaders</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Property to show header cells in each row. Defaults true.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">showsHeaders</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">true</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC9showsGridSbv"></a>
+                    <a name="//apple_ref/swift/Property/showsGrid" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC9showsGridSbv">showsGrid</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Property to show grid. Defaults true.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">showsGrid</span><span class="p">:</span> <span class="kt">Bool</span> <span class="o">=</span> <span class="kc">true</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC15maxMeasureWidth12CoreGraphics7CGFloatVv"></a>
+                    <a name="//apple_ref/swift/Property/maxMeasureWidth" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC15maxMeasureWidth12CoreGraphics7CGFloatVv">maxMeasureWidth</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Maximum width of a measure bar after zooming in. Defaults 500.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">maxMeasureWidth</span><span class="p">:</span> <span class="kt">CGFloat</span> <span class="o">=</span> <span class="mi">500</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC15minMeasureWidth12CoreGraphics7CGFloatVv"></a>
+                    <a name="//apple_ref/swift/Property/minMeasureWidth" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC15minMeasureWidth12CoreGraphics7CGFloatVv">minMeasureWidth</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Minimum width of a measure bar after zooming out. Defaults 100.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">minMeasureWidth</span><span class="p">:</span> <span class="kt">CGFloat</span> <span class="o">=</span> <span class="mi">100</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC12measureWidth12CoreGraphics7CGFloatVv"></a>
+                    <a name="//apple_ref/swift/Property/measureWidth" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC12measureWidth12CoreGraphics7CGFloatVv">measureWidth</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initial width of a measure bar. Defaults 200.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">measureWidth</span><span class="p">:</span> <span class="kt">CGFloat</span> <span class="o">=</span> <span class="mi">200</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC9gridLayerAA0ab4GridE0Cv"></a>
+                    <a name="//apple_ref/swift/Property/gridLayer" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC9gridLayerAA0ab4GridE0Cv">gridLayer</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Grid layer to set its customisable properties like drawing rules, colors or line widths.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">gridLayer</span> <span class="o">=</span> <span class="kt"><a href="../Classes/MIDITimeTableGridLayer.html">MIDITimeTableGridLayer</a></span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC07measureC0AA0ab7MeasureC0Cv"></a>
+                    <a name="//apple_ref/swift/Property/measureView" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC07measureC0AA0ab7MeasureC0Cv">measureView</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Measure view that draws measure bars on it. You can customise its style.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">measureView</span> <span class="o">=</span> <span class="kt"><a href="../Classes/MIDITimeTableMeasureView.html">MIDITimeTableMeasureView</a></span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC10dataSourceAA0abc4DataE0_pSgXwv"></a>
+                    <a name="//apple_ref/swift/Property/dataSource" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC10dataSourceAA0abc4DataE0_pSgXwv">dataSource</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Data source object of the time table to populate its data.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">dataSource</span><span class="p">:</span> <span class="kt"><a href="../Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a></span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC04timeB8DelegateAA0abcE0_pSgXwv"></a>
+                    <a name="//apple_ref/swift/Property/timeTableDelegate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC04timeB8DelegateAA0abcE0_pSgXwv">timeTableDelegate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Delegate object of the time table to inform about changes and customise sizing.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">timeTableDelegate</span><span class="p">:</span> <span class="kt"><a href="../Protocols/MIDITimeTableViewDelegate.html">MIDITimeTableViewDelegate</a></span><span class="p">?</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Init"></a>
+                <a name="//apple_ref/swift/Section/Init" class="dashAnchor"></a>
+                <a href="#/Init">
+                  <h3 class="section-name">Init</h3>
+                </a>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableView(im)initWithFrame:"></a>
+                    <a name="//apple_ref/swift/Method/init(frame:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableView(im)initWithFrame:">init(frame:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTableView</span><span class="p">:</span> <span class="kt">UIScrollView</span><span class="p">,</span> <span class="kt"><a href="../Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableView(im)initWithCoder:"></a>
+                    <a name="//apple_ref/swift/Method/init(coder:)" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableView(im)initWithCoder:">init(coder:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTableView</span><span class="p">:</span> <span class="kt">UIScrollView</span><span class="p">,</span> <span class="kt"><a href="../Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Lifecycle"></a>
+                <a name="//apple_ref/swift/Section/Lifecycle" class="dashAnchor"></a>
+                <a href="#/Lifecycle">
+                  <h3 class="section-name">Lifecycle</h3>
+                </a>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableView(im)layoutSubviews"></a>
+                    <a name="//apple_ref/swift/Method/layoutSubviews()" class="dashAnchor"></a>
+                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableView(im)layoutSubviews">layoutSubviews()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Undocumented</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTableView</span><span class="p">:</span> <span class="kt">UIScrollView</span><span class="p">,</span> <span class="kt"><a href="../Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a></span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableViewAAC10reloadDatayyF"></a>
+                    <a name="//apple_ref/swift/Method/reloadData()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableViewAAC10reloadDatayyF">reloadData()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Populates row and cell datas from its data source and redraws time table.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">reloadData</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+            <div class="task-group">
+              <div class="task-name-container">
+                <a name="/MIDITimeTableCellViewDelegate"></a>
+                <a name="//apple_ref/swift/Section/MIDITimeTableCellViewDelegate" class="dashAnchor"></a>
+                <a href="#/MIDITimeTableCellViewDelegate">
+                  <h3 class="section-name">MIDITimeTableCellViewDelegate</h3>
+                </a>
+              </div>
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0ab4CellC8DelegateP08midiTimebdC7DidMoveyAA0abdC0C_So22UIPanGestureRecognizerC3pantF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableCellViewDidMove(_:pan:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0ab4CellC8DelegateP08midiTimebdC7DidMoveyAA0abdC0C_So22UIPanGestureRecognizerC3pantF">midiTimeTableCellViewDidMove(_:pan:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">midiTimeTableCellViewDidMove</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableCellView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableCellView.html">MIDITimeTableCellView</a></span><span class="p">,</span> <span class="nv">pan</span><span class="p">:</span> <span class="kt">UIPanGestureRecognizer</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0ab4CellC8DelegateP08midiTimebdC9DidResizeyAA0abdC0C_So22UIPanGestureRecognizerC3pantF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableCellViewDidResize(_:pan:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0ab4CellC8DelegateP08midiTimebdC9DidResizeyAA0abdC0C_So22UIPanGestureRecognizerC3pantF">midiTimeTableCellViewDidResize(_:pan:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">midiTimeTableCellViewDidResize</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableCellView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableCellView.html">MIDITimeTableCellView</a></span><span class="p">,</span> <span class="nv">pan</span><span class="p">:</span> <span class="kt">UIPanGestureRecognizer</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0ab4CellC8DelegateP08midiTimebdC9DidDeleteyAA0abdC0CF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableCellViewDidDelete(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0ab4CellC8DelegateP08midiTimebdC9DidDeleteyAA0abdC0CF">midiTimeTableCellViewDidDelete(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">midiTimeTableCellViewDidDelete</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableCellView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableCellView.html">MIDITimeTableCellView</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2017 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2017-10-17)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>

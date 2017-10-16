@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>MIDITimeTableViewDelegate Protocol Reference</title>
+    <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
+    <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
+    <meta charset='utf-8'>
+    <script src="../js/jquery.min.js" defer></script>
+    <script src="../js/jazzy.js" defer></script>
+    
+  </head>
+  <body>
+    <a name="//apple_ref/swift/Protocol/MIDITimeTableViewDelegate" class="dashAnchor"></a>
+    <a title="MIDITimeTableViewDelegate Protocol Reference"></a>
+    <header>
+      <div class="content-wrapper">
+        <p><a href="../index.html">MIDITimeTableView Docs</a> (82% documented)</p>
+        <p class="header-right"><a href="https://github.com/cemolcay/MIDITimeTableView"><img src="../img/gh.png"/>View on GitHub</a></p>
+      </div>
+    </header>
+    <div class="content-wrapper">
+      <p id="breadcrumbs">
+        <a href="../index.html">MIDITimeTableView Reference</a>
+        <img id="carat" src="../img/carat.png" />
+        MIDITimeTableViewDelegate Protocol Reference
+      </p>
+    </div>
+    <div class="content-wrapper">
+      <nav class="sidebar">
+        <ul class="nav-groups">
+          <li class="nav-group-name">
+            <a href="../Classes.html">Classes</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTableCellView.html">MIDITimeTableCellView</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTableGridLayer.html">MIDITimeTableGridLayer</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes.html#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableHeaderCellView">MIDITimeTableHeaderCellView</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTableMeasureLayer.html">MIDITimeTableMeasureLayer</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTableMeasureView.html">MIDITimeTableMeasureView</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Enums.html">Enumerations</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Protocols.html">Protocols</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableViewDelegate.html">MIDITimeTableViewDelegate</a>
+              </li>
+            </ul>
+          </li>
+          <li class="nav-group-name">
+            <a href="../Structs.html">Structures</a>
+            <ul class="nav-group-tasks">
+              <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableRowData.html">MIDITimeTableRowData</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableTimeSignature.html">MIDITimeTableTimeSignature</a>
+              </li>
+            </ul>
+          </li>
+        </ul>
+      </nav>
+      <article class="main-content">
+        <section>
+          <section class="section">
+            <h1>MIDITimeTableViewDelegate</h1>
+              <div class="declaration">
+                <div class="language">
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableViewDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
+
+                </div>
+              </div>
+            <p>Delegate functions to inform about editing cells and sizing of the time table.</p>
+
+          </section>
+          <section class="section task-group-section">
+            <div class="task-group">
+              <ul>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_Si13didEditCellAtSi5indexSi03newI3RowSd0lI8PositionSd0lI8DurationtF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableView(_:didEditCellAt:index:newCellRow:newCellPosition:newCellDuration:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_Si13didEditCellAtSi5indexSi03newI3RowSd0lI8PositionSd0lI8DurationtF">midiTimeTableView(_:didEditCellAt:index:newCellRow:newCellPosition:newCellDuration:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Informs about the cell is either moved to another position, changed duration or changed position in a current or a new row.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">,</span> <span class="n">didEditCellAt</span> <span class="nv">row</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">index</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">newCellRow</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">newCellPosition</span><span class="p">:</span> <span class="kt">Double</span><span class="p">,</span> <span class="nv">newCellDuration</span><span class="p">:</span> <span class="kt">Double</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>midiTimeTableView</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Time table that performed changes on.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>row</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Initial row index of the edited cell.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>index</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Index of the cell in the initial row index.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>newCellRow</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Last row index of cell after editing.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>newCellPosition</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Last position of cell after editing.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>newCellDuration</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Last duration of cell after editing.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_Si15didDeleteCellAtSi5indextF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableView(_:didDeleteCellAt:index:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_Si15didDeleteCellAtSi5indextF">midiTimeTableView(_:didDeleteCellAt:index:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Informs about the cell is being deleted.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">,</span> <span class="n">didDeleteCellAt</span> <span class="nv">row</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">index</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>midiTimeTableView</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Time table that performed changes on.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>row</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Row index of the cell.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>index</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Index of the cell in the row.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebc16HeightForMeasureC012CoreGraphics7CGFloatVA2ACF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableViewHeightForMeasureView(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebc16HeightForMeasureC012CoreGraphics7CGFloatVA2ACF">midiTimeTableViewHeightForMeasureView(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Measure view height in the time table.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewHeightForMeasureView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGFloat</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>midiTimeTableView</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Time table to set its measure view&rsquo;s height.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Height of measure view.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC13HeightForRows12CoreGraphics7CGFloatVA2ACF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableViewHeightForRows(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC13HeightForRows12CoreGraphics7CGFloatVA2ACF">midiTimeTableViewHeightForRows(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Height of each row in the time table.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewHeightForRows</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGFloat</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>midiTimeTableView</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Time table to set its rows height.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Height of each row.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC22WidthForRowHeaderCells12CoreGraphics7CGFloatVA2ACF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableViewWidthForRowHeaderCells(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC22WidthForRowHeaderCells12CoreGraphics7CGFloatVA2ACF">midiTimeTableViewWidthForRowHeaderCells(_:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Width of header cells in each row.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewWidthForRowHeaderCells</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGFloat</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>midiTimeTableView</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Time table to set its header cells widths in each row.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Width of header cell in each row.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+              </ul>
+            </div>
+          </section>
+        </section>
+        <section id="footer">
+          <p>&copy; 2017 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2017-10-17)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+        </section>
+      </article>
+    </div>
+  </body>
+</div>
+</html>
