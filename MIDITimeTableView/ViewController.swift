@@ -154,6 +154,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAt row: Int, index: Int) {
     rowData[row].cells.remove(at: index)
+    timeTableView?.reloadData()
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAt row: Int, index: Int, newCellRow: Int, newCellPosition: Double, newCellDuration: Double) {

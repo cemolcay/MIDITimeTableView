@@ -115,6 +115,7 @@ public class MIDITimeTableMeasureView: UIView {
 public protocol MIDITimeTableCellViewDelegate: class {
   func midiTimeTableCellViewDidMove(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer)
   func midiTimeTableCellViewDidResize(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer)
+  func midiTimeTableCellViewDidDelete(_ midiTimeTableCellView: MIDITimeTableCellView)
 }
 
 public class MIDITimeTableCellView: UIView {
@@ -122,6 +123,10 @@ public class MIDITimeTableCellView: UIView {
   private var resizeViewWidthConstraint: NSLayoutConstraint?
   public var resizePanThreshold: CGFloat = 10
   public weak var delegate: MIDITimeTableCellViewDelegate?
+
+  public override var canBecomeFirstResponder: Bool {
+    return true
+  }
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -153,6 +158,9 @@ public class MIDITimeTableCellView: UIView {
 
     let resizeGesture = UIPanGestureRecognizer(target: self, action: #selector(didResize(pan:)))
     resizeView.addGestureRecognizer(resizeGesture)
+
+    let longPressGesure = UILongPressGestureRecognizer(target: self, action: #selector(didLongPress(longPress:)))
+    addGestureRecognizer(longPressGesure)
   }
 
   public override func layoutSubviews() {
@@ -166,6 +174,26 @@ public class MIDITimeTableCellView: UIView {
 
   @objc public func didResize(pan: UIPanGestureRecognizer) {
     delegate?.midiTimeTableCellViewDidResize(self, pan: pan)
+  }
+
+  @objc public func didLongPress(longPress: UILongPressGestureRecognizer) {
+    guard let superview = superview else { return }
+    becomeFirstResponder()
+
+    let menu = UIMenuController.shared
+    menu.menuItems = [
+      UIMenuItem(
+        title: NSLocalizedString("Delete", comment: "Delete button"),
+        action: #selector(didPressDeleteButton))
+    ]
+    menu.arrowDirection = .up
+    menu.setTargetRect(frame, in: superview)
+    menu.setMenuVisible(true, animated: true)
+  }
+
+  @objc public func didPressDeleteButton() {
+    UIMenuController.shared.setMenuVisible(false, animated: true)
+    delegate?.midiTimeTableCellViewDidDelete(self)
   }
 }
 
@@ -552,6 +580,12 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
     if case .ended = pan.state {
       didEditCell(midiTimeTableCellView)
     }
+  }
+
+  public func midiTimeTableCellViewDidDelete(_ midiTimeTableCellView: MIDITimeTableCellView) {
+    let row = Int((midiTimeTableCellView.frame.minY - measureHeight) / rowHeight)
+    guard let index = cellViews[row].index(of: midiTimeTableCellView) else { return }
+    timeTableDelegate?.midiTimeTableView(self, didDeleteCellAt: row, index: index)
   }
 
   private func didEditCell(_ cellView: MIDITimeTableCellView) {
