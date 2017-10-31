@@ -26,6 +26,7 @@ public class MIDITimeTableMeasureView: UIView {
     let width = frame.width / CGFloat(barCount)
     for i in 0..<barCount {
       let barLayer = MIDITimeTableMeasureLayer()
+      barLayer.tintColor = tintColor
       barLayer.showsBarNumber = showsBarNumbers
       barLayer.beatCount = beatCount
       barLayer.barNumber = i + 1

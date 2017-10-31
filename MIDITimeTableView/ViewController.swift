@@ -30,8 +30,10 @@ class HeaderCellView: MIDITimeTableHeaderCellView {
 
   func commonInit() {
     addSubview(titleLabel)
+    backgroundColor = UIColor(red: 36.0/255.0, green: 40.0/255.0, blue: 41.0/255.0, alpha: 1)
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.textAlignment = .center
+    titleLabel.textColor = UIColor(red: 216.0/255.0, green: 214.0/255.0, blue: 217.0/255.0, alpha: 1)
     titleLabel.font = UIFont.boldSystemFont(ofSize: 15)
     titleLabel.fill(to: self)
   }
@@ -57,11 +59,14 @@ class CellView: MIDITimeTableCellView {
   }
 
   func commonInit() {
+    backgroundColor = .clear
+    titleLabel.backgroundColor = UIColor(red: 16.0/255.0, green: 92.0/255.0, blue: 28.0/255.0, alpha: 1)
     addSubview(titleLabel)
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.textAlignment = .center
+    titleLabel.textColor = .white
     titleLabel.fill(to: self, insets: UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0))
-    titleLabel.backgroundColor = .white
+    titleLabel.layer.masksToBounds = true
     titleLabel.layer.borderColor = UIColor.black.cgColor
     titleLabel.layer.borderWidth = 1
     titleLabel.layer.cornerRadius = 5
@@ -153,6 +158,12 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     timeTableView?.timeTableDelegate = self
     timeTableView?.gridLayer.showsSubbeatLines = false
     timeTableView?.reloadData()
+    timeTableView?.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
+    timeTableView?.measureView.backgroundColor = UIColor(red: 26.0/255.0, green: 28.0/255.0, blue: 27.0/255.0, alpha: 1)
+    timeTableView?.measureView.tintColor = UIColor(red: 119.0/255.0, green: 121.0/255.0, blue: 120.0/255.0, alpha: 1)
+    timeTableView?.gridLayer.rowLineColor = .black
+    timeTableView?.gridLayer.barLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
+    timeTableView?.gridLayer.beatLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
   }
 
   // MARK: MIDITimeTableViewDataSource
@@ -177,7 +188,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   }
 
   func midiTimeTableViewHeightForMeasureView(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
-    return 30
+    return 20
   }
 
   func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
