@@ -32,7 +32,7 @@ public protocol MIDITimeTableCellViewDelegate: class {
 }
 
 /// Base cell view that shows on `MIDITimeTableView`. Has abilitiy to move, resize and delete.
-public class MIDITimeTableCellView: UIView {
+open class MIDITimeTableCellView: UIView {
   /// View that holds the pan gesture on right most side in the view to use in resizing cell.
   private var resizeView = UIView()
   /// Width constraint of resize view to be able to change its width ratio later.
@@ -42,7 +42,7 @@ public class MIDITimeTableCellView: UIView {
   /// Delegate that informs about editing cell.
   public weak var delegate: MIDITimeTableCellViewDelegate?
 
-  public override var canBecomeFirstResponder: Bool {
+  open override var canBecomeFirstResponder: Bool {
     return true
   }
 
@@ -81,7 +81,7 @@ public class MIDITimeTableCellView: UIView {
     addGestureRecognizer(longPressGesure)
   }
 
-  public override func layoutSubviews() {
+  open override func layoutSubviews() {
     super.layoutSubviews()
     resizeViewWidthConstraint?.constant = resizePanThreshold
   }

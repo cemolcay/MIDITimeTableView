@@ -72,7 +72,7 @@ public protocol MIDITimeTableViewDelegate: class {
 }
 
 /// Draws time table with multiple rows and editable cells. Heavily customisable.
-public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
+open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   /// Property to show measure bar. Defaults true.
   public var showsMeasure: Bool = true
   /// Property to show header cells in each row. Defaults true.
@@ -152,7 +152,7 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
 
   // MARK: Lifecycle
 
-  public override func layoutSubviews() {
+  open override func layoutSubviews() {
     super.layoutSubviews()
 
     for (index, row) in rowHeaderCellViews.enumerated() {
@@ -179,7 +179,13 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
       }
     }
 
-    measureView.barCount = Int(ceil(duration / Double(measureView.beatCount)))
+    // Calculate optimum bar count for measureView.
+    // Fit measure view in time table frame even if not enough data to show in time table.
+    let minBarCount = Int(ceil(frame.size.width / measureWidth))
+    var barCount = Int(ceil(duration / Double(measureView.beatCount)))
+    barCount = max(barCount, minBarCount)
+    measureView.barCount = barCount
+
     measureView.frame = CGRect(
       x: headerCellWidth,
       y: 0,
