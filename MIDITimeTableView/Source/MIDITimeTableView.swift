@@ -80,6 +80,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   /// Property to show grid. Defaults true.
   public var showsGrid: Bool = true
 
+  /// Speed of zooming by pinch gesture.
+  public var zoomSpeed: CGFloat = 0.4
   /// Maximum width of a measure bar after zooming in. Defaults 500.
   public var maxMeasureWidth: CGFloat = 500
   /// Minimum width of a measure bar after zooming out. Defaults 100.
@@ -233,15 +235,25 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
       }
       cellViews.append(cells)
     }
+
+    gridLayer.setNeedsLayout()
   }
 
   // MARK: Zooming
 
-  private var lastScale: CGFloat = 0
   @objc func didPinch(pinch: UIPinchGestureRecognizer) {
-    measureWidth += (lastScale < pinch.scale ? 1 : -1) * pinch.scale
-    lastScale = pinch.scale
-    setNeedsLayout()
+    switch pinch.state {
+    case .began, .changed:
+      var deltaScale = pinch.scale
+      deltaScale = ((deltaScale - 1) * zoomSpeed) + 1
+      deltaScale = min(deltaScale, maxMeasureWidth/measureWidth)
+      deltaScale = max(deltaScale, minMeasureWidth/measureWidth)
+      measureWidth *= deltaScale
+      setNeedsLayout()
+      pinch.scale = 1
+    default:
+      return
+    }
   }
 
   // MARK: MIDITimeTableCellViewDelegate
