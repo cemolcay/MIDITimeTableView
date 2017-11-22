@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "MIDITimeTableView"
-  s.version      = "0.0.1"
+  s.version      = "0.0.2"
   s.summary      = "Customisable and editable time table grid for showing midi or audio related data with a measure."
 
   # This description is used to generate tags and improve search results.
