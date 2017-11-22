@@ -9,7 +9,7 @@
 import UIKit
 
 /// Draws a time signature measure with beat and subbeat bars.
-public class MIDITimeTableMeasureLayer: CALayer {
+open class MIDITimeTableMeasureLayer: CALayer {
   /// Text layer that optionally shows bar number on it.
   public var textLayer = CATextLayer()
   /// Shape layer that draws measure bars.
@@ -19,7 +19,9 @@ public class MIDITimeTableMeasureLayer: CALayer {
   /// Number of beats in the measure.
   public var beatCount = 4
   /// Number of bar to show in text layer.
-  public var barNumber = 1
+  public var barNumber = 0
+  /// Text and bar colors.
+  public var tintColor: UIColor = .black
 
   /// Initilizes layer.
   public override init() {
@@ -42,12 +44,12 @@ public class MIDITimeTableMeasureLayer: CALayer {
     addSublayer(shapeLayer)
   }
 
-  public override func layoutSublayers() {
+  open override func layoutSublayers() {
     super.layoutSublayers()
     // Text layer
     textLayer.frame = CGRect(x: 2, y: 0, width: frame.width, height: frame.height/2)
     textLayer.fontSize = frame.height/2
-    textLayer.foregroundColor = UIColor.black.cgColor
+    textLayer.foregroundColor = tintColor.cgColor
     textLayer.contentsScale = UIScreen.main.scale
     textLayer.alignmentMode = kCAAlignmentLeft
     textLayer.string = showsBarNumber ? "\(barNumber)" : ""
@@ -71,6 +73,6 @@ public class MIDITimeTableMeasureLayer: CALayer {
     // Draw measure
     shapeLayer.path = path.cgPath
     shapeLayer.lineWidth = 1
-    shapeLayer.strokeColor = UIColor.gray.cgColor
+    shapeLayer.strokeColor = tintColor.cgColor
   }
 }

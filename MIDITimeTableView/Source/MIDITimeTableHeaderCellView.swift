@@ -9,6 +9,6 @@
 import UIKit
 
 /// Base class to header cell in each row of `MIDITimeTableView`.
-public class MIDITimeTableHeaderCellView: UIView {
+open class MIDITimeTableHeaderCellView: UIView {
 
 }

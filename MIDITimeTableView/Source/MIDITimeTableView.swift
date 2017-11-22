@@ -72,7 +72,7 @@ public protocol MIDITimeTableViewDelegate: class {
 }
 
 /// Draws time table with multiple rows and editable cells. Heavily customisable.
-public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
+open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   /// Property to show measure bar. Defaults true.
   public var showsMeasure: Bool = true
   /// Property to show header cells in each row. Defaults true.
@@ -80,6 +80,8 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   /// Property to show grid. Defaults true.
   public var showsGrid: Bool = true
 
+  /// Speed of zooming by pinch gesture.
+  public var zoomSpeed: CGFloat = 0.4
   /// Maximum width of a measure bar after zooming in. Defaults 500.
   public var maxMeasureWidth: CGFloat = 500
   /// Minimum width of a measure bar after zooming out. Defaults 100.
@@ -100,8 +102,8 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   /// Measure view that draws measure bars on it. You can customise its style.
   public private(set) var measureView = MIDITimeTableMeasureView()
 
-  private var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
-  private var cellViews = [[MIDITimeTableCellView]]()
+  public private(set) var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
+  public private(set) var cellViews = [[MIDITimeTableCellView]]()
   private var editingCellRow: Int?
 
   /// Data source object of the time table to populate its data.
@@ -152,7 +154,7 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
 
   // MARK: Lifecycle
 
-  public override func layoutSubviews() {
+  open override func layoutSubviews() {
     super.layoutSubviews()
 
     for (index, row) in rowHeaderCellViews.enumerated() {
@@ -179,7 +181,13 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
       }
     }
 
-    measureView.barCount = Int(ceil(duration / Double(measureView.beatCount)))
+    // Calculate optimum bar count for measureView.
+    // Fit measure view in time table frame even if not enough data to show in time table.
+    let minBarCount = Int(ceil(frame.size.width / measureWidth))
+    var barCount = Int(ceil(duration / Double(measureView.beatCount))) + 1
+    barCount = max(barCount, minBarCount)
+    measureView.barCount = barCount
+
     measureView.frame = CGRect(
       x: headerCellWidth,
       y: 0,
@@ -227,15 +235,25 @@ public class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
       }
       cellViews.append(cells)
     }
+
+    gridLayer.setNeedsLayout()
   }
 
   // MARK: Zooming
 
-  private var lastScale: CGFloat = 0
   @objc func didPinch(pinch: UIPinchGestureRecognizer) {
-    measureWidth += (lastScale < pinch.scale ? 1 : -1) * pinch.scale
-    lastScale = pinch.scale
-    setNeedsLayout()
+    switch pinch.state {
+    case .began, .changed:
+      var deltaScale = pinch.scale
+      deltaScale = ((deltaScale - 1) * zoomSpeed) + 1
+      deltaScale = min(deltaScale, maxMeasureWidth/measureWidth)
+      deltaScale = max(deltaScale, minMeasureWidth/measureWidth)
+      measureWidth *= deltaScale
+      setNeedsLayout()
+      pinch.scale = 1
+    default:
+      return
+    }
   }
 
   // MARK: MIDITimeTableCellViewDelegate
