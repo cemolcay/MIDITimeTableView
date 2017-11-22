@@ -154,6 +154,16 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
   override func viewDidLoad() {
     super.viewDidLoad()
+    rowData = [MIDITimeTableRowData(
+      cells: [
+        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
+        ],
+      headerCellView: HeaderCellView(title: "Chords"),
+      cellView: { cellData in
+        let title = cellData.data as? String ?? ""
+        return CellView(title: title)
+    })]
+
     timeTableView?.dataSource = self
     timeTableView?.timeTableDelegate = self
     timeTableView?.gridLayer.showsSubbeatLines = false

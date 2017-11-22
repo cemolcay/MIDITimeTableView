@@ -102,6 +102,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   /// Measure view that draws measure bars on it. You can customise its style.
   public private(set) var measureView = MIDITimeTableMeasureView()
 
+  // Delegate and data source references
+  private var rowData = [MIDITimeTableRowData]()
   public private(set) var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
   public private(set) var cellViews = [[MIDITimeTableCellView]]()
   private var editingCellRow: Int?
@@ -111,17 +113,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   /// Delegate object of the time table to inform about changes and customise sizing.
   public weak var timeTableDelegate: MIDITimeTableViewDelegate?
 
-  private var rowHeight: CGFloat {
-    return timeTableDelegate?.midiTimeTableViewHeightForRows(self) ?? 60
-  }
-
-  private var measureHeight: CGFloat {
-    return showsMeasure ? timeTableDelegate?.midiTimeTableViewHeightForMeasureView(self) ?? 30 : 0
-  }
-
-  private var headerCellWidth: CGFloat {
-    return showsHeaders ? timeTableDelegate?.midiTimeTableViewWidthForRowHeaderCells(self) ?? 120 : 0
-  }
+  private var rowHeight: CGFloat = 60
+  private var measureHeight: CGFloat = 30
+  private var headerCellWidth: CGFloat = 120
 
   private var beatWidth: CGFloat {
     return measureWidth / CGFloat(measureView.beatCount)
@@ -166,8 +160,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
     }
 
     var duration = 0.0
-    for i in 0..<(dataSource?.numberOfRows(in: self) ?? 0) {
-      guard let row = dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
+    for i in 0..<rowData.count {
+      let row = rowData[i]
       duration = row.duration > duration ? row.duration : duration
       for (index, cell) in row.cells.enumerated() {
         let cellView = cellViews[i][index]
@@ -198,6 +192,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
       width: headerCellWidth + measureView.frame.width,
       height: measureView.frame.height + (rowHeight * CGFloat(rowHeaderCellViews.count)))
 
+    // Grid layer
     gridLayer.rowCount = rowHeaderCellViews.count
     gridLayer.barCount = measureView.barCount
     gridLayer.rowHeight = rowHeight
@@ -206,11 +201,12 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
     gridLayer.measureHeight = measureHeight
     gridLayer.beatCount = measureView.beatCount
     gridLayer.isHidden = !showsGrid
-    gridLayer.frame = CGRect(x: 0, y: 0, width: contentSize.width, height: frame.size.height)
+    gridLayer.frame = CGRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height)
   }
 
   /// Populates row and cell datas from its data source and redraws time table.
   public func reloadData() {
+    // Data source
     rowHeaderCellViews.forEach({ $0.removeFromSuperview() })
     rowHeaderCellViews = []
     cellViews.flatMap({ $0 }).forEach({ $0.removeFromSuperview() })
@@ -220,8 +216,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
     let timeSignature = dataSource?.timeSignature(of: self) ?? MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
     measureView.beatCount = timeSignature.beats
 
+    rowData.removeAll()
     for i in 0..<numberOfRows {
       guard let row = dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
+      rowData.insert(row, at: i)
       let rowHeaderCell = row.headerCellView
       rowHeaderCellViews.append(rowHeaderCell)
       addSubview(rowHeaderCell)
@@ -235,6 +233,11 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
       }
       cellViews.append(cells)
     }
+
+    // Delegate
+    rowHeight = timeTableDelegate?.midiTimeTableViewHeightForRows(self) ?? rowHeight
+    measureHeight = showsMeasure ? (timeTableDelegate?.midiTimeTableViewHeightForMeasureView(self) ?? measureHeight) : 0
+    headerCellWidth = showsHeaders ? timeTableDelegate?.midiTimeTableViewWidthForRowHeaderCells(self) ?? headerCellWidth : 0
 
     gridLayer.setNeedsLayout()
   }
