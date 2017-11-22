@@ -102,8 +102,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   /// Measure view that draws measure bars on it. You can customise its style.
   public private(set) var measureView = MIDITimeTableMeasureView()
 
-  private var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
-  private var cellViews = [[MIDITimeTableCellView]]()
+  public private(set) var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
+  public private(set) var cellViews = [[MIDITimeTableCellView]]()
   private var editingCellRow: Int?
 
   /// Data source object of the time table to populate its data.
