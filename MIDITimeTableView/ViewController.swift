@@ -174,6 +174,12 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     timeTableView?.gridLayer.rowLineColor = .black
     timeTableView?.gridLayer.barLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
     timeTableView?.gridLayer.beatLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
+    timeTableView?.playheadView.tintColor = UIColor.gray.withAlphaComponent(0.5)
+    view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTap(tap:))))
+  }
+
+  @objc func didTap(tap: UITapGestureRecognizer) {
+    timeTableView?.playheadView.position += 1.0
   }
 
   // MARK: MIDITimeTableViewDataSource

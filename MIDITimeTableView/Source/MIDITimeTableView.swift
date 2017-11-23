@@ -72,13 +72,15 @@ public protocol MIDITimeTableViewDelegate: class {
 }
 
 /// Draws time table with multiple rows and editable cells. Heavily customisable.
-open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
+open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDITimeTablePlayheadViewDelegate {
   /// Property to show measure bar. Defaults true.
   public var showsMeasure: Bool = true
   /// Property to show header cells in each row. Defaults true.
   public var showsHeaders: Bool = true
   /// Property to show grid. Defaults true.
   public var showsGrid: Bool = true
+  /// Property to show playhead. Defaults true.
+  public var showsPlayhead: Bool = true
 
   /// Speed of zooming by pinch gesture.
   public var zoomSpeed: CGFloat = 0.4
@@ -101,6 +103,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
   public private(set) var gridLayer = MIDITimeTableGridLayer()
   /// Measure view that draws measure bars on it. You can customise its style.
   public private(set) var measureView = MIDITimeTableMeasureView()
+  /// Playhead view that shows the current position in timetable. You can set is hidden or movable status as well as its position.
+  public private(set) var playheadView = MIDITimeTablePlayheadView()
 
   // Delegate and data source references
   private var rowData = [MIDITimeTableRowData]()
@@ -139,6 +143,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
 
   private func commonInit() {
     addSubview(measureView)
+    addSubview(playheadView)
+    playheadView.delegate = self
     layer.insertSublayer(gridLayer, at: 0)
     let pinch = UIPinchGestureRecognizer(
       target: self,
@@ -191,6 +197,14 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
     contentSize = CGSize(
       width: headerCellWidth + measureView.frame.width,
       height: measureView.frame.height + (rowHeight * CGFloat(rowHeaderCellViews.count)))
+
+    // Playhead
+    playheadView.rowHeaderWidth = headerCellWidth
+    playheadView.measureHeight = measureHeight
+    playheadView.lineHeight = contentSize.height - measureHeight
+    playheadView.measureBeatWidth = measureWidth / CGFloat(measureView.beatCount)
+    playheadView.isHidden = !showsPlayhead
+    bringSubview(toFront: playheadView)
 
     // Grid layer
     gridLayer.rowCount = rowHeaderCellViews.count
@@ -344,6 +358,27 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate {
     editingCellRow = nil
     if row != newCellRow {
       reloadData()
+    }
+  }
+
+  // MARK: MIDITimeTablePlayheadViewDelegate
+
+  public func playheadView(_ playheadView: MIDITimeTablePlayheadView, didPan panGestureRecognizer: UIPanGestureRecognizer) {
+    let translation = panGestureRecognizer.translation(in: self)
+
+    // Horizontal move
+    if translation.x > subbeatWidth, playheadView.frame.maxX < contentSize.width {
+      playheadView.position += 0.25
+//      playheadView.center = CGPoint(
+//        x: playheadView.center.x + subbeatWidth,
+//        y: playheadView.center.y)
+      panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+    } else if translation.x < -subbeatWidth, playheadView.frame.minX > headerCellWidth {
+      playheadView.position -= 0.25
+//      playheadView.center = CGPoint(
+//        x: playheadView.center.x - subbeatWidth,
+//        y: playheadView.center.y)
+      panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
     }
   }
 }
