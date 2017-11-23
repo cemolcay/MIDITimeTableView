@@ -69,6 +69,11 @@ public protocol MIDITimeTableViewDelegate: class {
   /// - Parameter midiTimeTableView: Time table to set its header cells widths in each row.
   /// - Returns: Width of header cell in each row.
   func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat
+
+  /// Informs about user updated playhead position.
+  ///
+  /// - Parameter midiTimeTableView: Time table that updated.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double)
 }
 
 /// Draws time table with multiple rows and editable cells. Heavily customisable.
@@ -369,15 +374,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // Horizontal move
     if translation.x > subbeatWidth, playheadView.frame.maxX < contentSize.width {
       playheadView.position += 0.25
-//      playheadView.center = CGPoint(
-//        x: playheadView.center.x + subbeatWidth,
-//        y: playheadView.center.y)
       panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
     } else if translation.x < -subbeatWidth, playheadView.frame.minX > headerCellWidth {
       playheadView.position -= 0.25
-//      playheadView.center = CGPoint(
-//        x: playheadView.center.x - subbeatWidth,
-//        y: playheadView.center.y)
       panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
     }
   }

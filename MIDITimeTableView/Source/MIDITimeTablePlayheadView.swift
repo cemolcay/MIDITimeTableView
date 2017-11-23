@@ -10,23 +10,41 @@ import UIKit
 
 /// Delegate that informs about playhead is going to move.
 public protocol MIDITimeTablePlayheadViewDelegate: class {
+  /// Delegate method that should update playhead's position based on pan gesture translation in timetable view.
+  ///
+  /// - Parameters:
+  ///   - playheadView: Playhead that panning.
+  ///   - panGestureRecognizer: Pan gesture that pans playhead.
   func playheadView(_ playheadView: MIDITimeTablePlayheadView, didPan panGestureRecognizer: UIPanGestureRecognizer)
 }
 
+/// Draws a triangle, movable playhead that customisable with a custom shape layer or an image.
 public class MIDITimeTablePlayheadView: UIView {
+  /// Current position on timetable. Based on beats.
   public var position: Double = 0.0 { didSet{ updatePosition() }}
+  /// MIDITimeTableMeasureView's width that used in layout playhead in timetable.
   public var measureBeatWidth: CGFloat = 0.0 { didSet{ updatePosition() }}
+  /// MIDITimeTableMeasureView's height that used in layout playhead in timetable.
   public var measureHeight: CGFloat = 0.0 { didSet{ updatePosition() }}
+  /// MIDITimeTableHeaderCellView's width that used in layout playhead in timetable.
   public var rowHeaderWidth: CGFloat = 0.0 { didSet{ updatePosition() }}
 
+  /// Optional image for playhead instead of default triangle shape layer.
   public var image: UIImage? { didSet{ updateImage() }}
+  /// Shape layer that draws triangle playhead shape. You can change the default shape.
   public var shapeLayer = CAShapeLayer() { didSet{ setNeedsLayout() } }
 
+  /// Playhead's guide line color that draws on timetable.
   public var lineColor: UIColor = .white { didSet{ setNeedsLayout() }}
+  /// Playhead's guide line height that draws on timetable. It's best to match timetable's content height.
   public var lineHeight: CGFloat = 0 { didSet{ setNeedsLayout() }}
+  /// Playhead's guide line width that draws on timetable.
   public var lineWidth: CGFloat = 1 / UIScreen.main.scale { didSet{ setNeedsLayout() }}
+  /// Line layer that draws playhead's position guide on timetable.
   private var lineLayer = CALayer()
+  /// Optional image view that initilizes if an image assings.
   private var imageView: UIImageView?
+  /// Delegate of playhead.
   public weak var delegate: MIDITimeTablePlayheadViewDelegate?
 
   // MARK: Init

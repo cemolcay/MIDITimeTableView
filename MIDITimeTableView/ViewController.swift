@@ -227,5 +227,9 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
       rowData[row].cells.remove(at: index)
       rowData[newCellRow].cells.append(cell)
     }
-  } 
+  }
+
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double) {
+    return
+  }
 }
