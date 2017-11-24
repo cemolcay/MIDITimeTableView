@@ -21,7 +21,7 @@ public protocol MIDITimeTablePlayheadViewDelegate: class {
 /// Draws a triangle, movable playhead that customisable with a custom shape layer or an image.
 public class MIDITimeTablePlayheadView: UIView {
   /// Current position on timetable. Based on beats.
-  public dynamic var position: Double = 0.0 { didSet{ updatePosition() }}
+  @objc public dynamic var position: Double = 0.0 { didSet{ updatePosition() }}
   /// MIDITimeTableMeasureView's width that used in layout playhead in timetable.
   public var measureBeatWidth: CGFloat = 0.0 { didSet{ updatePosition() }}
   /// MIDITimeTableMeasureView's height that used in layout playhead in timetable.
