@@ -374,9 +374,11 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // Horizontal move
     if translation.x > subbeatWidth, playheadView.frame.maxX < contentSize.width {
       playheadView.position += 0.25
+      timeTableDelegate?.midiTimeTableView(self, didUpdatePlayhead: playheadView.position)
       panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
     } else if translation.x < -subbeatWidth, playheadView.frame.minX > headerCellWidth {
       playheadView.position -= 0.25
+      timeTableDelegate?.midiTimeTableView(self, didUpdatePlayhead: playheadView.position)
       panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
     }
   }
