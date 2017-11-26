@@ -34,9 +34,7 @@ public protocol MIDITimeTableCellViewDelegate: class {
 /// Base cell view that shows on `MIDITimeTableView`. Has abilitiy to move, resize and delete.
 open class MIDITimeTableCellView: UIView {
   /// View that holds the pan gesture on right most side in the view to use in resizing cell.
-  private var resizeView = UIView()
-  /// Width constraint of resize view to be able to change its width ratio later.
-  private var resizeViewWidthConstraint: NSLayoutConstraint?
+  private let resizeView = UIView()
   /// Inset from the rightmost side on the cell to capture resize gesture.
   public var resizePanThreshold: CGFloat = 10
   /// Delegate that informs about editing cell.
@@ -45,6 +43,8 @@ open class MIDITimeTableCellView: UIView {
   open override var canBecomeFirstResponder: Bool {
     return true
   }
+
+  // MARK: Init
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -58,33 +58,28 @@ open class MIDITimeTableCellView: UIView {
 
   private func commonInit() {
     addSubview(resizeView)
-    resizeView.translatesAutoresizingMaskIntoConstraints = false
-    resizeView.pinRight(to: self)
-    resizeView.fillVertical(to: self)
-    resizeViewWidthConstraint = NSLayoutConstraint(
-      item: resizeView,
-      attribute: .width,
-      relatedBy: .equal,
-      toItem: nil,
-      attribute: .notAnAttribute,
-      multiplier: 1,
-      constant: resizePanThreshold)
-    resizeView.addConstraint(resizeViewWidthConstraint!)
+    let resizeGesture = UIPanGestureRecognizer(target: self, action: #selector(didResize(pan:)))
+    resizeView.addGestureRecognizer(resizeGesture)
 
     let moveGesture = UIPanGestureRecognizer(target: self, action: #selector(didMove(pan:)))
     addGestureRecognizer(moveGesture)
-
-    let resizeGesture = UIPanGestureRecognizer(target: self, action: #selector(didResize(pan:)))
-    resizeView.addGestureRecognizer(resizeGesture)
 
     let longPressGesure = UILongPressGestureRecognizer(target: self, action: #selector(didLongPress(longPress:)))
     addGestureRecognizer(longPressGesure)
   }
 
+  // MARK: Layout
+
   open override func layoutSubviews() {
     super.layoutSubviews()
-    resizeViewWidthConstraint?.constant = resizePanThreshold
+    resizeView.frame = CGRect(
+      x: frame.size.width - resizePanThreshold,
+      y: 0,
+      width: resizePanThreshold,
+      height: frame.size.height)
   }
+
+  // MARK: Gestures
 
   @objc public func didMove(pan: UIPanGestureRecognizer) {
     delegate?.midiTimeTableCellViewDidMove(self, pan: pan)

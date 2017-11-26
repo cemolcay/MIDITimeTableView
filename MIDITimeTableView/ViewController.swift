@@ -60,12 +60,12 @@ class CellView: MIDITimeTableCellView {
 
   func commonInit() {
     backgroundColor = .clear
-    titleLabel.backgroundColor = UIColor(red: 16.0/255.0, green: 92.0/255.0, blue: 28.0/255.0, alpha: 1)
     addSubview(titleLabel)
+    titleLabel.backgroundColor = UIColor(red: 16.0/255.0, green: 92.0/255.0, blue: 28.0/255.0, alpha: 1)
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
+    titleLabel.fill(to: self, insets: UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0))
     titleLabel.textAlignment = .center
     titleLabel.textColor = .white
-    titleLabel.fill(to: self, insets: UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0))
     titleLabel.layer.masksToBounds = true
     titleLabel.layer.borderColor = UIColor.black.cgColor
     titleLabel.layer.borderWidth = 1

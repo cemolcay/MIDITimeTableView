@@ -122,6 +122,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// Delegate object of the time table to inform about changes and customise sizing.
   public weak var timeTableDelegate: MIDITimeTableViewDelegate?
 
+  private var isMoving = false
+  private var isResizing = false
   private var rowHeight: CGFloat = 60
   private var measureHeight: CGFloat = 30
   private var headerCellWidth: CGFloat = 120
@@ -150,6 +152,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     addSubview(measureView)
     addSubview(playheadView)
     playheadView.delegate = self
+    playheadView.layer.zPosition = 10
     layer.insertSublayer(gridLayer, at: 0)
     let pinch = UIPinchGestureRecognizer(
       target: self,
@@ -161,6 +164,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
   open override func layoutSubviews() {
     super.layoutSubviews()
+
+    if isResizing || isMoving {
+      return
+    }
 
     for (index, row) in rowHeaderCellViews.enumerated() {
       row.frame = CGRect(
@@ -209,7 +216,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     playheadView.lineHeight = contentSize.height - measureHeight
     playheadView.measureBeatWidth = measureWidth / CGFloat(measureView.beatCount)
     playheadView.isHidden = !showsPlayhead
-    bringSubview(toFront: playheadView)
 
     // Grid layer
     gridLayer.rowCount = rowHeaderCellViews.count
@@ -244,8 +250,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       addSubview(rowHeaderCell)
 
       var cells = [MIDITimeTableCellView]()
-      for cell in row.cells {
+      for (index, cell) in row.cells.enumerated() {
         let cellView = row.cellView(cell)
+        cellView.tag = index
         cellView.delegate = self
         cells.append(cellView)
         addSubview(cellView)
@@ -288,33 +295,28 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       editingCellRow = Int((midiTimeTableCellView.frame.minY - measureHeight) / rowHeight)
     }
 
+    isMoving = true
+
     // Horizontal move
     if translation.x > subbeatWidth, midiTimeTableCellView.frame.maxX < contentSize.width {
-      midiTimeTableCellView.center = CGPoint(
-        x: midiTimeTableCellView.center.x + subbeatWidth,
-        y: midiTimeTableCellView.center.y)
+      midiTimeTableCellView.frame.origin.x += subbeatWidth
       pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
     } else if translation.x < -subbeatWidth, midiTimeTableCellView.frame.minX > headerCellWidth {
-      midiTimeTableCellView.center = CGPoint(
-        x: midiTimeTableCellView.center.x - subbeatWidth,
-        y: midiTimeTableCellView.center.y)
+      midiTimeTableCellView.frame.origin.x -= subbeatWidth
       pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
     }
 
     // Vertical move
     if translation.y > rowHeight, midiTimeTableCellView.frame.maxY < measureHeight + (rowHeight * CGFloat(cellViews.count)) {
-      midiTimeTableCellView.center = CGPoint(
-        x: midiTimeTableCellView.center.x,
-        y: midiTimeTableCellView.center.y + rowHeight)
+      midiTimeTableCellView.frame.origin.y += rowHeight
       pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
     } else if translation.y < -rowHeight, midiTimeTableCellView.frame.minY > measureHeight {
-      midiTimeTableCellView.center = CGPoint(
-        x: midiTimeTableCellView.center.x,
-        y: midiTimeTableCellView.center.y - rowHeight)
+      midiTimeTableCellView.frame.origin.y -= rowHeight
       pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
     }
 
     if case .ended = pan.state {
+      isMoving = false
       didEditCell(midiTimeTableCellView)
     }
   }
@@ -325,7 +327,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     if case .began = pan.state {
       editingCellRow = Int((midiTimeTableCellView.frame.minY - measureHeight) / rowHeight)
+      isResizing = true
     }
+
 
     if translation.x > subbeatWidth, midiTimeTableCellView.frame.maxX < contentSize.width - subbeatWidth { // Increase
       midiTimeTableCellView.frame.size.width += subbeatWidth
@@ -336,6 +340,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     }
 
     if case .ended = pan.state {
+      isResizing = false
       didEditCell(midiTimeTableCellView)
     }
   }
@@ -361,9 +366,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       newCellDuration: newCellDuration)
 
     editingCellRow = nil
-    if row != newCellRow {
-      reloadData()
-    }
   }
 
   // MARK: MIDITimeTablePlayheadViewDelegate
