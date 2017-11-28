@@ -14,7 +14,7 @@
     <a title="MIDITimeTableMeasureView Class Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">MIDITimeTableView Docs</a> (82% documented)</p>
+        <p><a href="../index.html">MIDITimeTableView Docs</a> (81% documented)</p>
         <p class="header-right"><a href="https://github.com/cemolcay/MIDITimeTableView"><img src="../img/gh.png"/>View on GitHub</a></p>
       </div>
     </header>
@@ -47,6 +47,9 @@
                 <a href="../Classes/MIDITimeTableMeasureView.html">MIDITimeTableMeasureView</a>
               </li>
               <li class="nav-group-task">
+                <a href="../Classes/MIDITimeTablePlayheadView.html">MIDITimeTablePlayheadView</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a>
               </li>
             </ul>
@@ -64,6 +67,9 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTablePlayheadViewDelegate.html">MIDITimeTablePlayheadViewDelegate</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a>
@@ -95,7 +101,7 @@
             <h1>MIDITimeTableMeasureView</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTableMeasureView</span><span class="p">:</span> <span class="kt">UIView</span></code></pre>
+                  <pre class="highlight"><code><span class="n">open</span> <span class="kd">class</span> <span class="kt">MIDITimeTableMeasureView</span><span class="p">:</span> <span class="kt">UIView</span></code></pre>
 
                 </div>
               </div>
@@ -125,7 +131,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">barCount</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">1</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">barCount</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">0</span></code></pre>
 
                         </div>
                       </div>
@@ -189,6 +195,33 @@
                 <li class="item">
                   <div>
                     <code>
+                    <a name="/s:17MIDITimeTableView0ab7MeasureC0C6updateyyF"></a>
+                    <a name="//apple_ref/swift/Method/update()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0ab7MeasureC0C6updateyyF">update()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Refreshes and redraws measure layers</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">update</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
                     <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableMeasureView(im)layoutSubviews"></a>
                     <a name="//apple_ref/swift/Method/layoutSubviews()" class="dashAnchor"></a>
                     <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableMeasureView(im)layoutSubviews">layoutSubviews()</a>
@@ -206,7 +239,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTableMeasureView</span><span class="p">:</span> <span class="kt">UIView</span></code></pre>
+                          <pre class="highlight"><code><span class="n">open</span> <span class="kd">class</span> <span class="kt">MIDITimeTableMeasureView</span><span class="p">:</span> <span class="kt">UIView</span></code></pre>
 
                         </div>
                       </div>
@@ -218,7 +251,7 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2017 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2017-10-17)</p>
+          <p>&copy; 2017 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2017-11-28)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
         </section>
       </article>

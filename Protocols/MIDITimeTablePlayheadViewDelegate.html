@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>MIDITimeTableCellData Structure Reference</title>
+    <title>MIDITimeTablePlayheadViewDelegate Protocol Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset='utf-8'>
@@ -10,8 +10,8 @@
     
   </head>
   <body>
-    <a name="//apple_ref/swift/Struct/MIDITimeTableCellData" class="dashAnchor"></a>
-    <a title="MIDITimeTableCellData Structure Reference"></a>
+    <a name="//apple_ref/swift/Protocol/MIDITimeTablePlayheadViewDelegate" class="dashAnchor"></a>
+    <a title="MIDITimeTablePlayheadViewDelegate Protocol Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="../index.html">MIDITimeTableView Docs</a> (81% documented)</p>
@@ -22,7 +22,7 @@
       <p id="breadcrumbs">
         <a href="../index.html">MIDITimeTableView Reference</a>
         <img id="carat" src="../img/carat.png" />
-        MIDITimeTableCellData Structure Reference
+        MIDITimeTablePlayheadViewDelegate Protocol Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -98,14 +98,14 @@
       <article class="main-content">
         <section>
           <section class="section">
-            <h1>MIDITimeTableCellData</h1>
+            <h1>MIDITimeTablePlayheadViewDelegate</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableCellData</span></code></pre>
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTablePlayheadViewDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
 
                 </div>
               </div>
-            <p>Data of each cell in the rows of <code><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></code>.</p>
+            <p>Delegate that informs about playhead is going to move.</p>
 
           </section>
           <section class="section task-group-section">
@@ -114,9 +114,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB8CellDataV4dataypv"></a>
-                    <a name="//apple_ref/swift/Property/data" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB8CellDataV4dataypv">data</a>
+                    <a name="/s:17MIDITimeTableView0ab8PlayheadC8DelegateP08playheadC0yAA0abdC0C_So22UIPanGestureRecognizerC6didPantF"></a>
+                    <a name="//apple_ref/swift/Method/playheadView(_:didPan:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC8DelegateP08playheadC0yAA0abdC0C_So22UIPanGestureRecognizerC6didPantF">playheadView(_:didPan:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -124,97 +124,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Actual data to show on views.</p>
+                        <p>Delegate method that should update playhead&rsquo;s position based on pan gesture translation in timetable view.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">data</span><span class="p">:</span> <span class="kt">Any</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB8CellDataV8positionSdv"></a>
-                    <a name="//apple_ref/swift/Property/position" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB8CellDataV8positionSdv">position</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Position of the cell in the row in beats.
-For example if it is second beat of a second bar in a 4/4 measure, than it should be 6.0</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">position</span><span class="p">:</span> <span class="kt">Double</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB8CellDataV8durationSdv"></a>
-                    <a name="//apple_ref/swift/Property/duration" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB8CellDataV8durationSdv">duration</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Duration of the cell in the row in beats.
-For example if it is a quarter beat in a 4/4 measure, than it should be 0.25</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">duration</span><span class="p">:</span> <span class="kt">Double</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB8CellDataVACyp4data_Sd8positionSd8durationtcfc"></a>
-                    <a name="//apple_ref/swift/Method/init(data:position:duration:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB8CellDataVACyp4data_Sd8positionSd8durationtcfc">init(data:position:duration:)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Initilizes the cell data.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="kt">Any</span><span class="p">,</span> <span class="nv">position</span><span class="p">:</span> <span class="kt">Double</span><span class="p">,</span> <span class="nv">duration</span><span class="p">:</span> <span class="kt">Double</span><span class="p">)</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">playheadView</span><span class="p">(</span><span class="n">_</span> <span class="nv">playheadView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTablePlayheadView.html">MIDITimeTablePlayheadView</a></span><span class="p">,</span> <span class="n">didPan</span> <span class="nv">panGestureRecognizer</span><span class="p">:</span> <span class="kt">UIPanGestureRecognizer</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -225,36 +142,24 @@ For example if it is a quarter beat in a 4/4 measure, than it should be 0.25</p>
                             <tr>
                               <td>
                                 <code>
-                                <em>data</em>
+                                <em>playheadView</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>Data to show in cell view.</p>
+                                  <p>Playhead that panning.</p>
                                 </div>
                               </td>
                             </tr>
                             <tr>
                               <td>
                                 <code>
-                                <em>position</em>
+                                <em>panGestureRecognizer</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>Position of cell in row in form of beats.</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>duration</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Duration of cell in row in form of beats.</p>
+                                  <p>Pan gesture that pans playhead.</p>
                                 </div>
                               </td>
                             </tr>

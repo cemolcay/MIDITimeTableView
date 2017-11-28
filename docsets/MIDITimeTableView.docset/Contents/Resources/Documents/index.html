@@ -13,7 +13,7 @@
     <a title="MIDITimeTableView  Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="index.html">MIDITimeTableView Docs</a> (82% documented)</p>
+        <p><a href="index.html">MIDITimeTableView Docs</a> (81% documented)</p>
         <p class="header-right"><a href="https://github.com/cemolcay/MIDITimeTableView"><img src="img/gh.png"/>View on GitHub</a></p>
       </div>
     </header>
@@ -46,6 +46,9 @@
                 <a href="Classes/MIDITimeTableMeasureView.html">MIDITimeTableMeasureView</a>
               </li>
               <li class="nav-group-task">
+                <a href="Classes/MIDITimeTablePlayheadView.html">MIDITimeTablePlayheadView</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Classes/MIDITimeTableView.html">MIDITimeTableView</a>
               </li>
             </ul>
@@ -63,6 +66,9 @@
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
                 <a href="Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/MIDITimeTablePlayheadViewDelegate.html">MIDITimeTablePlayheadViewDelegate</a>
               </li>
               <li class="nav-group-task">
                 <a href="Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a>
@@ -114,32 +120,32 @@
 <p>You need a data object to store each row and its cells data.</p>
 <pre class="highlight swift"><code><span class="k">var</span> <span class="nv">rowData</span><span class="p">:</span> <span class="p">[</span><span class="kt">MIDITimeTableRowData</span><span class="p">]</span> <span class="o">=</span> <span class="p">[</span>
   <span class="kt">MIDITimeTableRowData</span><span class="p">(</span>
-      <span class="nv">cells</span><span class="p">:</span> <span class="p">[</span>
-        <span class="kt">MIDITimeTableCellData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="s">"C7"</span><span class="p">,</span> <span class="nv">position</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">duration</span><span class="p">:</span> <span class="mi">4</span><span class="p">),</span>
-        <span class="kt">MIDITimeTableCellData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="s">"Dm7"</span><span class="p">,</span> <span class="nv">position</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="nv">duration</span><span class="p">:</span> <span class="mi">4</span><span class="p">),</span>
-        <span class="kt">MIDITimeTableCellData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="s">"G7b5"</span><span class="p">,</span> <span class="nv">position</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="nv">duration</span><span class="p">:</span> <span class="mi">4</span><span class="p">),</span>
-        <span class="kt">MIDITimeTableCellData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="s">"C7"</span><span class="p">,</span> <span class="nv">position</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="nv">duration</span><span class="p">:</span> <span class="mi">4</span><span class="p">),</span>
-      <span class="p">],</span>
-      <span class="nv">headerCellView</span><span class="p">:</span> <span class="kt">HeaderCellView</span><span class="p">(</span><span class="nv">title</span><span class="p">:</span> <span class="s">"Chords"</span><span class="p">),</span>
-      <span class="nv">cellView</span><span class="p">:</span> <span class="p">{</span> <span class="n">cellData</span> <span class="k">in</span>
-        <span class="k">let</span> <span class="nv">title</span> <span class="o">=</span> <span class="n">cellData</span><span class="o">.</span><span class="n">data</span> <span class="k">as?</span> <span class="kt">String</span> <span class="p">??</span> <span class="s">""</span>
-        <span class="k">return</span> <span class="kt">CellView</span><span class="p">(</span><span class="nv">title</span><span class="p">:</span> <span class="n">title</span><span class="p">)</span>
-      <span class="p">}),</span>
+    <span class="nv">cells</span><span class="p">:</span> <span class="p">[</span>
+      <span class="kt">MIDITimeTableCellData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="s">"C7"</span><span class="p">,</span> <span class="nv">position</span><span class="p">:</span> <span class="mi">0</span><span class="p">,</span> <span class="nv">duration</span><span class="p">:</span> <span class="mi">4</span><span class="p">),</span>
+      <span class="kt">MIDITimeTableCellData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="s">"Dm7"</span><span class="p">,</span> <span class="nv">position</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="nv">duration</span><span class="p">:</span> <span class="mi">4</span><span class="p">),</span>
+      <span class="kt">MIDITimeTableCellData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="s">"G7b5"</span><span class="p">,</span> <span class="nv">position</span><span class="p">:</span> <span class="mi">8</span><span class="p">,</span> <span class="nv">duration</span><span class="p">:</span> <span class="mi">4</span><span class="p">),</span>
+      <span class="kt">MIDITimeTableCellData</span><span class="p">(</span><span class="nv">data</span><span class="p">:</span> <span class="s">"C7"</span><span class="p">,</span> <span class="nv">position</span><span class="p">:</span> <span class="mi">12</span><span class="p">,</span> <span class="nv">duration</span><span class="p">:</span> <span class="mi">4</span><span class="p">),</span>
+    <span class="p">],</span>
+    <span class="nv">headerCellView</span><span class="p">:</span> <span class="kt">HeaderCellView</span><span class="p">(</span><span class="nv">title</span><span class="p">:</span> <span class="s">"Chords"</span><span class="p">),</span>
+    <span class="nv">cellView</span><span class="p">:</span> <span class="p">{</span> <span class="n">cellData</span> <span class="k">in</span>
+      <span class="k">let</span> <span class="nv">title</span> <span class="o">=</span> <span class="n">cellData</span><span class="o">.</span><span class="n">data</span> <span class="k">as?</span> <span class="kt">String</span> <span class="p">??</span> <span class="s">""</span>
+      <span class="k">return</span> <span class="kt">CellView</span><span class="p">(</span><span class="nv">title</span><span class="p">:</span> <span class="n">title</span><span class="p">)</span>
+    <span class="p">}),</span>
 <span class="p">]</span>
 </code></pre>
 
 <p><code><a href="Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a></code> is very likely to <code>UITableViewDataSource</code> or <code>UICollectionViewDataSource</code> API. Just feed the row data, number of rows, time signature and you are ready to go.</p>
 <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">numberOfRows</span><span class="p">(</span><span class="k">in</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt">MIDITimeTableView</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Int</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="n">rowData</span><span class="o">.</span><span class="n">count</span>
+  <span class="k">return</span> <span class="n">rowData</span><span class="o">.</span><span class="n">count</span>
 <span class="p">}</span>
 
 <span class="kd">func</span> <span class="nf">timeSignature</span><span class="p">(</span><span class="n">of</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt">MIDITimeTableView</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">MIDITimeTableTimeSignature</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="kt">MIDITimeTableTimeSignature</span><span class="p">(</span><span class="nv">beats</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="nv">noteValue</span><span class="p">:</span> <span class="o">.</span><span class="n">quarter</span><span class="p">)</span>
+  <span class="k">return</span> <span class="kt">MIDITimeTableTimeSignature</span><span class="p">(</span><span class="nv">beats</span><span class="p">:</span> <span class="mi">4</span><span class="p">,</span> <span class="nv">noteValue</span><span class="p">:</span> <span class="o">.</span><span class="n">quarter</span><span class="p">)</span>
 <span class="p">}</span>
 
 <span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt">MIDITimeTableView</span><span class="p">,</span> <span class="n">rowAt</span> <span class="nv">index</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">MIDITimeTableRowData</span> <span class="p">{</span>
-    <span class="k">let</span> <span class="nv">row</span> <span class="o">=</span> <span class="n">rowData</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
-    <span class="k">return</span> <span class="n">row</span>
+  <span class="k">let</span> <span class="nv">row</span> <span class="o">=</span> <span class="n">rowData</span><span class="p">[</span><span class="n">index</span><span class="p">]</span>
+  <span class="k">return</span> <span class="n">row</span>
 <span class="p">}</span>
 </code></pre>
 
@@ -148,11 +154,19 @@
 <p><code><a href="Classes/MIDITimeTableCellView.html">MIDITimeTableCellView</a></code>&rsquo;s are editable, you can move around them on the grid, resize their duration or long press to open a delete menu. Also, you need to subclass yourself to present your own data on it.</p>
 
 <p>You can set the <code>minMeasureWidth</code> and <code>maxMeasureWidth</code> to set zoom levels of the time table.</p>
+<h2 id='documentation' class='heading'>Documentation</h2>
+
+<p><a href="http://cemolcay.github.io/MIDITimeTableView">Full documentation here.</a></p>
+<h2 id='appstore' class='heading'>AppStore</h2>
+
+<p>This library used in my app <a href="https://itunes.apple.com/us/app/chordbud-chord-progressions/id1313017378?mt=8">ChordBud</a>, check it out!</p>
+
+<p><a href="https://itunes.apple.com/us/app/chordbud-chord-progressions/id1313017378?mt=8"><img src="https://linkmaker.itunes.apple.com/assets/shared/badges/en-us/appstore-lrg.svg" alt="alt tag"></a></p>
 
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2017 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2017-10-17)</p>
+          <p>&copy; 2017 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2017-11-28)</p>
           <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
         </section>
       </article>
