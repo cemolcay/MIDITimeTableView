@@ -70,6 +70,15 @@ class CellView: MIDITimeTableCellView {
     titleLabel.layer.borderColor = UIColor.black.cgColor
     titleLabel.layer.borderWidth = 1
     titleLabel.layer.cornerRadius = 5
+    customMenuItems = [
+      MIDITimeTableCellViewCustomMenuItem(
+        title: "Custom Menu Item",
+        action: #selector(didPressCustomMenuItem))
+    ]
+  }
+
+  @objc func didPressCustomMenuItem() {
+    print("custom menu item pressed")
   }
 }
 

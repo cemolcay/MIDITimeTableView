@@ -31,6 +31,29 @@ public protocol MIDITimeTableCellViewDelegate: class {
   func midiTimeTableCellViewDidDelete(_ midiTimeTableCellView: MIDITimeTableCellView)
 }
 
+/// Defines a custom menu item for the `MIDITimeTableCellView` to show when you long press it.
+public struct MIDITimeTableCellViewCustomMenuItem {
+  /// Title of the custom menu item.
+  public private(set) var title: String
+  /// Action handler of the custom menu item.
+  public private(set) var action: Selector
+
+  /// Creates and returns a `UIMenuItem` from itself.
+  public var menuItem: UIMenuItem {
+    return UIMenuItem(title: title, action: action)
+  }
+
+  /// Initilizes custom `UIMenuItem` for `MIDITimeTableCellView`.
+  ///
+  /// - Parameters:
+  ///   - title: Title of the custom menu item.
+  ///   - action: Action handler of the custom menu item.
+  public init(title: String, action: Selector) {
+    self.title = title
+    self.action = action
+  }
+}
+
 /// Base cell view that shows on `MIDITimeTableView`. Has abilitiy to move, resize and delete.
 open class MIDITimeTableCellView: UIView {
   /// View that holds the pan gesture on right most side in the view to use in resizing cell.
@@ -39,6 +62,8 @@ open class MIDITimeTableCellView: UIView {
   public var resizePanThreshold: CGFloat = 10
   /// Delegate that informs about editing cell.
   public weak var delegate: MIDITimeTableCellViewDelegate?
+  /// Custom items other than delete, when you long press cell.
+  public var customMenuItems = [MIDITimeTableCellViewCustomMenuItem]()
 
   open override var canBecomeFirstResponder: Bool {
     return true
@@ -98,14 +123,13 @@ open class MIDITimeTableCellView: UIView {
       UIMenuItem(
         title: NSLocalizedString("Delete", comment: "Delete button"),
         action: #selector(didPressDeleteButton))
-    ]
+    ] + customMenuItems.map({ $0.menuItem })
     menu.arrowDirection = .up
     menu.setTargetRect(frame, in: superview)
     menu.setMenuVisible(true, animated: true)
   }
 
   @objc public func didPressDeleteButton() {
-    UIMenuController.shared.setMenuVisible(false, animated: true)
     delegate?.midiTimeTableCellViewDidDelete(self)
   }
 }
