@@ -268,6 +268,16 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     gridLayer.setNeedsLayout()
   }
 
+  /// Gets the row and column index of the cell view in the data source.
+  ///
+  /// - Parameter cell: The cell you want to get row and column info.
+  /// - Returns: Returns a row and column index Int pair in a tuple.
+  public func rowAndColumnIndex(of cell: MIDITimeTableCellView) -> (row: Int, column: Int)? {
+    let row = Int((cell.frame.minY - measureHeight) / rowHeight)
+    guard let column = cellViews[row].index(of: cell), row < cellViews.count else { return nil }
+    return (row, column)
+  }
+
   // MARK: Zooming
 
   @objc func didPinch(pinch: UIPinchGestureRecognizer) {
