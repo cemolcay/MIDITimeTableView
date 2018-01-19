@@ -8,7 +8,7 @@
 
 import UIKit
 
-/// Draws time table measures in its frame.
+/// Draws time table measures in its frame. Use `tintColor` property to change text and bar colors.
 open class MIDITimeTableMeasureView: UIView {
   /// Number of measure bars.
   public var barCount: Int = 0 { didSet{ update() }}

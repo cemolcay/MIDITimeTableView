@@ -29,7 +29,7 @@
 		B27C69091FC706F800816627 /* MIDITimeTablePlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTablePlayheadView.swift; sourceTree = "<group>"; };
 		B29FB6AB1F923E07006E4EA8 /* MIDITimeTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MIDITimeTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B29FB6AE1F923E07006E4EA8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		B29FB6B01F923E07006E4EA8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		B29FB6B01F923E07006E4EA8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; };
 		B29FB6B31F923E07006E4EA8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B29FB6B51F923E07006E4EA8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B29FB6B81F923E07006E4EA8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -91,16 +91,16 @@
 			isa = PBXGroup;
 			children = (
 				B29FB6C11F923E31006E4EA8 /* MIDITimeTableView.swift */,
-				B2A5100D1F954394005FE3DB /* MIDITimeTableGridLayer.swift */,
-				B2A5100F1F9543B6005FE3DB /* MIDITimeTableNoteValue.swift */,
-				B2A510111F9543D5005FE3DB /* MIDITimeTableTimeSignature.swift */,
-				B2A510131F9543FA005FE3DB /* MIDITimeTableMeasureLayer.swift */,
-				B2A510151F954414005FE3DB /* MIDITimeTableMeasureView.swift */,
 				B2A510171F95443A005FE3DB /* MIDITimeTableCellView.swift */,
 				B2A510191F95445A005FE3DB /* MIDITimeTableHeaderCellView.swift */,
+				B2A510151F954414005FE3DB /* MIDITimeTableMeasureView.swift */,
+				B2A510131F9543FA005FE3DB /* MIDITimeTableMeasureLayer.swift */,
+				B2A5100D1F954394005FE3DB /* MIDITimeTableGridLayer.swift */,
+				B27C69091FC706F800816627 /* MIDITimeTablePlayheadView.swift */,
+				B2A5100F1F9543B6005FE3DB /* MIDITimeTableNoteValue.swift */,
+				B2A510111F9543D5005FE3DB /* MIDITimeTableTimeSignature.swift */,
 				B2A5101B1F95447F005FE3DB /* MIDITimeTableRowData.swift */,
 				B2A5101D1F95449F005FE3DB /* MIDITimeTableCellData.swift */,
-				B27C69091FC706F800816627 /* MIDITimeTablePlayheadView.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";

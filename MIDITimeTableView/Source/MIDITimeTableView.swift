@@ -303,6 +303,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     if case .began = pan.state {
       editingCellRow = Int((midiTimeTableCellView.frame.minY - measureHeight) / rowHeight)
+      midiTimeTableCellView.isSelected = true
     }
 
     isMoving = true
@@ -338,8 +339,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     if case .began = pan.state {
       editingCellRow = Int((midiTimeTableCellView.frame.minY - measureHeight) / rowHeight)
       isResizing = true
+      midiTimeTableCellView.isSelected = true
     }
-
 
     if translation.x > subbeatWidth, midiTimeTableCellView.frame.maxX < contentSize.width - subbeatWidth { // Increase
       midiTimeTableCellView.frame.size.width += subbeatWidth
@@ -376,6 +377,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       newCellDuration: newCellDuration)
 
     editingCellRow = nil
+    cellView.isSelected = false
   }
 
   // MARK: MIDITimeTablePlayheadViewDelegate

@@ -43,6 +43,14 @@ class HeaderCellView: MIDITimeTableHeaderCellView {
 
 class CellView: MIDITimeTableCellView {
   var titleLabel = UILabel()
+  var selectedBorderColor: UIColor = .yellow
+  var defaultBorderColor: UIColor = .black
+
+  override var isSelected: Bool {
+    didSet {
+      titleLabel.layer.borderColor = (isSelected ? selectedBorderColor : defaultBorderColor).cgColor
+    }
+  }
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -169,20 +177,12 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    rowData = [MIDITimeTableRowData(
-      cells: [
-        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
-        ],
-      headerCellView: HeaderCellView(title: "Chords"),
-      cellView: { cellData in
-        let title = cellData.data as? String ?? ""
-        return CellView(title: title)
-    })]
 
     timeTableView?.dataSource = self
     timeTableView?.timeTableDelegate = self
     timeTableView?.gridLayer.showsSubbeatLines = false
     timeTableView?.reloadData()
+    
     timeTableView?.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
     timeTableView?.measureView.backgroundColor = UIColor(red: 26.0/255.0, green: 28.0/255.0, blue: 27.0/255.0, alpha: 1)
     timeTableView?.measureView.tintColor = UIColor(red: 119.0/255.0, green: 121.0/255.0, blue: 120.0/255.0, alpha: 1)
@@ -190,11 +190,6 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     timeTableView?.gridLayer.barLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
     timeTableView?.gridLayer.beatLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
     timeTableView?.playheadView.tintColor = UIColor.gray.withAlphaComponent(0.5)
-    view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTap(tap:))))
-  }
-
-  @objc func didTap(tap: UITapGestureRecognizer) {
-    timeTableView?.playheadView.position += 1.0
   }
 
   // MARK: MIDITimeTableViewDataSource
@@ -242,6 +237,8 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
       rowData[row].cells.remove(at: index)
       rowData[newCellRow].cells.append(cell)
     }
+
+    timeTableView?.reloadData()
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double) {
