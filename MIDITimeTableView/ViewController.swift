@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import ALKit
 
 class HeaderCellView: MIDITimeTableHeaderCellView {
   var titleLabel = UILabel()
@@ -32,10 +31,13 @@ class HeaderCellView: MIDITimeTableHeaderCellView {
     addSubview(titleLabel)
     backgroundColor = UIColor(red: 36.0/255.0, green: 40.0/255.0, blue: 41.0/255.0, alpha: 1)
     titleLabel.textColor = UIColor(red: 216.0/255.0, green: 214.0/255.0, blue: 217.0/255.0, alpha: 1)
-    titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.textAlignment = .center
     titleLabel.font = UIFont.boldSystemFont(ofSize: 15)
-    titleLabel.fill(to: self)
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    titleLabel.frame = CGRect(origin: .zero, size: frame.size)
   }
 }
 
@@ -63,7 +65,6 @@ class CellView: MIDITimeTableCellView {
     addSubview(titleLabel)
     titleLabel.backgroundColor = UIColor(red: 16.0/255.0, green: 92.0/255.0, blue: 28.0/255.0, alpha: 1)
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
-    titleLabel.fill(to: self, insets: UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0))
     titleLabel.textAlignment = .center
     titleLabel.textColor = .white
     titleLabel.layer.masksToBounds = true
@@ -75,6 +76,11 @@ class CellView: MIDITimeTableCellView {
         title: "Custom Menu Item",
         action: #selector(didPressCustomMenuItem))
     ]
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    titleLabel.frame = CGRect(origin: .zero, size: frame.size)
   }
 
   @objc func didPressCustomMenuItem() {
