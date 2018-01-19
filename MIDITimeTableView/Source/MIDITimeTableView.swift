@@ -288,8 +288,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
   open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     super.touchesBegan(touches, with: event)
-    unselectAllCells()
 
+    // Start drag timer.
     guard let touchLocation = touches.first?.location(in: self) else { return }
     dragStartPosition = touchLocation
     dragTimer = Timer.scheduledTimer(
@@ -303,9 +303,11 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   @objc private func popDragView() {
     isScrollEnabled = false
 
+    // Drag start position.
     dragStartPosition.x -= initialDragViewSize/2
     dragStartPosition.y -= initialDragViewSize/2
 
+    // Create drag view.
     dragView = UIView(frame: CGRect(origin: dragStartPosition, size: .zero))
     dragView?.layer.backgroundColor = UIColor.white.withAlphaComponent(0.3).cgColor
     dragView?.layer.borderColor = UIColor.white.cgColor
@@ -326,6 +328,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       },
       completion: nil)
 
+    // Reset drag timer.
     dragTimer?.invalidate()
     dragTimer = nil
   }
@@ -336,6 +339,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       let touchLocation = touches.first?.location(in: self)
       else { return }
 
+    // Set drag view frame
     let origin = dragStartPosition
     if touchLocation.y < origin.y && touchLocation.x < origin.x {
       dragView.frame = CGRect(
@@ -362,22 +366,30 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
         width: origin.x - touchLocation.x,
         height: touchLocation.y - origin.y)
     }
+
+    // Make cells selected.
+    cellViews
+      .flatMap({ $0 })
+      .forEach({ $0.isSelected = dragView.frame.intersects($0.frame) })
   }
 
   open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
     super.touchesCancelled(touches, with: event)
-    dragTimer?.invalidate()
-    dragTimer = nil
-    isScrollEnabled = true
-    dragView?.removeFromSuperview()
-    dragView = nil
+    resetDragging()
   }
 
   open override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
     super.touchesEnded(touches, with: event)
+    resetDragging()
+  }
+
+  private func resetDragging() {
+    // Enable scrolling back
+    isScrollEnabled = true
+    // Reset timer
     dragTimer?.invalidate()
     dragTimer = nil
-    isScrollEnabled = true
+    // Remove drag view
     dragView?.removeFromSuperview()
     dragView = nil
   }
