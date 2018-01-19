@@ -128,6 +128,12 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var measureHeight: CGFloat = 30
   private var headerCellWidth: CGFloat = 120
 
+  private var dragTimer: Timer?
+  private let dragTimeInterval: TimeInterval = 0.5
+  private var dragStartPosition: CGPoint = .zero
+  private var dragView: UIView?
+  private var initialDragViewSize: CGFloat = 30
+
   private var beatWidth: CGFloat {
     return measureWidth / CGFloat(measureView.beatCount)
   }
@@ -276,6 +282,108 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let row = Int((cell.frame.minY - measureHeight) / rowHeight)
     guard let column = cellViews[row].index(of: cell), row < cellViews.count else { return nil }
     return (row, column)
+  }
+
+  // MARK: Multiple selection
+
+  open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    super.touchesBegan(touches, with: event)
+    unselectAllCells()
+
+    guard let touchLocation = touches.first?.location(in: self) else { return }
+    dragStartPosition = touchLocation
+    dragTimer = Timer.scheduledTimer(
+      timeInterval: dragTimeInterval,
+      target: self,
+      selector: #selector(popDragView),
+      userInfo: nil,
+      repeats: false)
+  }
+
+  @objc private func popDragView() {
+    isScrollEnabled = false
+
+    dragStartPosition.x -= initialDragViewSize/2
+    dragStartPosition.y -= initialDragViewSize/2
+
+    dragView = UIView(frame: CGRect(origin: dragStartPosition, size: .zero))
+    dragView?.layer.backgroundColor = UIColor.white.withAlphaComponent(0.3).cgColor
+    dragView?.layer.borderColor = UIColor.white.cgColor
+    dragView?.layer.borderWidth = 1
+    addSubview(dragView!)
+    UIView.animate(
+      withDuration: 0.3,
+      delay: 0,
+      usingSpringWithDamping: 1,
+      initialSpringVelocity: 1,
+      options: [],
+      animations: {
+        self.dragView?.frame = CGRect(
+          x: self.dragStartPosition.x,
+          y: self.dragStartPosition.y,
+          width: self.initialDragViewSize,
+          height: self.initialDragViewSize)
+      },
+      completion: nil)
+
+    dragTimer?.invalidate()
+    dragTimer = nil
+  }
+
+  open override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    super.touchesMoved(touches, with: event)
+    guard let dragView = dragView,
+      let touchLocation = touches.first?.location(in: self)
+      else { return }
+
+    let origin = dragStartPosition
+    if touchLocation.y < origin.y && touchLocation.x < origin.x {
+      dragView.frame = CGRect(
+        x: touchLocation.x,
+        y: touchLocation.y,
+        width: origin.x - touchLocation.x,
+        height: origin.y - touchLocation.y)
+    } else if touchLocation.y < origin.y && touchLocation.x > origin.x {
+      dragView.frame = CGRect(
+        x: origin.x,
+        y: touchLocation.y,
+        width: touchLocation.x - origin.x,
+        height: origin.y - touchLocation.y)
+    } else if touchLocation.y > origin.y && touchLocation.x > origin.x {
+      dragView.frame = CGRect(
+        x: origin.x,
+        y: origin.y,
+        width: touchLocation.x - origin.x,
+        height: touchLocation.y - origin.y)
+    } else if touchLocation.y > origin.y && touchLocation.x < origin.x {
+      dragView.frame = CGRect(
+        x: touchLocation.x,
+        y: origin.y,
+        width: origin.x - touchLocation.x,
+        height: touchLocation.y - origin.y)
+    }
+  }
+
+  open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+    super.touchesCancelled(touches, with: event)
+    dragTimer?.invalidate()
+    dragTimer = nil
+    isScrollEnabled = true
+    dragView?.removeFromSuperview()
+    dragView = nil
+  }
+
+  open override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    super.touchesEnded(touches, with: event)
+    dragTimer?.invalidate()
+    dragTimer = nil
+    isScrollEnabled = true
+    dragView?.removeFromSuperview()
+    dragView = nil
+  }
+
+  private func unselectAllCells() {
+    cellViews.flatMap({ $0 }).forEach({ $0.isSelected = false })
   }
 
   // MARK: Zooming
