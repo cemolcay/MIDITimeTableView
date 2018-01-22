@@ -133,6 +133,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var dragStartPosition: CGPoint = .zero
   private var dragView: UIView?
   private var initialDragViewSize: CGFloat = 30
+  private var dragViewScrollThreshold: CGFloat = 20
 
   private var beatWidth: CGFloat {
     return measureWidth / CGFloat(measureView.beatCount)
@@ -284,7 +285,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     return (row, column)
   }
 
-  // MARK: Multiple selection
+  // MARK: Drag to select multiple cells
 
   open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
     super.touchesBegan(touches, with: event)
@@ -335,9 +336,12 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
   open override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
     super.touchesMoved(touches, with: event)
-    guard let dragView = dragView,
-      let touchLocation = touches.first?.location(in: self)
-      else { return }
+    guard let touchLocation = touches.first?.location(in: self) else { return }
+    updateDragView(touchLocation: touchLocation)
+  }
+
+  @objc private func updateDragView(touchLocation: CGPoint) {
+    guard let dragView = dragView else { return }
 
     // Set drag view frame
     let origin = dragStartPosition
@@ -367,10 +371,76 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
         height: touchLocation.y - origin.y)
     }
 
+    // Make scroll view scroll if drag view hits the limit
+    var visibleRect = CGRect(origin: contentOffset, size: bounds.size)
+    if touchLocation.y < visibleRect.minY + dragViewScrollThreshold { // move up
+      visibleRect.origin.y -= dragViewScrollThreshold
+      UIView.animate(
+        withDuration: 0.3,
+        animations: {
+          self.scrollRectToVisible(visibleRect, animated: false)
+        },
+        completion: { _ in
+          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x, y: touchLocation.y - self.dragViewScrollThreshold))
+        })
+    } else if touchLocation.y > visibleRect.maxY - dragViewScrollThreshold { // move down
+      visibleRect.origin.y += dragViewScrollThreshold
+      UIView.animate(
+        withDuration: 0.3,
+        animations: {
+          self.scrollRectToVisible(visibleRect, animated: false)
+        },
+        completion: { _ in
+          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x, y: touchLocation.y + self.dragViewScrollThreshold))
+        })
+    }
+
+    if touchLocation.x < visibleRect.minX + dragViewScrollThreshold { // move left
+      visibleRect.origin.x -= dragViewScrollThreshold
+      scrollRectToVisible(visibleRect, animated: true)
+      UIView.animate(
+        withDuration: 0.3,
+        animations: {
+          self.scrollRectToVisible(visibleRect, animated: false)
+        },
+        completion: { _ in
+          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x - self.dragViewScrollThreshold, y: touchLocation.y))
+        })
+    } else if touchLocation.x > visibleRect.maxX - dragViewScrollThreshold { // move right
+      visibleRect.origin.x += dragViewScrollThreshold
+      scrollRectToVisible(visibleRect, animated: true)
+      UIView.animate(
+        withDuration: 0.3,
+        animations: {
+          self.scrollRectToVisible(visibleRect, animated: false)
+        },
+        completion: { _ in
+          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x + self.dragViewScrollThreshold, y: touchLocation.y))
+        })
+    }
+
     // Make cells selected.
     cellViews
       .flatMap({ $0 })
       .forEach({ $0.isSelected = dragView.frame.intersects($0.frame) })
+  }
+
+  private var dragViewScrollTimer: Timer?
+  private func startScrolling(dragViewScrollPosition: CGPoint) {
+    dragViewScrollTimer = Timer.scheduledTimer(
+      timeInterval: 0.3,
+      target: self,
+      selector: #selector(scrollTimerTick),
+      userInfo: nil,
+      repeats: true)
+  }
+
+  @objc private func scrollTimerTick() {
+  }
+
+  private func stopScrolling() {
+    dragViewScrollTimer?.invalidate()
+    dragViewScrollTimer = nil
   }
 
   open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
