@@ -129,11 +129,11 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var headerCellWidth: CGFloat = 120
 
   private var dragTimer: Timer?
-  private let dragTimeInterval: TimeInterval = 0.5
+  private let dragTimerInterval: TimeInterval = 0.5
   private var dragStartPosition: CGPoint = .zero
   private var dragView: UIView?
   private var initialDragViewSize: CGFloat = 30
-  private var dragViewScrollThreshold: CGFloat = 20
+  private var dragViewAutoScrollingThreshold: CGFloat = 20
 
   private var beatWidth: CGFloat {
     return measureWidth / CGFloat(measureView.beatCount)
@@ -294,14 +294,14 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     guard let touchLocation = touches.first?.location(in: self) else { return }
     dragStartPosition = touchLocation
     dragTimer = Timer.scheduledTimer(
-      timeInterval: dragTimeInterval,
+      timeInterval: dragTimerInterval,
       target: self,
-      selector: #selector(popDragView),
+      selector: #selector(createDragView),
       userInfo: nil,
       repeats: false)
   }
 
-  @objc private func popDragView() {
+  @objc private func createDragView() {
     isScrollEnabled = false
 
     // Drag start position.
@@ -373,30 +373,30 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     // Make scroll view scroll if drag view hits the limit
     var visibleRect = CGRect(origin: contentOffset, size: bounds.size)
-    if touchLocation.y < visibleRect.minY + dragViewScrollThreshold { // move up
-      visibleRect.origin.y -= dragViewScrollThreshold
+    if touchLocation.y < visibleRect.minY + dragViewAutoScrollingThreshold { // move up
+      visibleRect.origin.y -= dragViewAutoScrollingThreshold
       UIView.animate(
         withDuration: 0.3,
         animations: {
           self.scrollRectToVisible(visibleRect, animated: false)
         },
         completion: { _ in
-          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x, y: touchLocation.y - self.dragViewScrollThreshold))
+          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x, y: touchLocation.y - self.dragViewAutoScrollingThreshold))
         })
-    } else if touchLocation.y > visibleRect.maxY - dragViewScrollThreshold { // move down
-      visibleRect.origin.y += dragViewScrollThreshold
+    } else if touchLocation.y > visibleRect.maxY - dragViewAutoScrollingThreshold { // move down
+      visibleRect.origin.y += dragViewAutoScrollingThreshold
       UIView.animate(
         withDuration: 0.3,
         animations: {
           self.scrollRectToVisible(visibleRect, animated: false)
         },
         completion: { _ in
-          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x, y: touchLocation.y + self.dragViewScrollThreshold))
+          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x, y: touchLocation.y + self.dragViewAutoScrollingThreshold))
         })
     }
 
-    if touchLocation.x < visibleRect.minX + dragViewScrollThreshold { // move left
-      visibleRect.origin.x -= dragViewScrollThreshold
+    if touchLocation.x < visibleRect.minX + dragViewAutoScrollingThreshold { // move left
+      visibleRect.origin.x -= dragViewAutoScrollingThreshold
       scrollRectToVisible(visibleRect, animated: true)
       UIView.animate(
         withDuration: 0.3,
@@ -404,10 +404,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
           self.scrollRectToVisible(visibleRect, animated: false)
         },
         completion: { _ in
-          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x - self.dragViewScrollThreshold, y: touchLocation.y))
+          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x - self.dragViewAutoScrollingThreshold, y: touchLocation.y))
         })
-    } else if touchLocation.x > visibleRect.maxX - dragViewScrollThreshold { // move right
-      visibleRect.origin.x += dragViewScrollThreshold
+    } else if touchLocation.x > visibleRect.maxX - dragViewAutoScrollingThreshold { // move right
+      visibleRect.origin.x += dragViewAutoScrollingThreshold
       scrollRectToVisible(visibleRect, animated: true)
       UIView.animate(
         withDuration: 0.3,
@@ -415,7 +415,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
           self.scrollRectToVisible(visibleRect, animated: false)
         },
         completion: { _ in
-          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x + self.dragViewScrollThreshold, y: touchLocation.y))
+          self.updateDragView(touchLocation: CGPoint(x: touchLocation.x + self.dragViewAutoScrollingThreshold, y: touchLocation.y))
         })
     }
 
