@@ -81,7 +81,7 @@ public protocol MIDITimeTableViewDataSource: class {
 }
 
 /// Edited cell data. Holds the edited cell's index before editing, and new row index, position and duration data after editing.
-public typealias MIDITimeTableViewEditedCell = (index: MIDITimeTableViewCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
+public typealias MIDITimeTableViewEditedCellData = (index: MIDITimeTableViewCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
 
 /// Delegate functions to inform about editing cells and sizing of the time table.
 public protocol MIDITimeTableViewDelegate: class {
@@ -90,17 +90,14 @@ public protocol MIDITimeTableViewDelegate: class {
   /// - Parameters:
   ///   - midiTimeTableView: Time table that performed changes on.
   ///   - cells: Edited cells data with changes before and after.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCell])
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData])
 
   /// Informs about the cell is either moved to another position, changed duration or changed position in a current or a new row.
   ///
   /// - Parameters:
   ///   - midiTimeTableView: Time table that performed changes on.
-  ///   - index: Row and column index of the cell in the initial row index.
-  ///   - newCellRow: Last row index of cell after editing.
-  ///   - newCellPosition: Last position of cell after editing.
-  ///   - newCellDuration: Last duration of cell after editing.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAt index: MIDITimeTableViewCellIndex, newCellRow: Int, newCellPosition: Double, newCellDuration: Double)
+  ///   - cell: Edited cell data with changes before and after.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cell: MIDITimeTableViewEditedCellData)
 
   /// Informs about the cell is being deleted.
   ///
@@ -656,10 +653,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     timeTableDelegate?.midiTimeTableView(
       self,
-      didEditCellAt: MIDITimeTableViewCellIndex(row: row, column: index),
-      newCellRow: newCellRow,
-      newCellPosition: newCellPosition,
-      newCellDuration: newCellDuration)
+      didEdit: (MIDITimeTableViewCellIndex(row: row, column: index), newCellRow, newCellPosition, newCellDuration))
 
     editingCellRow = nil
     cellView.isSelected = false

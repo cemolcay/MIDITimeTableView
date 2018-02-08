@@ -239,20 +239,20 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     timeTableView?.reloadData()
   }
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCell]) {
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData]) {
     return
   }
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAt index: MIDITimeTableViewCellIndex, newCellRow: Int, newCellPosition: Double, newCellDuration: Double) {
-    var cell = rowData[index.row].cells[index.column]
-    cell.duration = newCellDuration
-    cell.position = newCellPosition
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cell: MIDITimeTableViewEditedCellData) {
+    var editedCell = rowData[cell.index.row].cells[cell.index.column]
+    editedCell.duration = cell.newDuration
+    editedCell.position = cell.newPosition
 
-    if index.row == newCellRow {
-      rowData[index.row].cells[index.column] = cell
+    if cell.index.row == cell.newRowIndex {
+      rowData[cell.index.row].cells[cell.index.column] = editedCell
     } else { // move cell to new row
-      rowData[index.row].cells.remove(at: index.column)
-      rowData[newCellRow].cells.append(cell)
+      rowData[cell.index.row].cells.remove(at: cell.index.column)
+      rowData[cell.newRowIndex].cells.append(editedCell)
     }
 
     timeTableView?.reloadData()
