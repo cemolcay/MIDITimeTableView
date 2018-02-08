@@ -162,7 +162,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var rowData = [MIDITimeTableRowData]()
   public private(set) var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
   public private(set) var cellViews = [[MIDITimeTableCellView]]()
-  private var editingCellRow: Int?
 
   /// Data source object of the time table to populate its data.
   public weak var dataSource: MIDITimeTableViewDataSource?
@@ -333,7 +332,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   ///
   /// - Parameter cell: The cell you want to get row and column info.
   /// - Returns: Returns a row and column index Int pair in a tuple.
-  public func rowAndColumnIndex(of cell: MIDITimeTableCellView) -> MIDITimeTableViewCellIndex? {
+  public func cellIndex(of cell: MIDITimeTableCellView) -> MIDITimeTableViewCellIndex? {
     let row = Int((cell.frame.minY - measureHeight) / rowHeight)
     guard let column = cellViews[row].index(of: cell), row < cellViews.count else { return nil }
     return MIDITimeTableViewCellIndex(row: row, column: column)
@@ -542,7 +541,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     dragView = nil
   }
 
-  private func unselectAllCells() {
+  /// Makes all cells unselected.
+  public func unselectAllCells() {
     cellViews.flatMap({ $0 }).forEach({ $0.isSelected = false })
   }
 
@@ -569,34 +569,37 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let translation = pan.translation(in: self)
     bringSubview(toFront: midiTimeTableCellView)
 
+    let selectedCells = cellViews.flatMap({ $0 }).filter({ $0.isSelected })
+
     if case .began = pan.state {
-      editingCellRow = Int((midiTimeTableCellView.frame.minY - measureHeight) / rowHeight)
       midiTimeTableCellView.isSelected = true
     }
 
     isMoving = true
 
-    // Horizontal move
-    if translation.x > subbeatWidth, midiTimeTableCellView.frame.maxX < contentSize.width {
-      midiTimeTableCellView.frame.origin.x += subbeatWidth
-      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
-    } else if translation.x < -subbeatWidth, midiTimeTableCellView.frame.minX > headerCellWidth {
-      midiTimeTableCellView.frame.origin.x -= subbeatWidth
-      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
-    }
+    for cell in selectedCells {
+      // Horizontal move
+      if translation.x > subbeatWidth, cell.frame.maxX < contentSize.width {
+        cell.frame.origin.x += subbeatWidth
+        pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+      } else if translation.x < -subbeatWidth, cell.frame.minX > headerCellWidth {
+        cell.frame.origin.x -= subbeatWidth
+        pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+      }
 
-    // Vertical move
-    if translation.y > rowHeight, midiTimeTableCellView.frame.maxY < measureHeight + (rowHeight * CGFloat(cellViews.count)) {
-      midiTimeTableCellView.frame.origin.y += rowHeight
-      pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
-    } else if translation.y < -rowHeight, midiTimeTableCellView.frame.minY > measureHeight {
-      midiTimeTableCellView.frame.origin.y -= rowHeight
-      pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
+      // Vertical move
+      if translation.y > rowHeight, cell.frame.maxY < measureHeight + (rowHeight * CGFloat(cellViews.count)) {
+        cell.frame.origin.y += rowHeight
+        pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
+      } else if translation.y < -rowHeight, cell.frame.minY > measureHeight {
+        cell.frame.origin.y -= rowHeight
+        pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
+      }
     }
 
     if case .ended = pan.state {
       isMoving = false
-      didEditCell(midiTimeTableCellView)
+      didEditCells(selectedCells.flatMap({ cellIndex(of: $0) }))
     }
   }
 
@@ -604,23 +607,26 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let translation = pan.translation(in: self)
     bringSubview(toFront: midiTimeTableCellView)
 
+    let selectedCells = cellViews.flatMap({ $0 }).filter({ $0.isSelected })
+
     if case .began = pan.state {
-      editingCellRow = Int((midiTimeTableCellView.frame.minY - measureHeight) / rowHeight)
       isResizing = true
       midiTimeTableCellView.isSelected = true
     }
 
-    if translation.x > subbeatWidth, midiTimeTableCellView.frame.maxX < contentSize.width - subbeatWidth { // Increase
-      midiTimeTableCellView.frame.size.width += subbeatWidth
-      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
-    } else if translation.x < -subbeatWidth, midiTimeTableCellView.frame.width > subbeatWidth { // Decrease
-      midiTimeTableCellView.frame.size.width -= subbeatWidth
-      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+    for cell in selectedCells {
+      if translation.x > subbeatWidth, cell.frame.maxX < contentSize.width - subbeatWidth { // Increase
+        cell.frame.size.width += subbeatWidth
+        pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+      } else if translation.x < -subbeatWidth, cell.frame.width > subbeatWidth { // Decrease
+        cell.frame.size.width -= subbeatWidth
+        pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+      }
     }
 
     if case .ended = pan.state {
       isResizing = false
-      didEditCell(midiTimeTableCellView)
+      didEditCells(selectedCells.flatMap({ cellIndex(of: $0) }))
     }
   }
 
@@ -634,22 +640,29 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let deletingCellIndices = cellViews
       .flatMap({ $0 })
       .filter({ $0.isSelected })
-      .flatMap({ rowAndColumnIndex(of: $0) })
+      .flatMap({ cellIndex(of: $0) })
     timeTableDelegate?.midiTimeTableView(self, didDelete: deletingCellIndices)
   }
 
-  private func didEditCell(_ cellView: MIDITimeTableCellView) {
-    guard let row = editingCellRow, let index = cellViews[row].index(of: cellView) else { return }
-    let newCellPosition = Double(cellView.frame.minX - headerCellWidth) / Double(beatWidth)
-    let newCellDuration = Double(cellView.frame.size.width / beatWidth)
-    let newCellRow = Int((cellView.frame.minY - measureHeight) / rowHeight)
+  private func didEditCells(_ cells: [MIDITimeTableViewCellIndex]) {
+    var editedCells = [MIDITimeTableViewEditedCellData]()
+
+    for cell in cells {
+      let cellView = cellViews[cell.row][cell.column]
+      let newCellPosition = Double(cellView.frame.minX - headerCellWidth) / Double(beatWidth)
+      let newCellDuration = Double(cellView.frame.size.width / beatWidth)
+      let newCellRow = Int((cellView.frame.minY - measureHeight) / rowHeight)
+
+      editedCells.append((
+        cell,
+        newCellRow,
+        newCellPosition,
+        newCellDuration))
+    }
 
     timeTableDelegate?.midiTimeTableView(
       self,
-      didEdit: [(MIDITimeTableViewCellIndex(row: row, column: index), newCellRow, newCellPosition, newCellDuration)])
-
-    editingCellRow = nil
-    cellView.isSelected = false
+      didEdit: editedCells)
   }
 
   // MARK: MIDITimeTablePlayheadViewDelegate
