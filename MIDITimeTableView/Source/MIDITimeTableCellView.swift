@@ -24,6 +24,11 @@ public protocol MIDITimeTableCellViewDelegate: class {
   ///   - pan: Pan gesture that resizes the cell.
   func midiTimeTableCellViewDidResize(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer)
 
+  /// Informs about the cell has been tapped.
+  ///
+  /// - Parameter midiTimeTableCellView: The cell that tapped.
+  func midiTimeTableCellViewDidTap(_ midiTimeTableCellView: MIDITimeTableCellView)
+
   /// Informs about the cell is about to delete.
   ///
   /// - Parameter midiTimeTableCellView: Cell is going to delete.
@@ -87,6 +92,9 @@ open class MIDITimeTableCellView: UIView {
     let resizeGesture = UIPanGestureRecognizer(target: self, action: #selector(didResize(pan:)))
     resizeView.addGestureRecognizer(resizeGesture)
 
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTap(tap:)))
+    addGestureRecognizer(tapGesture)
+    
     let moveGesture = UIPanGestureRecognizer(target: self, action: #selector(didMove(pan:)))
     addGestureRecognizer(moveGesture)
 
@@ -111,6 +119,9 @@ open class MIDITimeTableCellView: UIView {
   }
 
   // MARK: Gestures
+  @objc public func didTap(tap: UITapGestureRecognizer) {
+    delegate?.midiTimeTableCellViewDidTap(self)
+  }
 
   @objc public func didMove(pan: UIPanGestureRecognizer) {
     delegate?.midiTimeTableCellViewDidMove(self, pan: pan)
