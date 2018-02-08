@@ -240,19 +240,17 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData]) {
-    return
-  }
+    for cell in cells {
+      var editedCell = rowData[cell.index.row].cells[cell.index.column]
+      editedCell.duration = cell.newDuration
+      editedCell.position = cell.newPosition
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cell: MIDITimeTableViewEditedCellData) {
-    var editedCell = rowData[cell.index.row].cells[cell.index.column]
-    editedCell.duration = cell.newDuration
-    editedCell.position = cell.newPosition
-
-    if cell.index.row == cell.newRowIndex {
-      rowData[cell.index.row].cells[cell.index.column] = editedCell
-    } else { // move cell to new row
-      rowData[cell.index.row].cells.remove(at: cell.index.column)
-      rowData[cell.newRowIndex].cells.append(editedCell)
+      if cell.index.row == cell.newRowIndex {
+        rowData[cell.index.row].cells[cell.index.column] = editedCell
+      } else { // move cell to new row
+        rowData[cell.index.row].cells.remove(at: cell.index.column)
+        rowData[cell.newRowIndex].cells.append(editedCell)
+      }
     }
 
     timeTableView?.reloadData()

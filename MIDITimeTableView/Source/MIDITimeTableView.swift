@@ -92,13 +92,6 @@ public protocol MIDITimeTableViewDelegate: class {
   ///   - cells: Edited cells data with changes before and after.
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData])
 
-  /// Informs about the cell is either moved to another position, changed duration or changed position in a current or a new row.
-  ///
-  /// - Parameters:
-  ///   - midiTimeTableView: Time table that performed changes on.
-  ///   - cell: Edited cell data with changes before and after.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cell: MIDITimeTableViewEditedCellData)
-
   /// Informs about the cell is being deleted.
   ///
   /// - Parameters:
@@ -653,7 +646,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     timeTableDelegate?.midiTimeTableView(
       self,
-      didEdit: (MIDITimeTableViewCellIndex(row: row, column: index), newCellRow, newCellPosition, newCellDuration))
+      didEdit: [(MIDITimeTableViewCellIndex(row: row, column: index), newCellRow, newCellPosition, newCellDuration)])
 
     editingCellRow = nil
     cellView.isSelected = false
