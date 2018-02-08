@@ -221,9 +221,26 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     return 100
   }
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAt index: MIDITimeTableViewCellIndex) {
-    rowData[index.row].cells.remove(at: index.column)
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableViewCellIndex]) {
+    var deletingIndices = [Int: [Int]]() // [rowIndex: [colIndex]]
+    for cell in cells {
+      if deletingIndices[cell.row] == nil {
+        deletingIndices[cell.row] = [cell.column]
+      } else {
+        deletingIndices[cell.row]?.append(cell.column)
+        deletingIndices[cell.row]?.sort()
+      }
+    }
+
+    for (row, col) in deletingIndices {
+      rowData[row].cells = rowData[row].cells.enumerated().filter({ !col.contains($0.offset) }).map({ $0.element })
+    }
+
     timeTableView?.reloadData()
+  }
+
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCell]) {
+    return
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAt index: MIDITimeTableViewCellIndex, newCellRow: Int, newCellPosition: Double, newCellDuration: Double) {

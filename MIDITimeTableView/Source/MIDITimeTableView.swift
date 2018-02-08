@@ -80,8 +80,18 @@ public protocol MIDITimeTableViewDataSource: class {
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData
 }
 
+/// Edited cell data. Holds the edited cell's index before editing, and new row index, position and duration data after editing.
+public typealias MIDITimeTableViewEditedCell = (index: MIDITimeTableViewCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
+
 /// Delegate functions to inform about editing cells and sizing of the time table.
 public protocol MIDITimeTableViewDelegate: class {
+  /// Informs about the cell is either moved to another position, changed duration or changed position in a current or a new row.
+  ///
+  /// - Parameters:
+  ///   - midiTimeTableView: Time table that performed changes on.
+  ///   - cells: Edited cells data with changes before and after.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCell])
+
   /// Informs about the cell is either moved to another position, changed duration or changed position in a current or a new row.
   ///
   /// - Parameters:
@@ -96,8 +106,8 @@ public protocol MIDITimeTableViewDelegate: class {
   ///
   /// - Parameters:
   ///   - midiTimeTableView: Time table that performed changes on.
-  ///   - index: Rown and column index of the cell in the row.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAt index: MIDITimeTableViewCellIndex)
+  ///   - cells: Row and column indices of the cells will be deleting.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableViewCellIndex])
 
   /// Measure view height in the time table.
   ///
@@ -631,11 +641,11 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   }
 
   public func midiTimeTableCellViewDidDelete(_ midiTimeTableCellView: MIDITimeTableCellView) {
-    cellViews
+    let deletingCellIndices = cellViews
       .flatMap({ $0 })
       .filter({ $0.isSelected })
       .flatMap({ rowAndColumnIndex(of: $0) })
-      .forEach({ timeTableDelegate?.midiTimeTableView(self, didDeleteCellAt: MIDITimeTableViewCellIndex(row: $0.row, column: $0.column)) })
+    timeTableDelegate?.midiTimeTableView(self, didDelete: deletingCellIndices)
   }
 
   private func didEditCell(_ cellView: MIDITimeTableCellView) {
