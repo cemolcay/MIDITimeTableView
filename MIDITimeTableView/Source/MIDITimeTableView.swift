@@ -8,6 +8,38 @@
 
 import UIKit
 
+/// Auto scrolling direction type
+public struct MIDITimeTableViewAutoScrollDirection: OptionSet {
+
+  // MARK: Option Set
+
+  public var rawValue: Int
+
+  public init(rawValue: Int) {
+    self.rawValue = rawValue
+  }
+
+  // MARK: Init
+
+  /// Default initilization with one or more direction types.
+  ///
+  /// - Parameter type: Direction types.
+  public init(type: [MIDITimeTableViewAutoScrollDirection]) {
+    var direction = MIDITimeTableViewAutoScrollDirection()
+    type.forEach({ direction.insert($0) })
+    self = direction
+  }
+
+  /// Left direction
+  public static let left = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 0)
+  /// Right direction
+  public static let right = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 1)
+  /// Up direction
+  public static let up = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 2)
+  /// Down direction
+  public static let down = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 3)
+}
+
 /// Populates the `MIDITimeTableView` with the datas of rows and cells.
 public protocol MIDITimeTableViewDataSource: class {
   /// Number of rows in the time table.
@@ -131,9 +163,12 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var dragTimer: Timer?
   private let dragTimerInterval: TimeInterval = 0.5
   private var dragStartPosition: CGPoint = .zero
+  private var dragCurrentPosition: CGPoint?
   private var dragView: UIView?
   private var initialDragViewSize: CGFloat = 30
-  private var dragViewAutoScrollingThreshold: CGFloat = 20
+  private var dragViewAutoScrollingThreshold: CGFloat = 50
+  private var autoScrollingTimer: Timer?
+  private var autoScrollingTimerInterval: TimeInterval = 0.3
 
   private var beatWidth: CGFloat {
     return measureWidth / CGFloat(measureView.beatCount)
@@ -338,43 +373,30 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     super.touchesMoved(touches, with: event)
     guard let touchLocation = touches.first?.location(in: self) else { return }
     updateDragView(touchLocation: touchLocation)
+    endAutoScrolling()
 
     // Make scroll view scroll if drag view hits the limit
+    var autoScrollDirection = MIDITimeTableViewAutoScrollDirection()
     var visibleRect = CGRect(origin: contentOffset, size: bounds.size)
     if touchLocation.y < visibleRect.minY + dragViewAutoScrollingThreshold { // move up
       visibleRect.origin.y -= dragViewAutoScrollingThreshold
-      scrollRectToVisible(visibleRect, completion: {
-        self.updateDragView(touchLocation: CGPoint(x: touchLocation.x, y: touchLocation.y - self.dragViewAutoScrollingThreshold))
-      })
+      autoScrollDirection.insert(.up)
     } else if touchLocation.y > visibleRect.maxY - dragViewAutoScrollingThreshold { // move down
-      visibleRect.origin.y += dragViewAutoScrollingThreshold
-      scrollRectToVisible(visibleRect, completion: {
-        self.updateDragView(touchLocation: CGPoint(x: touchLocation.x, y: touchLocation.y + self.dragViewAutoScrollingThreshold))
-      })
+      autoScrollDirection.insert(.down)
     }
-
     if touchLocation.x < visibleRect.minX + dragViewAutoScrollingThreshold { // move left
-      visibleRect.origin.x -= dragViewAutoScrollingThreshold
-      scrollRectToVisible(visibleRect, completion: {
-        self.updateDragView(touchLocation: CGPoint(x: touchLocation.x - self.dragViewAutoScrollingThreshold, y: touchLocation.y))
-      })
+      autoScrollDirection.insert(.left)
     } else if touchLocation.x > visibleRect.maxX - dragViewAutoScrollingThreshold { // move right
-      visibleRect.origin.x += dragViewAutoScrollingThreshold
-      scrollRectToVisible(visibleRect, completion: {
-        self.updateDragView(touchLocation: CGPoint(x: touchLocation.x + self.dragViewAutoScrollingThreshold, y: touchLocation.y))
-      })
+      autoScrollDirection.insert(.right)
     }
-  }
 
-  private func scrollRectToVisible(_ visibleRect: CGRect, completion: @escaping () -> Void) {
-    UIView.animate(
-      withDuration: 0.3,
-      animations: {
-        self.scrollRectToVisible(visibleRect, animated: false)
-      },
-      completion: { _ in
-        completion()
-    })
+    if autoScrollDirection.isEmpty {
+      endAutoScrolling()
+      dragCurrentPosition = nil
+    } else {
+      dragCurrentPosition = touchLocation
+      startAutoScrollTimer(with: autoScrollDirection)
+    }
   }
 
   private func updateDragView(touchLocation: CGPoint) {
@@ -414,6 +436,65 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       .forEach({ $0.isSelected = dragView.frame.intersects($0.frame) })
   }
 
+  private func startAutoScrollTimer(with direction: MIDITimeTableViewAutoScrollDirection) {
+    autoScrollingTimer = Timer.scheduledTimer(
+      timeInterval: autoScrollingTimerInterval,
+      target: self,
+      selector: #selector(autoScrollTimerTick(timer:)),
+      userInfo: ["direction": direction],
+      repeats: true)
+  }
+
+  @objc private func autoScrollTimerTick(timer: Timer) {
+    guard let userInfo = timer.userInfo as? [String: Any],
+      let dragCurrentPosition = dragCurrentPosition,
+      let direction = userInfo["direction"] as? MIDITimeTableViewAutoScrollDirection
+      else { return }
+
+    var scrollDirection = CGPoint.zero
+    if direction.contains(.left) {
+      scrollDirection.x -= 1
+    }
+    if direction.contains(.right) {
+      scrollDirection.x += 1
+    }
+    if direction.contains(.up) {
+      scrollDirection.y -= 1
+    }
+    if direction.contains(.down) {
+      scrollDirection.y += 1
+    }
+
+    // Calculate and auto scroll
+
+    let scrollAmount = CGSize(
+      width: scrollDirection.x * dragViewAutoScrollingThreshold,
+      height: scrollDirection.y * dragViewAutoScrollingThreshold)
+
+    let visibleRect = CGRect(
+      origin: CGPoint(
+        x: contentOffset.x + scrollAmount.width,
+        y: contentOffset.y + scrollAmount.height),
+      size: bounds.size)
+
+    let position = CGPoint(
+      x: dragCurrentPosition.x + scrollAmount.width,
+      y: dragCurrentPosition.y + scrollAmount.height)
+
+    UIView.animate(
+      withDuration: autoScrollingTimerInterval,
+      animations: {
+        self.scrollRectToVisible(visibleRect, animated: false)
+        self.updateDragView(touchLocation: position)
+      },
+      completion: { _ in self.updateDragView(touchLocation: position)})
+  }
+
+  private func endAutoScrolling() {
+    autoScrollingTimer?.invalidate()
+    autoScrollingTimer = nil
+  }
+
   open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
     super.touchesCancelled(touches, with: event)
     endDragging()
@@ -425,6 +506,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   }
 
   private func endDragging() {
+    // Disable auto scrolling
+    endAutoScrolling()
     // Enable scrolling back
     isScrollEnabled = true
     // Reset timer
