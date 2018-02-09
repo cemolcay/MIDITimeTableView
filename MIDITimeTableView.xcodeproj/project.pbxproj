@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		B22020FE202E3E75005A8339 /* MIDITimeTableHistory.swift in Sources */ = {isa = PBXBuildFile; fileRef = B22020FD202E3E75005A8339 /* MIDITimeTableHistory.swift */; };
 		B27C690A1FC706F800816627 /* MIDITimeTablePlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27C69091FC706F800816627 /* MIDITimeTablePlayheadView.swift */; };
 		B29FB6AF1F923E07006E4EA8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29FB6AE1F923E07006E4EA8 /* AppDelegate.swift */; };
 		B29FB6B11F923E07006E4EA8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29FB6B01F923E07006E4EA8 /* ViewController.swift */; };
@@ -26,6 +27,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		B22020FD202E3E75005A8339 /* MIDITimeTableHistory.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTableHistory.swift; sourceTree = "<group>"; };
 		B27C69091FC706F800816627 /* MIDITimeTablePlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTablePlayheadView.swift; sourceTree = "<group>"; };
 		B29FB6AB1F923E07006E4EA8 /* MIDITimeTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MIDITimeTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B29FB6AE1F923E07006E4EA8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
@@ -101,6 +103,7 @@
 				B2A510111F9543D5005FE3DB /* MIDITimeTableTimeSignature.swift */,
 				B2A5101B1F95447F005FE3DB /* MIDITimeTableRowData.swift */,
 				B2A5101D1F95449F005FE3DB /* MIDITimeTableCellData.swift */,
+				B22020FD202E3E75005A8339 /* MIDITimeTableHistory.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -178,6 +181,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				B2A510161F954414005FE3DB /* MIDITimeTableMeasureView.swift in Sources */,
+				B22020FE202E3E75005A8339 /* MIDITimeTableHistory.swift in Sources */,
 				B2A5100E1F954394005FE3DB /* MIDITimeTableGridLayer.swift in Sources */,
 				B2A5101E1F95449F005FE3DB /* MIDITimeTableCellData.swift in Sources */,
 				B29FB6C21F923E31006E4EA8 /* MIDITimeTableView.swift in Sources */,

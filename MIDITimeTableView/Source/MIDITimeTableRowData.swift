@@ -39,12 +39,21 @@ extension Collection where Iterator.Element == MIDITimeTableRowData {
     }
   }
 
+  /// Adds a cell data in a row.
+  ///
+  /// - Parameters:
+  ///   - cell: Cell data to append.
+  ///   - at: The row index to append cell data.
   public mutating func appendCell(_ cell: MIDITimeTableCellData, row at: Int) {
     guard var this = self as? [MIDITimeTableRowData] else { return }
     this[at].cells.append(cell)
     self = this as! Self
   }
 
+  /// Removes a cell from an index.
+  ///
+  /// - Parameter index: Cell index of the cell will be removed.
+  /// - Returns: Returns the removed cell.
   public mutating func removeCell(at index: MIDITimeTableCellIndex) -> MIDITimeTableCellData {
     guard var this = self as? [MIDITimeTableRowData] else { fatalError() }
     let cell = this[index.row].cells.remove(at: index.index)
@@ -52,6 +61,9 @@ extension Collection where Iterator.Element == MIDITimeTableRowData {
     return cell
   }
 
+  /// Removes multiple cells from multiple indices.
+  ///
+  /// - Parameter indicies: Indices of cells that will be removed.
   public mutating func removeCells(at indicies: [MIDITimeTableCellIndex]) {
     guard var this = self as? [MIDITimeTableRowData] else { fatalError() }
     for (row, index) in indicies.ordered {

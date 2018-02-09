@@ -107,7 +107,7 @@ public protocol MIDITimeTableViewDelegate: class {
 }
 
 /// Draws time table with multiple rows and editable cells. Heavily customisable.
-open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDITimeTablePlayheadViewDelegate {
+open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDITimeTablePlayheadViewDelegate, MIDITimeTableHistoryDelegate {
   /// Property to show measure bar. Defaults true.
   public var showsMeasure: Bool = true
   /// Property to show header cells in each row. Defaults true.
@@ -116,6 +116,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   public var showsGrid: Bool = true
   /// Property to show playhead. Defaults true.
   public var showsPlayhead: Bool = true
+  /// Property to enable/disable history feature. Deafults true.
+  public var holdsHistory: Bool = true
+
 
   /// Speed of zooming by pinch gesture.
   public var zoomSpeed: CGFloat = 0.4
@@ -142,8 +145,13 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   public private(set) var playheadView = MIDITimeTablePlayheadView()
 
   // Delegate and data source references
+  /// Current data to display of the time table.
   private var rowData = [MIDITimeTableRowData]()
+  /// History data that holds each `rowData` on each `reloadData` cycle.
+  public private(set) var history = MIDITimeTableHistory()
+  /// All row header cell views currently displaying.
   public private(set) var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
+  /// All data cell views currently displaying.
   public private(set) var cellViews = [[MIDITimeTableCellView]]()
 
   /// Data source object of the time table to populate its data.
@@ -191,6 +199,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private func commonInit() {
     addSubview(measureView)
     addSubview(playheadView)
+    history.delegate = self
     playheadView.delegate = self
     playheadView.layer.zPosition = 10
     layer.insertSublayer(gridLayer, at: 0)
@@ -273,21 +282,24 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     gridLayer.frame = CGRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height)
   }
 
-  /// Populates row and cell datas from its data source and redraws time table.
-  public func reloadData() {
+
+  /// Populates row and cell datas from its data source and redraws time table. Could be invoked with an history item.
+  ///
+  /// - Parameter historyItem: Optional history item. Defaults nil.
+  public func reloadData(historyItem: MIDITimeTableHistoryItem? = nil) {
     // Data source
     rowHeaderCellViews.forEach({ $0.removeFromSuperview() })
     rowHeaderCellViews = []
     cellViews.flatMap({ $0 }).forEach({ $0.removeFromSuperview() })
     cellViews = []
 
-    let numberOfRows = dataSource?.numberOfRows(in: self) ?? 0
+    let numberOfRows = historyItem?.count ?? dataSource?.numberOfRows(in: self) ?? 0
     let timeSignature = dataSource?.timeSignature(of: self) ?? MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
     measureView.beatCount = timeSignature.beats
 
     rowData.removeAll()
     for i in 0..<numberOfRows {
-      guard let row = dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
+      guard let row = historyItem?[i] ?? dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
       rowData.insert(row, at: i)
       let rowHeaderCell = row.headerCellView
       rowHeaderCellViews.append(rowHeaderCell)
@@ -310,6 +322,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     headerCellWidth = showsHeaders ? timeTableDelegate?.midiTimeTableViewWidthForRowHeaderCells(self) ?? headerCellWidth : 0
 
     gridLayer.setNeedsLayout()
+    history.append(item: rowData)
   }
 
   /// Gets the row and column index of the cell view in the data source.
@@ -673,5 +686,11 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       timeTableDelegate?.midiTimeTableView(self, didUpdatePlayhead: playheadView.position)
       panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
     }
+  }
+
+  // MARK: MIDITimeTableHistoryDelegate
+
+  public func midiTimeTableHistory(_ history: MIDITimeTableHistory, didHistoryChange item: MIDITimeTableHistoryItem) {
+
   }
 }
