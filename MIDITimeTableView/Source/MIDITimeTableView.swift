@@ -287,7 +287,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   ///
   /// - Parameter historyItem: Optional history item. Defaults nil.
   public func reloadData(historyItem: MIDITimeTableHistoryItem? = nil) {
-    // Data source
+    // Reset data source
     rowHeaderCellViews.forEach({ $0.removeFromSuperview() })
     rowHeaderCellViews = []
     cellViews.flatMap({ $0 }).forEach({ $0.removeFromSuperview() })
@@ -297,6 +297,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let timeSignature = dataSource?.timeSignature(of: self) ?? MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
     measureView.beatCount = timeSignature.beats
 
+    // Update rowData
     rowData.removeAll()
     for i in 0..<numberOfRows {
       guard let row = historyItem?[i] ?? dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
@@ -321,8 +322,15 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     measureHeight = showsMeasure ? (timeTableDelegate?.midiTimeTableViewHeightForMeasureView(self) ?? measureHeight) : 0
     headerCellWidth = showsHeaders ? timeTableDelegate?.midiTimeTableViewWidthForRowHeaderCells(self) ?? headerCellWidth : 0
 
+    // Update grid
     gridLayer.setNeedsLayout()
-    history.append(item: rowData)
+
+    // Keep history
+    if holdsHistory, historyItem == nil {
+      history.append(item: rowData)
+    }
+
+    print("history changed", history.items.count, history.currentIndex)
   }
 
   /// Gets the row and column index of the cell view in the data source.
@@ -691,6 +699,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   // MARK: MIDITimeTableHistoryDelegate
 
   public func midiTimeTableHistory(_ history: MIDITimeTableHistory, didHistoryChange item: MIDITimeTableHistoryItem) {
-
+    if holdsHistory {
+      reloadData(historyItem: item)
+    }
   }
 }

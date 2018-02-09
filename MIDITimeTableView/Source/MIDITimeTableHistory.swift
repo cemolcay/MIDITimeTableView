@@ -45,7 +45,7 @@ public class MIDITimeTableHistory {
 
   /// Returns true if user could do redo.
   public var hasNextItem: Bool {
-    return currentIndex < limit - 1
+    return currentIndex < items.count - 1
   }
 
   /// Manages history item limit changes.
@@ -84,17 +84,13 @@ public class MIDITimeTableHistory {
   ///
   /// - Parameter item: Item to add to history.
   public func append(item: MIDITimeTableHistoryItem) {
-    // Do not add new items if we are time traveling.
-    if currentIndex < items.count - 1 {
-      return
-    }
     // If we hit the limit, remove first item.
     if items.count >= limit {
       items.remove(at: 0)
     }
     // Append item end of the queue.
     items.append(item)
-    currentIndex = items.count - 1
+    currentIndex += 1
   }
 }
 
