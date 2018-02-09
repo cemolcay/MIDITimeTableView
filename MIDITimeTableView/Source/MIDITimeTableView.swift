@@ -163,8 +163,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var dragStartPosition: CGPoint = .zero
   private var dragCurrentPosition: CGPoint?
   private var dragView: UIView?
-  private var initialDragViewSize: CGFloat = 30
-  private var dragViewAutoScrollingThreshold: CGFloat = 50
+  private var initialDragViewSize: CGFloat = 90
+  private var dragViewAutoScrollingThreshold: CGFloat = 100
   private var autoScrollingTimer: Timer?
   private var autoScrollingTimerInterval: TimeInterval = 0.3
 
@@ -385,15 +385,15 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // Make scroll view scroll if drag view hits the limit
     var autoScrollDirection = MIDITimeTableViewAutoScrollDirection()
     var visibleRect = CGRect(origin: contentOffset, size: bounds.size)
-    if touchLocation.y < visibleRect.minY + dragViewAutoScrollingThreshold { // move up
+    if touchLocation.y < visibleRect.minY + dragViewAutoScrollingThreshold, contentOffset.y > 0 { // move up
       visibleRect.origin.y -= dragViewAutoScrollingThreshold
       autoScrollDirection.insert(.up)
-    } else if touchLocation.y > visibleRect.maxY - dragViewAutoScrollingThreshold { // move down
+    } else if touchLocation.y > visibleRect.maxY - dragViewAutoScrollingThreshold, contentOffset.y + frame.size.height < contentSize.height { // move down
       autoScrollDirection.insert(.down)
     }
-    if touchLocation.x < visibleRect.minX + dragViewAutoScrollingThreshold { // move left
+    if touchLocation.x < visibleRect.minX + dragViewAutoScrollingThreshold, contentOffset.x > 0 { // move left
       autoScrollDirection.insert(.left)
-    } else if touchLocation.x > visibleRect.maxX - dragViewAutoScrollingThreshold { // move right
+    } else if touchLocation.x > visibleRect.maxX - dragViewAutoScrollingThreshold, contentOffset.x + frame.size.width < contentSize.width { // move right
       autoScrollDirection.insert(.right)
     }
 

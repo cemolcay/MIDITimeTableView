@@ -112,6 +112,18 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         let title = cellData.data as? String ?? ""
         return CellView(title: title)
       }),
+    MIDITimeTableRowData(
+      cells: [
+        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
+        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
+        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
+        MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
+        ],
+      headerCellView: HeaderCellView(title: "Chords"),
+      cellView: { cellData in
+        let title = cellData.data as? String ?? ""
+        return CellView(title: title)
+    }),
 
     MIDITimeTableRowData(
       cells: [
