@@ -8,6 +8,52 @@
 
 import UIKit
 
+/// Defines cell index in the time table view.
+public struct MIDITimeTableCellIndex: Hashable {
+  /// Row index of the cell.
+  public var row: Int
+  /// Index number in the row. Does not represent column.
+  public var index: Int
+  /// Hashable value
+  public var hashValue: Int
+
+  /// Initilizes the index with row and column indices.
+  ///
+  /// - Parameter row: Row index of the cell.
+  /// - Parameter index: Index number in the row.
+  public init(row: Int, index: Int) {
+    self.row = row
+    self.index = index
+    hashValue = row.hashValue ^ index.hashValue &* 16777619
+  }
+
+  // MARK: Equatable
+
+  /// Checks equality between two indices.
+  ///
+  /// - Parameters:
+  ///   - lhs: Left hand side of the equation.
+  ///   - rhs: Right hand side of the equation.
+  /// - Returns: Returns true if two indicies are equal, otherwise returns false.
+  public static func ==(lhs: MIDITimeTableCellIndex, rhs: MIDITimeTableCellIndex) -> Bool {
+    return lhs.row == rhs.row && lhs.index == rhs.index
+  }
+}
+
+extension Collection where Iterator.Element == MIDITimeTableCellIndex {
+
+  /// Creates a dictionary that rows as key and indices of same rows as their value.
+  public var ordered: [Int: [Int]] {
+    guard let this = self as? [MIDITimeTableCellIndex] else { fatalError() }
+    var dict = [Int: [Int]]()
+    let keys = Set(this.map({ $0.row })).sorted()
+    for key in keys {
+      dict[key] = this.filter({ $0.row == key }).map({ $0.index })
+    }
+    return dict
+  }
+}
+
 /// Data of each cell in the rows of `MIDITimeTableView`.
 public struct MIDITimeTableCellData {
   /// Actual data to show on views.

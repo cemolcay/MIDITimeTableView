@@ -40,23 +40,6 @@ public struct MIDITimeTableViewAutoScrollDirection: OptionSet {
   public static let down = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 3)
 }
 
-/// Defines cell index in the time table view.
-public struct MIDITimeTableViewCellIndex {
-  /// Row index of the cell.
-  public var row: Int
-  /// Column index of the cell.
-  public var column: Int
-
-  /// Initilizes the index with row and column indices.
-  ///
-  /// - Parameter row: Row index of the cell.
-  /// - Parameter column: Column index of the cell.
-  public init(row: Int, column: Int) {
-    self.row = row
-    self.column = column
-  }
-}
-
 /// Populates the `MIDITimeTableView` with the datas of rows and cells.
 public protocol MIDITimeTableViewDataSource: class {
   /// Number of rows in the time table.
@@ -81,7 +64,7 @@ public protocol MIDITimeTableViewDataSource: class {
 }
 
 /// Edited cell data. Holds the edited cell's index before editing, and new row index, position and duration data after editing.
-public typealias MIDITimeTableViewEditedCellData = (index: MIDITimeTableViewCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
+public typealias MIDITimeTableViewEditedCellData = (index: MIDITimeTableCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
 
 /// Delegate functions to inform about editing cells and sizing of the time table.
 public protocol MIDITimeTableViewDelegate: class {
@@ -97,7 +80,7 @@ public protocol MIDITimeTableViewDelegate: class {
   /// - Parameters:
   ///   - midiTimeTableView: Time table that performed changes on.
   ///   - cells: Row and column indices of the cells will be deleting.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableViewCellIndex])
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex])
 
   /// Measure view height in the time table.
   ///
@@ -173,9 +156,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var rowHeight: CGFloat = 60
   private var measureHeight: CGFloat = 30
   private var headerCellWidth: CGFloat = 120
+  private var editingCellIndices = [MIDITimeTableCellIndex]()
 
   private var dragTimer: Timer?
-  private let dragTimerInterval: TimeInterval = 0.5
+  private var dragTimerInterval: TimeInterval = 0.5
   private var dragStartPosition: CGPoint = .zero
   private var dragCurrentPosition: CGPoint?
   private var dragView: UIView?
@@ -332,10 +316,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   ///
   /// - Parameter cell: The cell you want to get row and column info.
   /// - Returns: Returns a row and column index Int pair in a tuple.
-  public func cellIndex(of cell: MIDITimeTableCellView) -> MIDITimeTableViewCellIndex? {
+  public func cellIndex(of cell: MIDITimeTableCellView) -> MIDITimeTableCellIndex? {
     let row = Int((cell.frame.minY - measureHeight) / rowHeight)
-    guard let column = cellViews[row].index(of: cell), row < cellViews.count else { return nil }
-    return MIDITimeTableViewCellIndex(row: row, column: column)
+    guard let index = cellViews[row].index(of: cell), row < cellViews.count else { return nil }
+    return MIDITimeTableCellIndex(row: row, index: index)
   }
 
   /// Unselects all cells if tapped an empty area of the time table.
@@ -415,7 +399,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     if autoScrollDirection.isEmpty {
       endAutoScrolling()
-      dragCurrentPosition = nil
     } else {
       dragCurrentPosition = touchLocation
       startAutoScrollTimer(with: autoScrollDirection)
@@ -516,6 +499,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private func endAutoScrolling() {
     autoScrollingTimer?.invalidate()
     autoScrollingTimer = nil
+    dragCurrentPosition = nil
   }
 
   open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -573,6 +557,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     if case .began = pan.state {
       midiTimeTableCellView.isSelected = true
+      editingCellIndices = cellViews.flatMap({ $0 }).filter({ $0.isSelected }).flatMap({ cellIndex(of: $0) })
     }
 
     isMoving = true
@@ -599,7 +584,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     if case .ended = pan.state {
       isMoving = false
-      didEditCells(selectedCells.flatMap({ cellIndex(of: $0) }))
+      didEditCells(editingCellIndices)
     }
   }
 
@@ -612,6 +597,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     if case .began = pan.state {
       isResizing = true
       midiTimeTableCellView.isSelected = true
+      editingCellIndices = cellViews.flatMap({ $0 }).filter({ $0.isSelected }).flatMap({ cellIndex(of: $0) })
     }
 
     for cell in selectedCells {
@@ -626,8 +612,28 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     if case .ended = pan.state {
       isResizing = false
-      didEditCells(selectedCells.flatMap({ cellIndex(of: $0) }))
+      didEditCells(editingCellIndices)
     }
+  }
+
+  private func didEditCells(_ cells: [MIDITimeTableCellIndex]) {
+    var editedCells = [MIDITimeTableViewEditedCellData]()
+
+    for cell in cells {
+      let cellView = cellViews[cell.row][cell.index]
+      let newCellPosition = Double(cellView.frame.minX - headerCellWidth) / Double(beatWidth)
+      let newCellDuration = Double(cellView.frame.size.width / beatWidth)
+      let newCellRow = Int((cellView.frame.minY - measureHeight) / rowHeight)
+
+      editedCells.append((
+        cell,
+        newCellRow,
+        newCellPosition,
+        newCellDuration))
+    }
+
+    editingCellIndices = []
+    timeTableDelegate?.midiTimeTableView(self, didEdit: editedCells)
   }
 
   public func midiTimeTableCellViewDidTap(_ midiTimeTableCellView: MIDITimeTableCellView) {
@@ -642,27 +648,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       .filter({ $0.isSelected })
       .flatMap({ cellIndex(of: $0) })
     timeTableDelegate?.midiTimeTableView(self, didDelete: deletingCellIndices)
-  }
-
-  private func didEditCells(_ cells: [MIDITimeTableViewCellIndex]) {
-    var editedCells = [MIDITimeTableViewEditedCellData]()
-
-    for cell in cells {
-      let cellView = cellViews[cell.row][cell.column]
-      let newCellPosition = Double(cellView.frame.minX - headerCellWidth) / Double(beatWidth)
-      let newCellDuration = Double(cellView.frame.size.width / beatWidth)
-      let newCellRow = Int((cellView.frame.minY - measureHeight) / rowHeight)
-
-      editedCells.append((
-        cell,
-        newCellRow,
-        newCellPosition,
-        newCellDuration))
-    }
-
-    timeTableDelegate?.midiTimeTableView(
-      self,
-      didEdit: editedCells)
   }
 
   // MARK: MIDITimeTablePlayheadViewDelegate

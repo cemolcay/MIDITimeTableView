@@ -221,13 +221,13 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     return 100
   }
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableViewCellIndex]) {
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
     var deletingIndices = [Int: [Int]]() // [rowIndex: [colIndex]]
     for cell in cells {
       if deletingIndices[cell.row] == nil {
-        deletingIndices[cell.row] = [cell.column]
+        deletingIndices[cell.row] = [cell.index]
       } else {
-        deletingIndices[cell.row]?.append(cell.column)
+        deletingIndices[cell.row]?.append(cell.index)
         deletingIndices[cell.row]?.sort()
       }
     }
@@ -240,19 +240,21 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData]) {
-    for cell in cells {
-      var editedCell = rowData[cell.index.row].cells[cell.index.column]
-      editedCell.duration = cell.newDuration
-      editedCell.position = cell.newPosition
+    var removingCells = [MIDITimeTableCellIndex]()
 
-      if cell.index.row == cell.newRowIndex {
-        rowData[cell.index.row].cells[cell.index.column] = editedCell
-      } else { // move cell to new row
-        rowData[cell.index.row].cells.remove(at: cell.index.column)
-        rowData[cell.newRowIndex].cells.append(editedCell)
+    for cell in cells {
+      // Update edited cell
+      rowData[cell.index].duration = cell.newDuration
+      rowData[cell.index].position = cell.newPosition
+
+      // update cell row
+      if cell.index.row != cell.newRowIndex {
+        rowData.appendCell(rowData[cell.index], row: cell.newRowIndex)
+        removingCells.append(cell.index)
       }
     }
 
+    rowData.removeCells(at: removingCells)
     timeTableView?.reloadData()
   }
 
