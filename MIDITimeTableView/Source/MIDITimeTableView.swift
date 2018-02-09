@@ -562,21 +562,29 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     isMoving = true
 
+    let selectedCellsPositionY = selectedCells.map({ $0.frame.origin.y }).sorted()
+    let topMostSelectedCellRowY = selectedCellsPositionY.first ?? 0
+    let bottomMostSelectedCellRowY = selectedCellsPositionY.last ?? 0
+
     for cell in selectedCells {
       // Horizontal move
-      if translation.x > subbeatWidth, cell.frame.maxX < contentSize.width {
+      if translation.x > subbeatWidth, cell.frame.maxX < contentSize.width { // Right
         cell.frame.origin.x += subbeatWidth
         pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
-      } else if translation.x < -subbeatWidth, cell.frame.minX > headerCellWidth {
+      } else if translation.x < -subbeatWidth, cell.frame.minX > headerCellWidth { // Left
         cell.frame.origin.x -= subbeatWidth
         pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
       }
 
       // Vertical move
-      if translation.y > rowHeight, cell.frame.maxY < measureHeight + (rowHeight * CGFloat(cellViews.count)) {
+      if translation.y > rowHeight,
+        cell.frame.maxY < measureHeight + (rowHeight * CGFloat(cellViews.count)),
+        bottomMostSelectedCellRowY + rowHeight < measureHeight + (rowHeight * CGFloat(cellViews.count)) { // Down
         cell.frame.origin.y += rowHeight
         pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
-      } else if translation.y < -rowHeight, cell.frame.minY > measureHeight {
+      } else if translation.y < -rowHeight,
+          cell.frame.minY > measureHeight,
+          topMostSelectedCellRowY > measureHeight { // Up
         cell.frame.origin.y -= rowHeight
         pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
       }
