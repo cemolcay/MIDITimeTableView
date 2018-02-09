@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import ALKit
 
 /// Delegate functions to inform about editing or deleting cell.
 public protocol MIDITimeTableCellViewDelegate: class {
@@ -24,6 +23,11 @@ public protocol MIDITimeTableCellViewDelegate: class {
   ///   - midiTimeTableCellView: Cell that resizing.
   ///   - pan: Pan gesture that resizes the cell.
   func midiTimeTableCellViewDidResize(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer)
+
+  /// Informs about the cell has been tapped.
+  ///
+  /// - Parameter midiTimeTableCellView: The cell that tapped.
+  func midiTimeTableCellViewDidTap(_ midiTimeTableCellView: MIDITimeTableCellView)
 
   /// Informs about the cell is about to delete.
   ///
@@ -64,6 +68,8 @@ open class MIDITimeTableCellView: UIView {
   public weak var delegate: MIDITimeTableCellViewDelegate?
   /// Custom items other than delete, when you long press cell.
   public var customMenuItems = [MIDITimeTableCellViewCustomMenuItem]()
+  /// When cell's position or duration editing, is selected.
+  public var isSelected: Bool = false
 
   open override var canBecomeFirstResponder: Bool {
     return true
@@ -86,11 +92,19 @@ open class MIDITimeTableCellView: UIView {
     let resizeGesture = UIPanGestureRecognizer(target: self, action: #selector(didResize(pan:)))
     resizeView.addGestureRecognizer(resizeGesture)
 
+    let tapGesture = UITapGestureRecognizer(target: self, action: #selector(didTap(tap:)))
+    addGestureRecognizer(tapGesture)
+    
     let moveGesture = UIPanGestureRecognizer(target: self, action: #selector(didMove(pan:)))
     addGestureRecognizer(moveGesture)
 
     let longPressGesure = UILongPressGestureRecognizer(target: self, action: #selector(didLongPress(longPress:)))
     addGestureRecognizer(longPressGesure)
+
+    NotificationCenter.default.addObserver(self,
+      selector: #selector(menuControllerWillHideNotification),
+      name: .UIMenuControllerWillHideMenu,
+      object: nil)
   }
 
   // MARK: Layout
@@ -105,6 +119,9 @@ open class MIDITimeTableCellView: UIView {
   }
 
   // MARK: Gestures
+  @objc public func didTap(tap: UITapGestureRecognizer) {
+    delegate?.midiTimeTableCellViewDidTap(self)
+  }
 
   @objc public func didMove(pan: UIPanGestureRecognizer) {
     delegate?.midiTimeTableCellViewDidMove(self, pan: pan)
@@ -117,6 +134,7 @@ open class MIDITimeTableCellView: UIView {
   @objc public func didLongPress(longPress: UILongPressGestureRecognizer) {
     guard let superview = superview else { return }
     becomeFirstResponder()
+    isSelected = true
 
     let menu = UIMenuController.shared
     menu.menuItems = [
@@ -131,5 +149,9 @@ open class MIDITimeTableCellView: UIView {
 
   @objc public func didPressDeleteButton() {
     delegate?.midiTimeTableCellViewDidDelete(self)
+  }
+
+  @objc public func menuControllerWillHideNotification() {
+    isSelected = false
   }
 }

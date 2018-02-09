@@ -7,7 +7,6 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		914F99B55F3BF3515EF96172 /* Pods_MIDITimeTableView.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 202293A5DB1DE9749CAC9296 /* Pods_MIDITimeTableView.framework */; };
 		B27C690A1FC706F800816627 /* MIDITimeTablePlayheadView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B27C69091FC706F800816627 /* MIDITimeTablePlayheadView.swift */; };
 		B29FB6AF1F923E07006E4EA8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29FB6AE1F923E07006E4EA8 /* AppDelegate.swift */; };
 		B29FB6B11F923E07006E4EA8 /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = B29FB6B01F923E07006E4EA8 /* ViewController.swift */; };
@@ -27,13 +26,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		202293A5DB1DE9749CAC9296 /* Pods_MIDITimeTableView.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_MIDITimeTableView.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		6745DEA4E4F2BEA9C452B7E9 /* Pods-MIDITimeTableView.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MIDITimeTableView.debug.xcconfig"; path = "Pods/Target Support Files/Pods-MIDITimeTableView/Pods-MIDITimeTableView.debug.xcconfig"; sourceTree = "<group>"; };
-		A3D2E1AD28EB061BA62032AA /* Pods-MIDITimeTableView.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-MIDITimeTableView.release.xcconfig"; path = "Pods/Target Support Files/Pods-MIDITimeTableView/Pods-MIDITimeTableView.release.xcconfig"; sourceTree = "<group>"; };
 		B27C69091FC706F800816627 /* MIDITimeTablePlayheadView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MIDITimeTablePlayheadView.swift; sourceTree = "<group>"; };
 		B29FB6AB1F923E07006E4EA8 /* MIDITimeTableView.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = MIDITimeTableView.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		B29FB6AE1F923E07006E4EA8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
-		B29FB6B01F923E07006E4EA8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ViewController.swift; sourceTree = "<group>"; };
+		B29FB6B01F923E07006E4EA8 /* ViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = ViewController.swift; sourceTree = "<group>"; };
 		B29FB6B31F923E07006E4EA8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		B29FB6B51F923E07006E4EA8 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		B29FB6B81F923E07006E4EA8 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
@@ -55,37 +51,17 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				914F99B55F3BF3515EF96172 /* Pods_MIDITimeTableView.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		28978C79BF264D3799298C8B /* Pods */ = {
-			isa = PBXGroup;
-			children = (
-				6745DEA4E4F2BEA9C452B7E9 /* Pods-MIDITimeTableView.debug.xcconfig */,
-				A3D2E1AD28EB061BA62032AA /* Pods-MIDITimeTableView.release.xcconfig */,
-			);
-			name = Pods;
-			sourceTree = "<group>";
-		};
-		393074BDFB44E7EFCED64785 /* Frameworks */ = {
-			isa = PBXGroup;
-			children = (
-				202293A5DB1DE9749CAC9296 /* Pods_MIDITimeTableView.framework */,
-			);
-			name = Frameworks;
-			sourceTree = "<group>";
-		};
 		B29FB6A21F923E07006E4EA8 = {
 			isa = PBXGroup;
 			children = (
 				B29FB6AD1F923E07006E4EA8 /* MIDITimeTableView */,
 				B29FB6AC1F923E07006E4EA8 /* Products */,
-				28978C79BF264D3799298C8B /* Pods */,
-				393074BDFB44E7EFCED64785 /* Frameworks */,
 			);
 			sourceTree = "<group>";
 		};
@@ -115,16 +91,16 @@
 			isa = PBXGroup;
 			children = (
 				B29FB6C11F923E31006E4EA8 /* MIDITimeTableView.swift */,
-				B2A5100D1F954394005FE3DB /* MIDITimeTableGridLayer.swift */,
-				B2A5100F1F9543B6005FE3DB /* MIDITimeTableNoteValue.swift */,
-				B2A510111F9543D5005FE3DB /* MIDITimeTableTimeSignature.swift */,
-				B2A510131F9543FA005FE3DB /* MIDITimeTableMeasureLayer.swift */,
-				B2A510151F954414005FE3DB /* MIDITimeTableMeasureView.swift */,
 				B2A510171F95443A005FE3DB /* MIDITimeTableCellView.swift */,
 				B2A510191F95445A005FE3DB /* MIDITimeTableHeaderCellView.swift */,
+				B2A510151F954414005FE3DB /* MIDITimeTableMeasureView.swift */,
+				B2A510131F9543FA005FE3DB /* MIDITimeTableMeasureLayer.swift */,
+				B2A5100D1F954394005FE3DB /* MIDITimeTableGridLayer.swift */,
+				B27C69091FC706F800816627 /* MIDITimeTablePlayheadView.swift */,
+				B2A5100F1F9543B6005FE3DB /* MIDITimeTableNoteValue.swift */,
+				B2A510111F9543D5005FE3DB /* MIDITimeTableTimeSignature.swift */,
 				B2A5101B1F95447F005FE3DB /* MIDITimeTableRowData.swift */,
 				B2A5101D1F95449F005FE3DB /* MIDITimeTableCellData.swift */,
-				B27C69091FC706F800816627 /* MIDITimeTablePlayheadView.swift */,
 			);
 			path = Source;
 			sourceTree = "<group>";
@@ -136,12 +112,9 @@
 			isa = PBXNativeTarget;
 			buildConfigurationList = B29FB6BD1F923E07006E4EA8 /* Build configuration list for PBXNativeTarget "MIDITimeTableView" */;
 			buildPhases = (
-				E6412CC646622C03CF5FFD0B /* [CP] Check Pods Manifest.lock */,
 				B29FB6A71F923E07006E4EA8 /* Sources */,
 				B29FB6A81F923E07006E4EA8 /* Frameworks */,
 				B29FB6A91F923E07006E4EA8 /* Resources */,
-				1D10661AFF574BD54E00B8DF /* [CP] Embed Pods Frameworks */,
-				4F3FCD434D1C8897E428FC0E /* [CP] Copy Pods Resources */,
 			);
 			buildRules = (
 			);
@@ -198,60 +171,6 @@
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXResourcesBuildPhase section */
-
-/* Begin PBXShellScriptBuildPhase section */
-		1D10661AFF574BD54E00B8DF /* [CP] Embed Pods Frameworks */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${SRCROOT}/Pods/Target Support Files/Pods-MIDITimeTableView/Pods-MIDITimeTableView-frameworks.sh",
-				"${BUILT_PRODUCTS_DIR}/ALKit/ALKit.framework",
-			);
-			name = "[CP] Embed Pods Frameworks";
-			outputPaths = (
-				"${TARGET_BUILD_DIR}/${FRAMEWORKS_FOLDER_PATH}/ALKit.framework",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MIDITimeTableView/Pods-MIDITimeTableView-frameworks.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		4F3FCD434D1C8897E428FC0E /* [CP] Copy Pods Resources */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "[CP] Copy Pods Resources";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "\"${SRCROOT}/Pods/Target Support Files/Pods-MIDITimeTableView/Pods-MIDITimeTableView-resources.sh\"\n";
-			showEnvVarsInLog = 0;
-		};
-		E6412CC646622C03CF5FFD0B /* [CP] Check Pods Manifest.lock */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-				"${PODS_PODFILE_DIR_PATH}/Podfile.lock",
-				"${PODS_ROOT}/Manifest.lock",
-			);
-			name = "[CP] Check Pods Manifest.lock";
-			outputPaths = (
-				"$(DERIVED_FILE_DIR)/Pods-MIDITimeTableView-checkManifestLockResult.txt",
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "diff \"${PODS_PODFILE_DIR_PATH}/Podfile.lock\" \"${PODS_ROOT}/Manifest.lock\" > /dev/null\nif [ $? != 0 ] ; then\n    # print error to STDERR\n    echo \"error: The sandbox is not in sync with the Podfile.lock. Run 'pod install' or update your CocoaPods installation.\" >&2\n    exit 1\nfi\n# This output is used by Xcode 'outputs' to avoid re-running this script phase.\necho \"SUCCESS\" > \"${SCRIPT_OUTPUT_FILE_0}\"\n";
-			showEnvVarsInLog = 0;
-		};
-/* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
 		B29FB6A71F923E07006E4EA8 /* Sources */ = {
@@ -405,7 +324,6 @@
 		};
 		B29FB6BE1F923E07006E4EA8 /* Debug */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = 6745DEA4E4F2BEA9C452B7E9 /* Pods-MIDITimeTableView.debug.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;
@@ -422,7 +340,6 @@
 		};
 		B29FB6BF1F923E07006E4EA8 /* Release */ = {
 			isa = XCBuildConfiguration;
-			baseConfigurationReference = A3D2E1AD28EB061BA62032AA /* Pods-MIDITimeTableView.release.xcconfig */;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				CODE_SIGN_STYLE = Automatic;

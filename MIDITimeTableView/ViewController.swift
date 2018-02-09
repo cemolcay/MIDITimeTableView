@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import ALKit
 
 class HeaderCellView: MIDITimeTableHeaderCellView {
   var titleLabel = UILabel()
@@ -32,15 +31,26 @@ class HeaderCellView: MIDITimeTableHeaderCellView {
     addSubview(titleLabel)
     backgroundColor = UIColor(red: 36.0/255.0, green: 40.0/255.0, blue: 41.0/255.0, alpha: 1)
     titleLabel.textColor = UIColor(red: 216.0/255.0, green: 214.0/255.0, blue: 217.0/255.0, alpha: 1)
-    titleLabel.translatesAutoresizingMaskIntoConstraints = false
     titleLabel.textAlignment = .center
     titleLabel.font = UIFont.boldSystemFont(ofSize: 15)
-    titleLabel.fill(to: self)
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    titleLabel.frame = CGRect(origin: .zero, size: frame.size)
   }
 }
 
 class CellView: MIDITimeTableCellView {
   var titleLabel = UILabel()
+  var selectedBorderColor: UIColor = .yellow
+  var defaultBorderColor: UIColor = .black
+
+  override var isSelected: Bool {
+    didSet {
+      titleLabel.layer.borderColor = (isSelected ? selectedBorderColor : defaultBorderColor).cgColor
+    }
+  }
 
   override init(frame: CGRect) {
     super.init(frame: frame)
@@ -63,7 +73,6 @@ class CellView: MIDITimeTableCellView {
     addSubview(titleLabel)
     titleLabel.backgroundColor = UIColor(red: 16.0/255.0, green: 92.0/255.0, blue: 28.0/255.0, alpha: 1)
     titleLabel.translatesAutoresizingMaskIntoConstraints = false
-    titleLabel.fill(to: self, insets: UIEdgeInsets(top: 5, left: 0, bottom: 5, right: 0))
     titleLabel.textAlignment = .center
     titleLabel.textColor = .white
     titleLabel.layer.masksToBounds = true
@@ -75,6 +84,11 @@ class CellView: MIDITimeTableCellView {
         title: "Custom Menu Item",
         action: #selector(didPressCustomMenuItem))
     ]
+  }
+
+  override func layoutSubviews() {
+    super.layoutSubviews()
+    titleLabel.frame = CGRect(origin: .zero, size: frame.size)
   }
 
   @objc func didPressCustomMenuItem() {
@@ -98,6 +112,18 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         let title = cellData.data as? String ?? ""
         return CellView(title: title)
       }),
+    MIDITimeTableRowData(
+      cells: [
+        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
+        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
+        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
+        MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
+        ],
+      headerCellView: HeaderCellView(title: "Chords"),
+      cellView: { cellData in
+        let title = cellData.data as? String ?? ""
+        return CellView(title: title)
+    }),
 
     MIDITimeTableRowData(
       cells: [
@@ -163,20 +189,12 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    rowData = [MIDITimeTableRowData(
-      cells: [
-        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
-        ],
-      headerCellView: HeaderCellView(title: "Chords"),
-      cellView: { cellData in
-        let title = cellData.data as? String ?? ""
-        return CellView(title: title)
-    })]
 
     timeTableView?.dataSource = self
     timeTableView?.timeTableDelegate = self
     timeTableView?.gridLayer.showsSubbeatLines = false
     timeTableView?.reloadData()
+    
     timeTableView?.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
     timeTableView?.measureView.backgroundColor = UIColor(red: 26.0/255.0, green: 28.0/255.0, blue: 27.0/255.0, alpha: 1)
     timeTableView?.measureView.tintColor = UIColor(red: 119.0/255.0, green: 121.0/255.0, blue: 120.0/255.0, alpha: 1)
@@ -184,11 +202,6 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     timeTableView?.gridLayer.barLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
     timeTableView?.gridLayer.beatLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
     timeTableView?.playheadView.tintColor = UIColor.gray.withAlphaComponent(0.5)
-    view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTap(tap:))))
-  }
-
-  @objc func didTap(tap: UITapGestureRecognizer) {
-    timeTableView?.playheadView.position += 1.0
   }
 
   // MARK: MIDITimeTableViewDataSource
@@ -220,22 +233,41 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     return 100
   }
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAt row: Int, index: Int) {
-    rowData[row].cells.remove(at: index)
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
+    var deletingIndices = [Int: [Int]]() // [rowIndex: [colIndex]]
+    for cell in cells {
+      if deletingIndices[cell.row] == nil {
+        deletingIndices[cell.row] = [cell.index]
+      } else {
+        deletingIndices[cell.row]?.append(cell.index)
+        deletingIndices[cell.row]?.sort()
+      }
+    }
+
+    for (row, col) in deletingIndices {
+      rowData[row].cells = rowData[row].cells.enumerated().filter({ !col.contains($0.offset) }).map({ $0.element })
+    }
+
     timeTableView?.reloadData()
   }
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAt row: Int, index: Int, newCellRow: Int, newCellPosition: Double, newCellDuration: Double) {
-    var cell = rowData[row].cells[index]
-    cell.duration = newCellDuration
-    cell.position = newCellPosition
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData]) {
+    var removingCells = [MIDITimeTableCellIndex]()
 
-    if row == newCellRow {
-      rowData[row].cells[index] = cell
-    } else { // move cell to new row
-      rowData[row].cells.remove(at: index)
-      rowData[newCellRow].cells.append(cell)
+    for cell in cells {
+      // Update edited cell
+      rowData[cell.index].duration = cell.newDuration
+      rowData[cell.index].position = cell.newPosition
+
+      // update cell row
+      if cell.index.row != cell.newRowIndex {
+        rowData.appendCell(rowData[cell.index], row: cell.newRowIndex)
+        removingCells.append(cell.index)
+      }
     }
+
+    rowData.removeCells(at: removingCells)
+    timeTableView?.reloadData()
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double) {

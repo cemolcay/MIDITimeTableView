@@ -8,6 +8,38 @@
 
 import UIKit
 
+/// Auto scrolling direction type
+public struct MIDITimeTableViewAutoScrollDirection: OptionSet {
+
+  // MARK: Option Set
+
+  public var rawValue: Int
+
+  public init(rawValue: Int) {
+    self.rawValue = rawValue
+  }
+
+  // MARK: Init
+
+  /// Default initilization with one or more direction types.
+  ///
+  /// - Parameter type: Direction types.
+  public init(type: [MIDITimeTableViewAutoScrollDirection]) {
+    var direction = MIDITimeTableViewAutoScrollDirection()
+    type.forEach({ direction.insert($0) })
+    self = direction
+  }
+
+  /// Left direction
+  public static let left = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 0)
+  /// Right direction
+  public static let right = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 1)
+  /// Up direction
+  public static let up = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 2)
+  /// Down direction
+  public static let down = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 3)
+}
+
 /// Populates the `MIDITimeTableView` with the datas of rows and cells.
 public protocol MIDITimeTableViewDataSource: class {
   /// Number of rows in the time table.
@@ -31,26 +63,24 @@ public protocol MIDITimeTableViewDataSource: class {
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData
 }
 
+/// Edited cell data. Holds the edited cell's index before editing, and new row index, position and duration data after editing.
+public typealias MIDITimeTableViewEditedCellData = (index: MIDITimeTableCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
+
 /// Delegate functions to inform about editing cells and sizing of the time table.
 public protocol MIDITimeTableViewDelegate: class {
   /// Informs about the cell is either moved to another position, changed duration or changed position in a current or a new row.
   ///
   /// - Parameters:
   ///   - midiTimeTableView: Time table that performed changes on.
-  ///   - row: Initial row index of the edited cell.
-  ///   - index: Index of the cell in the initial row index.
-  ///   - newCellRow: Last row index of cell after editing.
-  ///   - newCellPosition: Last position of cell after editing.
-  ///   - newCellDuration: Last duration of cell after editing.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEditCellAt row: Int, index: Int, newCellRow: Int, newCellPosition: Double, newCellDuration: Double)
+  ///   - cells: Edited cells data with changes before and after.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData])
 
   /// Informs about the cell is being deleted.
   ///
   /// - Parameters:
   ///   - midiTimeTableView: Time table that performed changes on.
-  ///   - row: Row index of the cell.
-  ///   - index: Index of the cell in the row.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDeleteCellAt row: Int, index: Int)
+  ///   - cells: Row and column indices of the cells will be deleting.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex])
 
   /// Measure view height in the time table.
   ///
@@ -115,7 +145,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var rowData = [MIDITimeTableRowData]()
   public private(set) var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
   public private(set) var cellViews = [[MIDITimeTableCellView]]()
-  private var editingCellRow: Int?
 
   /// Data source object of the time table to populate its data.
   public weak var dataSource: MIDITimeTableViewDataSource?
@@ -127,6 +156,17 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var rowHeight: CGFloat = 60
   private var measureHeight: CGFloat = 30
   private var headerCellWidth: CGFloat = 120
+  private var editingCellIndices = [MIDITimeTableCellIndex]()
+
+  private var dragTimer: Timer?
+  private var dragTimerInterval: TimeInterval = 0.5
+  private var dragStartPosition: CGPoint = .zero
+  private var dragCurrentPosition: CGPoint?
+  private var dragView: UIView?
+  private var initialDragViewSize: CGFloat = 90
+  private var dragViewAutoScrollingThreshold: CGFloat = 100
+  private var autoScrollingTimer: Timer?
+  private var autoScrollingTimerInterval: TimeInterval = 0.3
 
   private var beatWidth: CGFloat {
     return measureWidth / CGFloat(measureView.beatCount)
@@ -158,6 +198,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       target: self,
       action: #selector(didPinch(pinch:)))
     addGestureRecognizer(pinch)
+    let tap = UITapGestureRecognizer(
+      target: self,
+      action: #selector(didTap(tap:)))
+    addGestureRecognizer(tap)
   }
 
   // MARK: Lifecycle
@@ -272,10 +316,218 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   ///
   /// - Parameter cell: The cell you want to get row and column info.
   /// - Returns: Returns a row and column index Int pair in a tuple.
-  public func rowAndColumnIndex(of cell: MIDITimeTableCellView) -> (row: Int, column: Int)? {
+  public func cellIndex(of cell: MIDITimeTableCellView) -> MIDITimeTableCellIndex? {
     let row = Int((cell.frame.minY - measureHeight) / rowHeight)
-    guard let column = cellViews[row].index(of: cell), row < cellViews.count else { return nil }
-    return (row, column)
+    guard let index = cellViews[row].index(of: cell), row < cellViews.count else { return nil }
+    return MIDITimeTableCellIndex(row: row, index: index)
+  }
+
+  /// Unselects all cells if tapped an empty area of the time table.
+  @objc private func didTap(tap: UITapGestureRecognizer) {
+    unselectAllCells()
+  }
+
+  // MARK: Drag to select multiple cells
+
+  open override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
+    super.touchesBegan(touches, with: event)
+
+    // Start drag timer.
+    guard let touchLocation = touches.first?.location(in: self) else { return }
+    dragStartPosition = touchLocation
+    dragTimer = Timer.scheduledTimer(
+      timeInterval: dragTimerInterval,
+      target: self,
+      selector: #selector(createDragView),
+      userInfo: nil,
+      repeats: false)
+  }
+
+  @objc private func createDragView() {
+    isScrollEnabled = false
+
+    // Drag start position.
+    dragStartPosition.x -= initialDragViewSize/2
+    dragStartPosition.y -= initialDragViewSize/2
+
+    // Create drag view.
+    dragView = UIView(frame: CGRect(origin: dragStartPosition, size: .zero))
+    dragView?.layer.backgroundColor = UIColor.white.withAlphaComponent(0.3).cgColor
+    dragView?.layer.borderColor = UIColor.white.cgColor
+    dragView?.layer.borderWidth = 1
+    addSubview(dragView!)
+    UIView.animate(
+      withDuration: 0.3,
+      delay: 0,
+      usingSpringWithDamping: 1,
+      initialSpringVelocity: 1,
+      options: [],
+      animations: {
+        self.dragView?.frame = CGRect(
+          x: self.dragStartPosition.x,
+          y: self.dragStartPosition.y,
+          width: self.initialDragViewSize,
+          height: self.initialDragViewSize)
+      },
+      completion: nil)
+
+    // Reset drag timer.
+    dragTimer?.invalidate()
+    dragTimer = nil
+  }
+
+  open override func touchesMoved(_ touches: Set<UITouch>, with event: UIEvent?) {
+    super.touchesMoved(touches, with: event)
+    guard let touchLocation = touches.first?.location(in: self) else { return }
+    updateDragView(touchLocation: touchLocation)
+    endAutoScrolling()
+
+    // Make scroll view scroll if drag view hits the limit
+    var autoScrollDirection = MIDITimeTableViewAutoScrollDirection()
+    var visibleRect = CGRect(origin: contentOffset, size: bounds.size)
+    if touchLocation.y < visibleRect.minY + dragViewAutoScrollingThreshold, contentOffset.y > 0 { // move up
+      visibleRect.origin.y -= dragViewAutoScrollingThreshold
+      autoScrollDirection.insert(.up)
+    } else if touchLocation.y > visibleRect.maxY - dragViewAutoScrollingThreshold, contentOffset.y + frame.size.height < contentSize.height { // move down
+      autoScrollDirection.insert(.down)
+    }
+    if touchLocation.x < visibleRect.minX + dragViewAutoScrollingThreshold, contentOffset.x > 0 { // move left
+      autoScrollDirection.insert(.left)
+    } else if touchLocation.x > visibleRect.maxX - dragViewAutoScrollingThreshold, contentOffset.x + frame.size.width < contentSize.width { // move right
+      autoScrollDirection.insert(.right)
+    }
+
+    if autoScrollDirection.isEmpty {
+      endAutoScrolling()
+    } else {
+      dragCurrentPosition = touchLocation
+      startAutoScrollTimer(with: autoScrollDirection)
+    }
+  }
+
+  private func updateDragView(touchLocation: CGPoint) {
+    guard let dragView = dragView else { return }
+
+    // Set drag view frame
+    let origin = dragStartPosition
+    if touchLocation.y < origin.y && touchLocation.x < origin.x {
+      dragView.frame = CGRect(
+        x: touchLocation.x,
+        y: touchLocation.y,
+        width: origin.x - touchLocation.x,
+        height: origin.y - touchLocation.y)
+    } else if touchLocation.y < origin.y && touchLocation.x > origin.x {
+      dragView.frame = CGRect(
+        x: origin.x,
+        y: touchLocation.y,
+        width: touchLocation.x - origin.x,
+        height: origin.y - touchLocation.y)
+    } else if touchLocation.y > origin.y && touchLocation.x > origin.x {
+      dragView.frame = CGRect(
+        x: origin.x,
+        y: origin.y,
+        width: touchLocation.x - origin.x,
+        height: touchLocation.y - origin.y)
+    } else if touchLocation.y > origin.y && touchLocation.x < origin.x {
+      dragView.frame = CGRect(
+        x: touchLocation.x,
+        y: origin.y,
+        width: origin.x - touchLocation.x,
+        height: touchLocation.y - origin.y)
+    }
+
+    // Make cells selected.
+    cellViews
+      .flatMap({ $0 })
+      .forEach({ $0.isSelected = dragView.frame.intersects($0.frame) })
+  }
+
+  private func startAutoScrollTimer(with direction: MIDITimeTableViewAutoScrollDirection) {
+    autoScrollingTimer = Timer.scheduledTimer(
+      timeInterval: autoScrollingTimerInterval,
+      target: self,
+      selector: #selector(autoScrollTimerTick(timer:)),
+      userInfo: ["direction": direction],
+      repeats: true)
+  }
+
+  @objc private func autoScrollTimerTick(timer: Timer) {
+    guard let userInfo = timer.userInfo as? [String: Any],
+      let dragCurrentPosition = dragCurrentPosition,
+      let direction = userInfo["direction"] as? MIDITimeTableViewAutoScrollDirection
+      else { return }
+
+    var scrollDirection = CGPoint.zero
+    if direction.contains(.left) {
+      scrollDirection.x -= 1
+    }
+    if direction.contains(.right) {
+      scrollDirection.x += 1
+    }
+    if direction.contains(.up) {
+      scrollDirection.y -= 1
+    }
+    if direction.contains(.down) {
+      scrollDirection.y += 1
+    }
+
+    // Calculate and auto scroll
+
+    let scrollAmount = CGSize(
+      width: scrollDirection.x * dragViewAutoScrollingThreshold,
+      height: scrollDirection.y * dragViewAutoScrollingThreshold)
+
+    let visibleRect = CGRect(
+      origin: CGPoint(
+        x: contentOffset.x + scrollAmount.width,
+        y: contentOffset.y + scrollAmount.height),
+      size: bounds.size)
+
+    let position = CGPoint(
+      x: dragCurrentPosition.x + scrollAmount.width,
+      y: dragCurrentPosition.y + scrollAmount.height)
+
+    UIView.animate(
+      withDuration: autoScrollingTimerInterval,
+      animations: {
+        self.scrollRectToVisible(visibleRect, animated: false)
+        self.updateDragView(touchLocation: position)
+      },
+      completion: { _ in self.updateDragView(touchLocation: position)})
+  }
+
+  private func endAutoScrolling() {
+    autoScrollingTimer?.invalidate()
+    autoScrollingTimer = nil
+    dragCurrentPosition = nil
+  }
+
+  open override func touchesCancelled(_ touches: Set<UITouch>, with event: UIEvent?) {
+    super.touchesCancelled(touches, with: event)
+    endDragging()
+  }
+
+  open override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
+    super.touchesEnded(touches, with: event)
+    endDragging()
+  }
+
+  private func endDragging() {
+    // Disable auto scrolling
+    endAutoScrolling()
+    // Enable scrolling back
+    isScrollEnabled = true
+    // Reset timer
+    dragTimer?.invalidate()
+    dragTimer = nil
+    // Remove drag view
+    dragView?.removeFromSuperview()
+    dragView = nil
+  }
+
+  /// Makes all cells unselected.
+  public func unselectAllCells() {
+    cellViews.flatMap({ $0 }).forEach({ $0.isSelected = false })
   }
 
   // MARK: Zooming
@@ -301,33 +553,46 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let translation = pan.translation(in: self)
     bringSubview(toFront: midiTimeTableCellView)
 
+    let selectedCells = cellViews.flatMap({ $0 }).filter({ $0.isSelected })
+
     if case .began = pan.state {
-      editingCellRow = Int((midiTimeTableCellView.frame.minY - measureHeight) / rowHeight)
+      midiTimeTableCellView.isSelected = true
+      editingCellIndices = cellViews.flatMap({ $0 }).filter({ $0.isSelected }).flatMap({ cellIndex(of: $0) })
     }
 
     isMoving = true
 
-    // Horizontal move
-    if translation.x > subbeatWidth, midiTimeTableCellView.frame.maxX < contentSize.width {
-      midiTimeTableCellView.frame.origin.x += subbeatWidth
-      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
-    } else if translation.x < -subbeatWidth, midiTimeTableCellView.frame.minX > headerCellWidth {
-      midiTimeTableCellView.frame.origin.x -= subbeatWidth
-      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
-    }
+    let selectedCellsPositionY = selectedCells.map({ $0.frame.origin.y }).sorted()
+    let topMostSelectedCellRowY = selectedCellsPositionY.first ?? 0
+    let bottomMostSelectedCellRowY = selectedCellsPositionY.last ?? 0
 
-    // Vertical move
-    if translation.y > rowHeight, midiTimeTableCellView.frame.maxY < measureHeight + (rowHeight * CGFloat(cellViews.count)) {
-      midiTimeTableCellView.frame.origin.y += rowHeight
-      pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
-    } else if translation.y < -rowHeight, midiTimeTableCellView.frame.minY > measureHeight {
-      midiTimeTableCellView.frame.origin.y -= rowHeight
-      pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
+    for cell in selectedCells {
+      // Horizontal move
+      if translation.x > subbeatWidth, cell.frame.maxX < contentSize.width { // Right
+        cell.frame.origin.x += subbeatWidth
+        pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+      } else if translation.x < -subbeatWidth, cell.frame.minX > headerCellWidth { // Left
+        cell.frame.origin.x -= subbeatWidth
+        pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+      }
+
+      // Vertical move
+      if translation.y > rowHeight,
+        cell.frame.maxY < measureHeight + (rowHeight * CGFloat(cellViews.count)),
+        bottomMostSelectedCellRowY + rowHeight < measureHeight + (rowHeight * CGFloat(cellViews.count)) { // Down
+        cell.frame.origin.y += rowHeight
+        pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
+      } else if translation.y < -rowHeight,
+          cell.frame.minY > measureHeight,
+          topMostSelectedCellRowY > measureHeight { // Up
+        cell.frame.origin.y -= rowHeight
+        pan.setTranslation(CGPoint(x: translation.x, y: 0), in: self)
+      }
     }
 
     if case .ended = pan.state {
       isMoving = false
-      didEditCell(midiTimeTableCellView)
+      didEditCells(editingCellIndices)
     }
   }
 
@@ -335,47 +600,62 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let translation = pan.translation(in: self)
     bringSubview(toFront: midiTimeTableCellView)
 
+    let selectedCells = cellViews.flatMap({ $0 }).filter({ $0.isSelected })
+
     if case .began = pan.state {
-      editingCellRow = Int((midiTimeTableCellView.frame.minY - measureHeight) / rowHeight)
       isResizing = true
+      midiTimeTableCellView.isSelected = true
+      editingCellIndices = cellViews.flatMap({ $0 }).filter({ $0.isSelected }).flatMap({ cellIndex(of: $0) })
     }
 
-
-    if translation.x > subbeatWidth, midiTimeTableCellView.frame.maxX < contentSize.width - subbeatWidth { // Increase
-      midiTimeTableCellView.frame.size.width += subbeatWidth
-      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
-    } else if translation.x < -subbeatWidth, midiTimeTableCellView.frame.width > subbeatWidth { // Decrease
-      midiTimeTableCellView.frame.size.width -= subbeatWidth
-      pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+    for cell in selectedCells {
+      if translation.x > subbeatWidth, cell.frame.maxX < contentSize.width - subbeatWidth { // Increase
+        cell.frame.size.width += subbeatWidth
+        pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+      } else if translation.x < -subbeatWidth, cell.frame.width > subbeatWidth { // Decrease
+        cell.frame.size.width -= subbeatWidth
+        pan.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+      }
     }
 
     if case .ended = pan.state {
       isResizing = false
-      didEditCell(midiTimeTableCellView)
+      didEditCells(editingCellIndices)
+    }
+  }
+
+  private func didEditCells(_ cells: [MIDITimeTableCellIndex]) {
+    var editedCells = [MIDITimeTableViewEditedCellData]()
+
+    for cell in cells {
+      let cellView = cellViews[cell.row][cell.index]
+      let newCellPosition = Double(cellView.frame.minX - headerCellWidth) / Double(beatWidth)
+      let newCellDuration = Double(cellView.frame.size.width / beatWidth)
+      let newCellRow = Int((cellView.frame.minY - measureHeight) / rowHeight)
+
+      editedCells.append((
+        cell,
+        newCellRow,
+        newCellPosition,
+        newCellDuration))
+    }
+
+    editingCellIndices = []
+    timeTableDelegate?.midiTimeTableView(self, didEdit: editedCells)
+  }
+
+  public func midiTimeTableCellViewDidTap(_ midiTimeTableCellView: MIDITimeTableCellView) {
+    for cell in cellViews.flatMap({ $0 }) {
+      cell.isSelected = cell == midiTimeTableCellView
     }
   }
 
   public func midiTimeTableCellViewDidDelete(_ midiTimeTableCellView: MIDITimeTableCellView) {
-    let row = Int((midiTimeTableCellView.frame.minY - measureHeight) / rowHeight)
-    guard let index = cellViews[row].index(of: midiTimeTableCellView) else { return }
-    timeTableDelegate?.midiTimeTableView(self, didDeleteCellAt: row, index: index)
-  }
-
-  private func didEditCell(_ cellView: MIDITimeTableCellView) {
-    guard let row = editingCellRow, let index = cellViews[row].index(of: cellView) else { return }
-    let newCellPosition = Double(cellView.frame.minX - headerCellWidth) / Double(beatWidth)
-    let newCellDuration = Double(cellView.frame.size.width / beatWidth)
-    let newCellRow = Int((cellView.frame.minY - measureHeight) / rowHeight)
-
-    timeTableDelegate?.midiTimeTableView(
-      self,
-      didEditCellAt: row,
-      index: index,
-      newCellRow: newCellRow,
-      newCellPosition: newCellPosition,
-      newCellDuration: newCellDuration)
-
-    editingCellRow = nil
+    let deletingCellIndices = cellViews
+      .flatMap({ $0 })
+      .filter({ $0.isSelected })
+      .flatMap({ cellIndex(of: $0) })
+    timeTableDelegate?.midiTimeTableView(self, didDelete: deletingCellIndices)
   }
 
   // MARK: MIDITimeTablePlayheadViewDelegate
