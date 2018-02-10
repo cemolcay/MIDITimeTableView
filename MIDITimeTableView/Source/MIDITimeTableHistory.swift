@@ -27,7 +27,7 @@ public class MIDITimeTableHistory {
   /// Items holding in the history queue.
   public private(set) var items = [MIDITimeTableHistoryItem]()
   /// Current index of history. Defaults first item, 0.
-  public private(set) var currentIndex = 0
+  public private(set) var currentIndex = -1
   /// Limit of the history items. Defaults 10.
   public var limit: Int { didSet{ limitDidChange() }}
   /// Delegate that informs about changes.
@@ -88,9 +88,11 @@ public class MIDITimeTableHistory {
     if items.count >= limit {
       items.remove(at: 0)
     }
-    // Append item end of the queue.
-    items.append(item)
+    // Append item to history.
     currentIndex += 1
+    if currentIndex >= limit {
+      currentIndex = limit - 1
+    }
+    items.insert(item, at: currentIndex)
   }
 }
-

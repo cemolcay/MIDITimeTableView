@@ -108,12 +108,12 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
         MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
         MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
-      ],
+        ],
       headerCellView: HeaderCellView(title: "Chords"),
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
         return CellView(title: title)
-      }),
+    }),
 
     MIDITimeTableRowData(
       cells: [
@@ -126,7 +126,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
         return CellView(title: title)
-      }),
+    }),
 
     MIDITimeTableRowData(
       cells: [
@@ -169,7 +169,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
         MIDITimeTableCellData(data: "C", position: 12, duration: 0.5),
         MIDITimeTableCellData(data: "C", position: 14, duration: 0.5),
-      ],
+        ],
       headerCellView: HeaderCellView(title: "Synths"),
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
@@ -280,5 +280,9 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double) {
     return
+  }
+
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, historyDidChange history: MIDITimeTableHistory) {
+    rowData = history.currentItem
   }
 }

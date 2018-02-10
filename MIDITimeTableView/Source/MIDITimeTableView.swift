@@ -104,6 +104,13 @@ public protocol MIDITimeTableViewDelegate: class {
   ///
   /// - Parameter midiTimeTableView: Time table that updated.
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double)
+
+  /// Informs about history has been changed. You need to update your `rowData` with history's `currentItem`.
+  ///
+  /// - Parameters:
+  ///   - midiTimeTableView: Time table taht updated.
+  ///   - history: History object of the time table.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, historyDidChange history: MIDITimeTableHistory)
 }
 
 /// Draws time table with multiple rows and editable cells. Heavily customisable.
@@ -701,6 +708,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   public func midiTimeTableHistory(_ history: MIDITimeTableHistory, didHistoryChange item: MIDITimeTableHistoryItem) {
     if holdsHistory {
       reloadData(historyItem: item)
+      timeTableDelegate?.midiTimeTableView(self, historyDidChange: history)
     }
   }
 }
