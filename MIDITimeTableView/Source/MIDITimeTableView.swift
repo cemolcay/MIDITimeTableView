@@ -336,8 +336,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     if holdsHistory, historyItem == nil {
       history.append(item: rowData)
     }
-
-    print("history changed", history.items.count, history.currentIndex)
   }
 
   /// Gets the row and column index of the cell view in the data source.
