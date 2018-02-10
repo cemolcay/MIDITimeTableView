@@ -98,20 +98,10 @@ class CellView: MIDITimeTableCellView {
 
 class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTableViewDelegate {
   @IBOutlet weak var timeTableView: MIDITimeTableView?
+  @IBOutlet weak var undoButton: UIBarButtonItem?
+  @IBOutlet weak var redoButton: UIBarButtonItem?
 
   var rowData: [MIDITimeTableRowData] = [
-    MIDITimeTableRowData(
-      cells: [
-        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
-        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
-        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
-        MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
-      ],
-      headerCellView: HeaderCellView(title: "Chords"),
-      cellView: { cellData in
-        let title = cellData.data as? String ?? ""
-        return CellView(title: title)
-      }),
     MIDITimeTableRowData(
       cells: [
         MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
@@ -136,7 +126,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
         return CellView(title: title)
-      }),
+    }),
 
     MIDITimeTableRowData(
       cells: [
@@ -179,7 +169,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
         MIDITimeTableCellData(data: "C", position: 12, duration: 0.5),
         MIDITimeTableCellData(data: "C", position: 14, duration: 0.5),
-      ],
+        ],
       headerCellView: HeaderCellView(title: "Synths"),
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
@@ -189,7 +179,8 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
   override func viewDidLoad() {
     super.viewDidLoad()
-
+    updateHistoryButtons()
+    
     timeTableView?.dataSource = self
     timeTableView?.timeTableDelegate = self
     timeTableView?.gridLayer.showsSubbeatLines = false
@@ -202,6 +193,21 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     timeTableView?.gridLayer.barLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
     timeTableView?.gridLayer.beatLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
     timeTableView?.playheadView.tintColor = UIColor.gray.withAlphaComponent(0.5)
+  }
+
+  @IBAction func redoDidPress(sender: UIButton) {
+    timeTableView?.history.redo()
+    updateHistoryButtons()
+  }
+
+  @IBAction func undoDidPress(sender: UIButton) {
+    timeTableView?.history.undo()
+    updateHistoryButtons()
+  }
+
+  private func updateHistoryButtons() {
+    undoButton?.isEnabled = timeTableView?.history.hasPreviousItem ?? false
+    redoButton?.isEnabled = timeTableView?.history.hasNextItem ?? false
   }
 
   // MARK: MIDITimeTableViewDataSource
@@ -249,6 +255,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     }
 
     timeTableView?.reloadData()
+    updateHistoryButtons()
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData]) {
@@ -268,9 +275,14 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
     rowData.removeCells(at: removingCells)
     timeTableView?.reloadData()
+    updateHistoryButtons()
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double) {
     return
+  }
+
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, historyDidChange history: MIDITimeTableHistory) {
+    rowData = history.currentItem
   }
 }
