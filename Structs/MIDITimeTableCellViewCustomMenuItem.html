@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>MIDITimeTableNoteValue Enumeration Reference</title>
+    <title>MIDITimeTableCellViewCustomMenuItem Structure Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset='utf-8'>
@@ -10,8 +10,8 @@
     
   </head>
   <body>
-    <a name="//apple_ref/swift/Enum/MIDITimeTableNoteValue" class="dashAnchor"></a>
-    <a title="MIDITimeTableNoteValue Enumeration Reference"></a>
+    <a name="//apple_ref/swift/Struct/MIDITimeTableCellViewCustomMenuItem" class="dashAnchor"></a>
+    <a title="MIDITimeTableCellViewCustomMenuItem Structure Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="../index.html">MIDITimeTableView Docs</a> (84% documented)</p>
@@ -22,7 +22,7 @@
       <p id="breadcrumbs">
         <a href="../index.html">MIDITimeTableView Reference</a>
         <img id="carat" src="../img/carat.png" />
-        MIDITimeTableNoteValue Enumeration Reference
+        MIDITimeTableCellViewCustomMenuItem Structure Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -132,14 +132,14 @@
       <article class="main-content">
         <section>
           <section class="section">
-            <h1>MIDITimeTableNoteValue</h1>
+            <h1>MIDITimeTableCellViewCustomMenuItem</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">MIDITimeTableNoteValue</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableCellViewCustomMenuItem</span></code></pre>
 
                 </div>
               </div>
-            <p>Value of note for defining its duration in rhythme.</p>
+            <p>Defines a custom menu item for the <code><a href="../Classes/MIDITimeTableCellView.html">MIDITimeTableCellView</a></code> to show when you long press it.</p>
 
           </section>
           <section class="section task-group-section">
@@ -148,9 +148,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO5wholeA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/whole" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO5wholeA2CmF">whole</a>
+                    <a name="/s:17MIDITimeTableView0ab4CellC14CustomMenuItemV5titleSSv"></a>
+                    <a name="//apple_ref/swift/Property/title" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0ab4CellC14CustomMenuItemV5titleSSv">title</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -158,30 +158,26 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Whole note worths a beat.</p>
+                        <p>Title of the custom menu item.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">whole</span> <span class="o">=</span> <span class="mi">1</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">title</span><span class="p">:</span> <span class="kt">String</span></code></pre>
 
                         </div>
                       </div>
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO4halfA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/half" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO4halfA2CmF">half</a>
+                    <a name="/s:17MIDITimeTableView0ab4CellC14CustomMenuItemV6action10ObjectiveC8SelectorVv"></a>
+                    <a name="//apple_ref/swift/Property/action" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0ab4CellC14CustomMenuItemV6action10ObjectiveC8SelectorVv">action</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -189,30 +185,26 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Half note worths half a beat.</p>
+                        <p>Action handler of the custom menu item.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">half</span> <span class="o">=</span> <span class="mi">2</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">action</span><span class="p">:</span> <span class="kt">Selector</span></code></pre>
 
                         </div>
                       </div>
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO7quarterA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/quarter" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO7quarterA2CmF">quarter</a>
+                    <a name="/s:17MIDITimeTableView0ab4CellC14CustomMenuItemV04menuG0So06UIMenuG0Cv"></a>
+                    <a name="//apple_ref/swift/Property/menuItem" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0ab4CellC14CustomMenuItemV04menuG0So06UIMenuG0Cv">menuItem</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -220,30 +212,26 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Quarter note worths quarter a beat.</p>
+                        <p>Creates and returns a <code>UIMenuItem</code> from itself.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">quarter</span> <span class="o">=</span> <span class="mi">4</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">menuItem</span><span class="p">:</span> <span class="kt">UIMenuItem</span></code></pre>
 
                         </div>
                       </div>
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO6eighthA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/eighth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO6eighthA2CmF">eighth</a>
+                    <a name="/s:17MIDITimeTableView0ab4CellC14CustomMenuItemVACSS5title_10ObjectiveC8SelectorV6actiontcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(title:action:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0ab4CellC14CustomMenuItemVACSS5title_10ObjectiveC8SelectorV6actiontcfc">init(title:action:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -251,109 +239,47 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Eighth note worhts one eighth of a beat.</p>
+                        <p>Initilizes custom <code>UIMenuItem</code> for <code><a href="../Classes/MIDITimeTableCellView.html">MIDITimeTableCellView</a></code>.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">eighth</span> <span class="o">=</span> <span class="mi">8</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">title</span><span class="p">:</span> <span class="kt">String</span><span class="p">,</span> <span class="nv">action</span><span class="p">:</span> <span class="kt">Selector</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO9sixteenthA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/sixteenth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO9sixteenthA2CmF">sixteenth</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Sixteenth note worths one sixteenth of a beat.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">sixteenth</span> <span class="o">=</span> <span class="mi">16</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO12thirtysecondA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/thirtysecond" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO12thirtysecondA2CmF">thirtysecond</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Thirtysecond note worths one thirtysecond of a beat.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">thirtysecond</span> <span class="o">=</span> <span class="mi">32</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO11sixtyfourthA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/sixtyfourth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO11sixtyfourthA2CmF">sixtyfourth</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Sixtyfourth note worths one sixtyfourth of a beat.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">sixtyfourth</span> <span class="o">=</span> <span class="mi">64</span></code></pre>
-
-                        </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>title</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Title of the custom menu item.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>action</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Action handler of the custom menu item.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>

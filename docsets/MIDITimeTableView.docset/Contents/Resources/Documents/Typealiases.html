@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Protocols  Reference</title>
+    <title>Type Aliases  Reference</title>
     <link rel="stylesheet" type="text/css" href="css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="css/highlight.css" />
     <meta charset='utf-8'>
@@ -10,7 +10,7 @@
     
   </head>
   <body>
-    <a title="Protocols  Reference"></a>
+    <a title="Type Aliases  Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="index.html">MIDITimeTableView Docs</a> (84% documented)</p>
@@ -21,7 +21,7 @@
       <p id="breadcrumbs">
         <a href="index.html">MIDITimeTableView Reference</a>
         <img id="carat" src="img/carat.png" />
-        Protocols  Reference
+        Type Aliases  Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -131,8 +131,8 @@
       <article class="main-content">
         <section>
           <section class="section">
-            <h1>Protocols</h1>
-            <p>The following protocols are available globally.</p>
+            <h1>Type Aliases</h1>
+            <p>The following type aliases are available globally.</p>
 
           </section>
           <section class="section task-group-section">
@@ -141,9 +141,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB15HistoryDelegateP"></a>
-                    <a name="//apple_ref/swift/Protocol/MIDITimeTableHistoryDelegate" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB15HistoryDelegateP">MIDITimeTableHistoryDelegate</a>
+                    <a name="/s:17MIDITimeTableView0aB11HistoryItema"></a>
+                    <a name="//apple_ref/swift/Alias/MIDITimeTableHistoryItem" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB11HistoryItema">MIDITimeTableHistoryItem</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -151,15 +151,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Informs about changes on history.</p>
+                        <p>A history item that represents row data array.</p>
 
-                        <a href="Protocols/MIDITimeTableHistoryDelegate.html" class="slightly-smaller">See more</a>
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableHistoryDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">typealias</span> <span class="kt">MIDITimeTableHistoryItem</span> <span class="o">=</span> <span class="p">[</span><span class="kt"><a href="Structs/MIDITimeTableRowData.html">MIDITimeTableRowData</a></span><span class="p">]</span></code></pre>
 
                         </div>
                       </div>
@@ -173,9 +172,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0abC10DataSourceP"></a>
-                    <a name="//apple_ref/swift/Protocol/MIDITimeTableViewDataSource" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC10DataSourceP">MIDITimeTableViewDataSource</a>
+                    <a name="/s:17MIDITimeTableView0abC14EditedCellDataa"></a>
+                    <a name="//apple_ref/swift/Alias/MIDITimeTableViewEditedCellData" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC14EditedCellDataa">MIDITimeTableViewEditedCellData</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -183,107 +182,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Populates the <code><a href="Classes/MIDITimeTableView.html">MIDITimeTableView</a></code> with the datas of rows and cells.</p>
+                        <p>Edited cell data. Holds the edited cell&rsquo;s index before editing, and new row index, position and duration data after editing.</p>
 
-                        <a href="Protocols/MIDITimeTableViewDataSource.html" class="slightly-smaller">See more</a>
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableViewDataSource</span><span class="p">:</span> <span class="kd">class</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0abC8DelegateP"></a>
-                    <a name="//apple_ref/swift/Protocol/MIDITimeTableViewDelegate" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP">MIDITimeTableViewDelegate</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Delegate functions to inform about editing cells and sizing of the time table.</p>
-
-                        <a href="Protocols/MIDITimeTableViewDelegate.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableViewDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC8DelegateP"></a>
-                    <a name="//apple_ref/swift/Protocol/MIDITimeTablePlayheadViewDelegate" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC8DelegateP">MIDITimeTablePlayheadViewDelegate</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Delegate that informs about playhead is going to move.</p>
-
-                        <a href="Protocols/MIDITimeTablePlayheadViewDelegate.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTablePlayheadViewDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0ab4CellC8DelegateP"></a>
-                    <a name="//apple_ref/swift/Protocol/MIDITimeTableCellViewDelegate" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab4CellC8DelegateP">MIDITimeTableCellViewDelegate</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Delegate functions to inform about editing or deleting cell.</p>
-
-                        <a href="Protocols/MIDITimeTableCellViewDelegate.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableCellViewDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">typealias</span> <span class="kt">MIDITimeTableViewEditedCellData</span> <span class="o">=</span> <span class="p">(</span><span class="nv">index</span><span class="p">:</span> <span class="kt"><a href="Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a></span><span class="p">,</span> <span class="nv">newRowIndex</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">newPosition</span><span class="p">:</span> <span class="kt">Double</span><span class="p">,</span> <span class="nv">newDuration</span><span class="p">:</span> <span class="kt">Double</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>

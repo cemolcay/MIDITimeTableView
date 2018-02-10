@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>MIDITimeTableNoteValue Enumeration Reference</title>
+    <title>Collection Extension Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset='utf-8'>
@@ -10,8 +10,8 @@
     
   </head>
   <body>
-    <a name="//apple_ref/swift/Enum/MIDITimeTableNoteValue" class="dashAnchor"></a>
-    <a title="MIDITimeTableNoteValue Enumeration Reference"></a>
+    <a name="//apple_ref/swift/Extension/Collection" class="dashAnchor"></a>
+    <a title="Collection Extension Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="../index.html">MIDITimeTableView Docs</a> (84% documented)</p>
@@ -22,7 +22,7 @@
       <p id="breadcrumbs">
         <a href="../index.html">MIDITimeTableView Reference</a>
         <img id="carat" src="../img/carat.png" />
-        MIDITimeTableNoteValue Enumeration Reference
+        Collection Extension Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -132,15 +132,14 @@
       <article class="main-content">
         <section>
           <section class="section">
-            <h1>MIDITimeTableNoteValue</h1>
+            <h1>Collection</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">MIDITimeTableNoteValue</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+                  <pre class="highlight"><code><span class="kd">protocol</span> <span class="kt">Collection</span> <span class="p">:</span> <span class="kt">Sequence</span></code></pre>
 
                 </div>
               </div>
-            <p>Value of note for defining its duration in rhythme.</p>
-
+            
           </section>
           <section class="section task-group-section">
             <div class="task-group">
@@ -148,9 +147,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO5wholeA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/whole" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO5wholeA2CmF">whole</a>
+                    <a name="/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC9CellIndexV7ElementRtzlE7ordereds10DictionaryVySiSaySiGGv"></a>
+                    <a name="//apple_ref/swift/Property/ordered" class="dashAnchor"></a>
+                    <a class="token" href="#/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC9CellIndexV7ElementRtzlE7ordereds10DictionaryVySiSaySiGGv">ordered</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -158,14 +157,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Whole note worths a beat.</p>
+                        <p>Creates a dictionary that rows as key and indices of same rows as their value.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">whole</span> <span class="o">=</span> <span class="mi">1</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">ordered</span><span class="p">:</span> <span class="p">[</span><span class="kt">Int</span><span class="p">:</span> <span class="p">[</span><span class="kt">Int</span><span class="p">]]</span></code></pre>
 
                         </div>
                       </div>
@@ -179,9 +178,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO4halfA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/half" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO4halfA2CmF">half</a>
+                    <a name="/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC7RowDataV7ElementRtzlE9subscriptAC0bc4CellF0VSi_Sitci"></a>
+                    <a name="//apple_ref/swift/Method/subscript(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC7RowDataV7ElementRtzlE9subscriptAC0bc4CellF0VSi_Sitci">subscript(_:_:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -189,30 +188,57 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Half note worths half a beat.</p>
+                        <p>Returns a cell data at the index of a row, if available. If not, returns nil.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">half</span> <span class="o">=</span> <span class="mi">2</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">subscript</span><span class="p">(</span><span class="nv">row</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">index</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a></span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>row</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Row index of the cell data.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>index</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Index number in the row of the cell data.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO7quarterA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/quarter" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO7quarterA2CmF">quarter</a>
+                    <a name="/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC7RowDataV7ElementRtzlE9subscriptAC0bc4CellF0VAC0bcI5IndexVci"></a>
+                    <a name="//apple_ref/swift/Method/subscript(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC7RowDataV7ElementRtzlE9subscriptAC0bc4CellF0VAC0bcI5IndexVci">subscript(_:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -220,30 +246,45 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Quarter note worths quarter a beat.</p>
+                        <p>Returns a cell data with <code><a href="../Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a></code>, if available. If not returns nil.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">quarter</span> <span class="o">=</span> <span class="mi">4</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">subscript</span><span class="p">(</span><span class="nv">index</span><span class="p">:</span> <span class="kt"><a href="../Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a></span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>index</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Cell index of the cell data.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO6eighthA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/eighth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO6eighthA2CmF">eighth</a>
+                    <a name="/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC7RowDataV7ElementRtzlE10appendCellyAC0bciF0V_Si3rowtF"></a>
+                    <a name="//apple_ref/swift/Method/appendCell(_:row:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC7RowDataV7ElementRtzlE10appendCellyAC0bciF0V_Si3rowtF">appendCell(_:row:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -251,30 +292,57 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Eighth note worhts one eighth of a beat.</p>
+                        <p>Adds a cell data in a row.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">eighth</span> <span class="o">=</span> <span class="mi">8</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">mutating</span> <span class="kd">func</span> <span class="nf">appendCell</span><span class="p">(</span><span class="n">_</span> <span class="nv">cell</span><span class="p">:</span> <span class="kt"><a href="../Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a></span><span class="p">,</span> <span class="n">row</span> <span class="nv">at</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>cell</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Cell data to append.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>at</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>The row index to append cell data.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO9sixteenthA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/sixteenth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO9sixteenthA2CmF">sixteenth</a>
+                    <a name="/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC7RowDataV7ElementRtzlE10removeCellAC0bciF0VAC0bcI5IndexV2at_tF"></a>
+                    <a name="//apple_ref/swift/Method/removeCell(at:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC7RowDataV7ElementRtzlE10removeCellAC0bciF0VAC0bcI5IndexV2at_tF">removeCell(at:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -282,30 +350,49 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Sixteenth note worths one sixteenth of a beat.</p>
+                        <p>Removes a cell from an index.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">sixteenth</span> <span class="o">=</span> <span class="mi">16</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">mutating</span> <span class="kd">func</span> <span class="nf">removeCell</span><span class="p">(</span><span class="n">at</span> <span class="nv">index</span><span class="p">:</span> <span class="kt"><a href="../Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt"><a href="../Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a></span></code></pre>
 
                         </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>index</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Cell index of the cell will be removed.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Returns the removed cell.</p>
                       </div>
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO12thirtysecondA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/thirtysecond" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO12thirtysecondA2CmF">thirtysecond</a>
+                    <a name="/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC7RowDataV7ElementRtzlE11removeCellsySayAC0bC9CellIndexVG2at_tF"></a>
+                    <a name="//apple_ref/swift/Method/removeCells(at:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:s10CollectionP17MIDITimeTableViewsAARzAC0bC7RowDataV7ElementRtzlE11removeCellsySayAC0bC9CellIndexVG2at_tF">removeCells(at:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -313,47 +400,35 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Thirtysecond note worths one thirtysecond of a beat.</p>
+                        <p>Removes multiple cells from multiple indices.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">thirtysecond</span> <span class="o">=</span> <span class="mi">32</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">mutating</span> <span class="kd">func</span> <span class="nf">removeCells</span><span class="p">(</span><span class="n">at</span> <span class="nv">indicies</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a></span><span class="p">])</span></code></pre>
 
                         </div>
                       </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO11sixtyfourthA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/sixtyfourth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO11sixtyfourthA2CmF">sixtyfourth</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Sixtyfourth note worths one sixtyfourth of a beat.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">sixtyfourth</span> <span class="o">=</span> <span class="mi">64</span></code></pre>
-
-                        </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>indicies</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Indices of cells that will be removed.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>

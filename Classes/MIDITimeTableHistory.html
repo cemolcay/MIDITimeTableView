@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>MIDITimeTablePlayheadView Class Reference</title>
+    <title>MIDITimeTableHistory Class Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset='utf-8'>
@@ -10,8 +10,8 @@
     
   </head>
   <body>
-    <a name="//apple_ref/swift/Class/MIDITimeTablePlayheadView" class="dashAnchor"></a>
-    <a title="MIDITimeTablePlayheadView Class Reference"></a>
+    <a name="//apple_ref/swift/Class/MIDITimeTableHistory" class="dashAnchor"></a>
+    <a title="MIDITimeTableHistory Class Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="../index.html">MIDITimeTableView Docs</a> (84% documented)</p>
@@ -22,7 +22,7 @@
       <p id="breadcrumbs">
         <a href="../index.html">MIDITimeTableView Reference</a>
         <img id="carat" src="../img/carat.png" />
-        MIDITimeTablePlayheadView Class Reference
+        MIDITimeTableHistory Class Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -132,14 +132,14 @@
       <article class="main-content">
         <section>
           <section class="section">
-            <h1>MIDITimeTablePlayheadView</h1>
+            <h1>MIDITimeTableHistory</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTablePlayheadView</span><span class="p">:</span> <span class="kt">UIView</span></code></pre>
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTableHistory</span></code></pre>
 
                 </div>
               </div>
-            <p>Draws a triangle, movable playhead that customisable with a custom shape layer or an image.</p>
+            <p>Creates and manages history with a limit and items. Messages changes throught the delegate.</p>
 
           </section>
           <section class="section task-group-section">
@@ -148,9 +148,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTablePlayheadView(py)position"></a>
-                    <a name="//apple_ref/swift/Property/position" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTablePlayheadView(py)position">position</a>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryC5itemsSaySayAA0aB7RowDataVGGv"></a>
+                    <a name="//apple_ref/swift/Property/items" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryC5itemsSaySayAA0aB7RowDataVGGv">items</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -158,14 +158,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Current position on timetable. Based on beats.</p>
+                        <p>Items holding in the history queue.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">@objc</span> <span class="kd">public</span> <span class="kd">dynamic</span> <span class="k">var</span> <span class="nv">position</span><span class="p">:</span> <span class="kt">Double</span> <span class="o">=</span> <span class="mf">0.0</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">items</span> <span class="o">=</span> <span class="p">[</span><span class="kt"><a href="../Typealiases.html#/s:17MIDITimeTableView0aB11HistoryItema">MIDITimeTableHistoryItem</a></span><span class="p">]()</span></code></pre>
 
                         </div>
                       </div>
@@ -175,9 +175,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC0C16measureBeatWidth12CoreGraphics7CGFloatVv"></a>
-                    <a name="//apple_ref/swift/Property/measureBeatWidth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC0C16measureBeatWidth12CoreGraphics7CGFloatVv">measureBeatWidth</a>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryC12currentIndexSiv"></a>
+                    <a name="//apple_ref/swift/Property/currentIndex" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryC12currentIndexSiv">currentIndex</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -185,14 +185,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>MIDITimeTableMeasureView&rsquo;s width that used in layout playhead in timetable.</p>
+                        <p>Current index of history. Defaults first item, 0.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">measureBeatWidth</span><span class="p">:</span> <span class="kt">CGFloat</span> <span class="o">=</span> <span class="mf">0.0</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">private(set)</span> <span class="k">var</span> <span class="nv">currentIndex</span> <span class="o">=</span> <span class="o">-</span><span class="mi">1</span></code></pre>
 
                         </div>
                       </div>
@@ -202,9 +202,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC0C13measureHeight12CoreGraphics7CGFloatVv"></a>
-                    <a name="//apple_ref/swift/Property/measureHeight" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC0C13measureHeight12CoreGraphics7CGFloatVv">measureHeight</a>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryC5limitSiv"></a>
+                    <a name="//apple_ref/swift/Property/limit" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryC5limitSiv">limit</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -212,14 +212,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>MIDITimeTableMeasureView&rsquo;s height that used in layout playhead in timetable.</p>
+                        <p>Limit of the history items. Defaults 10.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">measureHeight</span><span class="p">:</span> <span class="kt">CGFloat</span> <span class="o">=</span> <span class="mf">0.0</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
 
                         </div>
                       </div>
@@ -229,171 +229,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC0C14rowHeaderWidth12CoreGraphics7CGFloatVv"></a>
-                    <a name="//apple_ref/swift/Property/rowHeaderWidth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC0C14rowHeaderWidth12CoreGraphics7CGFloatVv">rowHeaderWidth</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>MIDITimeTableHeaderCellView&rsquo;s width that used in layout playhead in timetable.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">rowHeaderWidth</span><span class="p">:</span> <span class="kt">CGFloat</span> <span class="o">=</span> <span class="mf">0.0</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC0C5imageSo7UIImageCSgv"></a>
-                    <a name="//apple_ref/swift/Property/image" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC0C5imageSo7UIImageCSgv">image</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Optional image for playhead instead of default triangle shape layer.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">image</span><span class="p">:</span> <span class="kt">UIImage</span><span class="p">?</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC0C10shapeLayerSo07CAShapeF0Cv"></a>
-                    <a name="//apple_ref/swift/Property/shapeLayer" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC0C10shapeLayerSo07CAShapeF0Cv">shapeLayer</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Shape layer that draws triangle playhead shape. You can change the default shape.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">shapeLayer</span> <span class="o">=</span> <span class="kt">CAShapeLayer</span><span class="p">()</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC0C9lineColorSo7UIColorCv"></a>
-                    <a name="//apple_ref/swift/Property/lineColor" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC0C9lineColorSo7UIColorCv">lineColor</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Playhead&rsquo;s guide line color that draws on timetable.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">lineColor</span><span class="p">:</span> <span class="kt">UIColor</span> <span class="o">=</span> <span class="o">.</span><span class="n">white</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC0C10lineHeight12CoreGraphics7CGFloatVv"></a>
-                    <a name="//apple_ref/swift/Property/lineHeight" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC0C10lineHeight12CoreGraphics7CGFloatVv">lineHeight</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Playhead&rsquo;s guide line height that draws on timetable. It&rsquo;s best to match timetable&rsquo;s content height.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">lineHeight</span><span class="p">:</span> <span class="kt">CGFloat</span> <span class="o">=</span> <span class="mi">0</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC0C9lineWidth12CoreGraphics7CGFloatVv"></a>
-                    <a name="//apple_ref/swift/Property/lineWidth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC0C9lineWidth12CoreGraphics7CGFloatVv">lineWidth</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Playhead&rsquo;s guide line width that draws on timetable.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">lineWidth</span><span class="p">:</span> <span class="kt">CGFloat</span> <span class="o">=</span> <span class="mi">1</span> <span class="o">/</span> <span class="kt">UIScreen</span><span class="o">.</span><span class="n">main</span><span class="o">.</span><span class="n">scale</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC0C8delegateAA0abdC8Delegate_pSgXwv"></a>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryC8delegateAA0abD8Delegate_pSgXwv"></a>
                     <a name="//apple_ref/swift/Property/delegate" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC0C8delegateAA0abdC8Delegate_pSgXwv">delegate</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryC8delegateAA0abD8Delegate_pSgXwv">delegate</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -401,52 +239,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Delegate of playhead.</p>
+                        <p>Delegate that informs about changes.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">delegate</span><span class="p">:</span> <span class="kt"><a href="../Protocols/MIDITimeTablePlayheadViewDelegate.html">MIDITimeTablePlayheadViewDelegate</a></span><span class="p">?</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <div class="task-name-container">
-                <a name="/Init"></a>
-                <a name="//apple_ref/swift/Section/Init" class="dashAnchor"></a>
-                <a href="#/Init">
-                  <h3 class="section-name">Init</h3>
-                </a>
-              </div>
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTablePlayheadView(im)initWithFrame:"></a>
-                    <a name="//apple_ref/swift/Method/init(frame:)" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTablePlayheadView(im)initWithFrame:">init(frame:)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Undocumented</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTablePlayheadView</span><span class="p">:</span> <span class="kt">UIView</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">weak</span> <span class="k">var</span> <span class="nv">delegate</span><span class="p">:</span> <span class="kt"><a href="../Protocols/MIDITimeTableHistoryDelegate.html">MIDITimeTableHistoryDelegate</a></span><span class="p">?</span></code></pre>
 
                         </div>
                       </div>
@@ -456,9 +256,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTablePlayheadView(im)initWithCoder:"></a>
-                    <a name="//apple_ref/swift/Method/init(coder:)" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTablePlayheadView(im)initWithCoder:">init(coder:)</a>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryC11currentItemSayAA0aB7RowDataVGv"></a>
+                    <a name="//apple_ref/swift/Property/currentItem" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryC11currentItemSayAA0aB7RowDataVGv">currentItem</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -466,14 +266,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Returns current history item.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTablePlayheadView</span><span class="p">:</span> <span class="kt">UIView</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">currentItem</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:17MIDITimeTableView0aB11HistoryItema">MIDITimeTableHistoryItem</a></span></code></pre>
 
                         </div>
                       </div>
@@ -483,9 +283,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTablePlayheadView(im)init"></a>
-                    <a name="//apple_ref/swift/Method/init()" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTablePlayheadView(im)init">init()</a>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryC15hasPreviousItemSbv"></a>
+                    <a name="//apple_ref/swift/Property/hasPreviousItem" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryC15hasPreviousItemSbv">hasPreviousItem</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -493,14 +293,14 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Returns true if user could do undo.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTablePlayheadView</span><span class="p">:</span> <span class="kt">UIView</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">hasPreviousItem</span><span class="p">:</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
                       </div>
@@ -510,9 +310,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTablePlayheadView(im)layoutSubviews"></a>
-                    <a name="//apple_ref/swift/Method/layoutSubviews()" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTablePlayheadView(im)layoutSubviews">layoutSubviews()</a>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryC11hasNextItemSbv"></a>
+                    <a name="//apple_ref/swift/Property/hasNextItem" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryC11hasNextItemSbv">hasNextItem</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -520,16 +320,162 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Undocumented</p>
+                        <p>Returns true if user could do redo.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">class</span> <span class="kt">MIDITimeTablePlayheadView</span><span class="p">:</span> <span class="kt">UIView</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">hasNextItem</span><span class="p">:</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryCACSi5limit_tcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(limit:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryCACSi5limit_tcfc">init(limit:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initilizes the history.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">limit</span><span class="p">:</span> <span class="kt">Int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>limit</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Limit of the history. Defaults 10.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryC4undoyyF"></a>
+                    <a name="//apple_ref/swift/Method/undo()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryC4undoyyF">undo()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Makes an undo. Moves back <code><a href="../Classes/MIDITimeTableHistory.html#/s:17MIDITimeTableView0aB7HistoryC12currentIndexSiv">currentIndex</a></code> pointer one item.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">undo</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryC4redoyyF"></a>
+                    <a name="//apple_ref/swift/Method/redo()" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryC4redoyyF">redo()</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Makes a redo. Moves forward <code><a href="../Classes/MIDITimeTableHistory.html#/s:17MIDITimeTableView0aB7HistoryC12currentIndexSiv">currentIndex</a></code> pointer one item.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">redo</span><span class="p">()</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB7HistoryC6appendySayAA0aB7RowDataVG4item_tF"></a>
+                    <a name="//apple_ref/swift/Method/append(item:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB7HistoryC6appendySayAA0aB7RowDataVG4item_tF">append(item:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Adds an item to history queue. If hits the limit, removes the first item and appends end of the queue.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">func</span> <span class="nf">append</span><span class="p">(</span><span class="nv">item</span><span class="p">:</span> <span class="kt"><a href="../Typealiases.html#/s:17MIDITimeTableView0aB11HistoryItema">MIDITimeTableHistoryItem</a></span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>item</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Item to add to history.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>

@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>MIDITimeTableNoteValue Enumeration Reference</title>
+    <title>MIDITimeTableCellIndex Structure Reference</title>
     <link rel="stylesheet" type="text/css" href="../css/jazzy.css" />
     <link rel="stylesheet" type="text/css" href="../css/highlight.css" />
     <meta charset='utf-8'>
@@ -10,8 +10,8 @@
     
   </head>
   <body>
-    <a name="//apple_ref/swift/Enum/MIDITimeTableNoteValue" class="dashAnchor"></a>
-    <a title="MIDITimeTableNoteValue Enumeration Reference"></a>
+    <a name="//apple_ref/swift/Struct/MIDITimeTableCellIndex" class="dashAnchor"></a>
+    <a title="MIDITimeTableCellIndex Structure Reference"></a>
     <header>
       <div class="content-wrapper">
         <p><a href="../index.html">MIDITimeTableView Docs</a> (84% documented)</p>
@@ -22,7 +22,7 @@
       <p id="breadcrumbs">
         <a href="../index.html">MIDITimeTableView Reference</a>
         <img id="carat" src="../img/carat.png" />
-        MIDITimeTableNoteValue Enumeration Reference
+        MIDITimeTableCellIndex Structure Reference
       </p>
     </div>
     <div class="content-wrapper">
@@ -132,14 +132,14 @@
       <article class="main-content">
         <section>
           <section class="section">
-            <h1>MIDITimeTableNoteValue</h1>
+            <h1>MIDITimeTableCellIndex</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">enum</span> <span class="kt">MIDITimeTableNoteValue</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableCellIndex</span><span class="p">:</span> <span class="kt">Hashable</span></code></pre>
 
                 </div>
               </div>
-            <p>Value of note for defining its duration in rhythme.</p>
+            <p>Defines cell index in the time table view.</p>
 
           </section>
           <section class="section task-group-section">
@@ -148,9 +148,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO5wholeA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/whole" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO5wholeA2CmF">whole</a>
+                    <a name="/s:17MIDITimeTableView0aB9CellIndexV3rowSiv"></a>
+                    <a name="//apple_ref/swift/Property/row" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB9CellIndexV3rowSiv">row</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -158,16 +158,128 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Whole note worths a beat.</p>
+                        <p>Row index of the cell.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">whole</span> <span class="o">=</span> <span class="mi">1</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">row</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
 
                         </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB9CellIndexV5indexSiv"></a>
+                    <a name="//apple_ref/swift/Property/index" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB9CellIndexV5indexSiv">index</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Index number in the row. Does not represent column.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">index</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB9CellIndexV9hashValueSiv"></a>
+                    <a name="//apple_ref/swift/Property/hashValue" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB9CellIndexV9hashValueSiv">hashValue</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Hashable value</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">hashValue</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB9CellIndexVACSi3row_Si5indextcfc"></a>
+                    <a name="//apple_ref/swift/Method/init(row:index:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB9CellIndexVACSi3row_Si5indextcfc">init(row:index:)</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Initilizes the index with row and column indices.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">row</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">index</span><span class="p">:</span> <span class="kt">Int</span><span class="p">)</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>row</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Row index of the cell.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>index</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Index number in the row.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
                     </section>
                   </div>
@@ -175,13 +287,20 @@
               </ul>
             </div>
             <div class="task-group">
+              <div class="task-name-container">
+                <a name="/Equatable"></a>
+                <a name="//apple_ref/swift/Section/Equatable" class="dashAnchor"></a>
+                <a href="#/Equatable">
+                  <h3 class="section-name">Equatable</h3>
+                </a>
+              </div>
               <ul>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO4halfA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/half" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO4halfA2CmF">half</a>
+                    <a name="/s:17MIDITimeTableView0aB9CellIndexV2eeoiSbAC_ACtFZ"></a>
+                    <a name="//apple_ref/swift/Method/==(_:_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB9CellIndexV2eeoiSbAC_ACtFZ">==(_:_:)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -189,171 +308,51 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Half note worths half a beat.</p>
+                        <p>Checks equality between two indices.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">half</span> <span class="o">=</span> <span class="mi">2</span></code></pre>
+                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">static</span> <span class="kd">func</span> <span class="o">==</span><span class="p">(</span><span class="nv">lhs</span><span class="p">:</span> <span class="kt">MIDITimeTableCellIndex</span><span class="p">,</span> <span class="nv">rhs</span><span class="p">:</span> <span class="kt">MIDITimeTableCellIndex</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
                       </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO7quarterA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/quarter" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO7quarterA2CmF">quarter</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Quarter note worths quarter a beat.</p>
-
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>lhs</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Left hand side of the equation.</p>
+                                </div>
+                              </td>
+                            </tr>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>rhs</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Right hand side of the equation.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
                       </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">quarter</span> <span class="o">=</span> <span class="mi">4</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO6eighthA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/eighth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO6eighthA2CmF">eighth</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Eighth note worhts one eighth of a beat.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">eighth</span> <span class="o">=</span> <span class="mi">8</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO9sixteenthA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/sixteenth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO9sixteenthA2CmF">sixteenth</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Sixteenth note worths one sixteenth of a beat.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">sixteenth</span> <span class="o">=</span> <span class="mi">16</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO12thirtysecondA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/thirtysecond" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO12thirtysecondA2CmF">thirtysecond</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Thirtysecond note worths one thirtysecond of a beat.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">thirtysecond</span> <span class="o">=</span> <span class="mi">32</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB9NoteValueO11sixtyfourthA2CmF"></a>
-                    <a name="//apple_ref/swift/Element/sixtyfourth" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB9NoteValueO11sixtyfourthA2CmF">sixtyfourth</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Sixtyfourth note worths one sixtyfourth of a beat.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="k">case</span> <span class="n">sixtyfourth</span> <span class="o">=</span> <span class="mi">64</span></code></pre>
-
-                        </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Returns true if two indicies are equal, otherwise returns false.</p>
                       </div>
                     </section>
                   </div>
