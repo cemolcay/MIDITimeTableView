@@ -88,7 +88,7 @@ You can set the `minMeasureWidth` and `maxMeasureWidth` to set zoom levels of th
 Documentation
 ----
 
-[Full documentation here.](http://cemolcay.github.io/MIDITimeTableView)
+[Full documentation are here.](http://cemolcay.github.io/MIDITimeTableView)
 
 AppStore
 ----
