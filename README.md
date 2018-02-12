@@ -21,6 +21,23 @@ Install
 pod 'MIDITimeTableView'
 ```
 
+Features
+----
+
+* Easy to implement, Delegate/DataSource API similar to `UITableView` and `UICollectionView`.
+* Unlimited rows and cells.
+* Cells and Row Headers are fully customisable. You can show any UIView inside them.
+* Shows bar measure (optional).
+* Shows editable playhead that shows current time (optional).
+* Pinch to zoom in/out. (optional).
+* Edit single cell or multiple cells.
+* Drag them around to change row or position.
+* Drag them from right edge to change duration.
+* Long press any cell to show customisable menu.
+* Holds history with a customisable limit and make undo/redo (optional).
+* Customise grid and show bar, beat and subbeat lines with any style (optional).
+
+
 Usage
 ----
 
