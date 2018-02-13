@@ -104,10 +104,10 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   var rowData: [MIDITimeTableRowData] = [
     MIDITimeTableRowData(
       cells: [
-        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
-        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
-        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
-        MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
+//        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
+//        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
+//        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
+//        MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
         ],
       headerCellView: HeaderCellView(title: "Chords"),
       cellView: { cellData in
@@ -117,10 +117,10 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
     MIDITimeTableRowData(
       cells: [
-        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
-        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
-        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
+//        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
+//        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
+//        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
+//        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
         ],
       headerCellView: HeaderCellView(title: "Bass"),
       cellView: { cellData in
@@ -130,25 +130,25 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
     MIDITimeTableRowData(
       cells: [
-        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 1, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 2, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 3, duration: 1),
-
-        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
-        MIDITimeTableCellData(data: "D", position: 5, duration: 1),
-        MIDITimeTableCellData(data: "D", position: 6, duration: 1),
-        MIDITimeTableCellData(data: "D", position: 7, duration: 1),
-
-        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
-        MIDITimeTableCellData(data: "G", position: 9, duration: 1),
-        MIDITimeTableCellData(data: "G", position: 10, duration: 1),
-        MIDITimeTableCellData(data: "G", position: 11, duration: 1),
-
-        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 13, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 14, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 15, duration: 1),
+//        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
+//        MIDITimeTableCellData(data: "C", position: 1, duration: 1),
+//        MIDITimeTableCellData(data: "C", position: 2, duration: 1),
+//        MIDITimeTableCellData(data: "C", position: 3, duration: 1),
+//
+//        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
+//        MIDITimeTableCellData(data: "D", position: 5, duration: 1),
+//        MIDITimeTableCellData(data: "D", position: 6, duration: 1),
+//        MIDITimeTableCellData(data: "D", position: 7, duration: 1),
+//
+//        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
+//        MIDITimeTableCellData(data: "G", position: 9, duration: 1),
+//        MIDITimeTableCellData(data: "G", position: 10, duration: 1),
+//        MIDITimeTableCellData(data: "G", position: 11, duration: 1),
+//
+//        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
+//        MIDITimeTableCellData(data: "C", position: 13, duration: 1),
+//        MIDITimeTableCellData(data: "C", position: 14, duration: 1),
+//        MIDITimeTableCellData(data: "C", position: 15, duration: 1),
         ],
       headerCellView: HeaderCellView(title: "Melody"),
       cellView: { cellData in
@@ -159,16 +159,16 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     MIDITimeTableRowData(
       cells: [
         MIDITimeTableCellData(data: "C", position: 0, duration: 0.5),
-        MIDITimeTableCellData(data: "C", position: 2, duration: 0.5),
-
-        MIDITimeTableCellData(data: "D", position: 4, duration: 0.5),
-        MIDITimeTableCellData(data: "D", position: 6, duration: 0.5),
-
-        MIDITimeTableCellData(data: "G", position: 8, duration: 0.5),
-        MIDITimeTableCellData(data: "G", position: 10, duration: 0.5),
-
-        MIDITimeTableCellData(data: "C", position: 12, duration: 0.5),
-        MIDITimeTableCellData(data: "C", position: 14, duration: 0.5),
+//        MIDITimeTableCellData(data: "C", position: 2, duration: 0.5),
+//
+//        MIDITimeTableCellData(data: "D", position: 4, duration: 0.5),
+//        MIDITimeTableCellData(data: "D", position: 6, duration: 0.5),
+//
+//        MIDITimeTableCellData(data: "G", position: 8, duration: 0.5),
+//        MIDITimeTableCellData(data: "G", position: 10, duration: 0.5),
+//
+//        MIDITimeTableCellData(data: "C", position: 12, duration: 0.5),
+//        MIDITimeTableCellData(data: "C", position: 14, duration: 0.5),
         ],
       headerCellView: HeaderCellView(title: "Synths"),
       cellView: { cellData in
@@ -179,12 +179,12 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    updateHistoryButtons()
     
     timeTableView?.dataSource = self
     timeTableView?.timeTableDelegate = self
     timeTableView?.gridLayer.showsSubbeatLines = false
     timeTableView?.reloadData()
+    updateHistoryButtons()
     
     timeTableView?.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
     timeTableView?.measureView.backgroundColor = UIColor(red: 26.0/255.0, green: 28.0/255.0, blue: 27.0/255.0, alpha: 1)

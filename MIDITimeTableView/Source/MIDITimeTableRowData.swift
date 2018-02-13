@@ -81,6 +81,8 @@ public struct MIDITimeTableRowData {
   public var headerCellView: MIDITimeTableHeaderCellView
   /// View of each cell in the row.
   public var cellView: (MIDITimeTableCellData) -> MIDITimeTableCellView
+  /// Other data for your custom objects. It is useful when moving history related custom data back and forth.
+  public var customData: Any?
 
   /// Calculates the duration of cells in the row.
   public var duration: Double {
@@ -98,9 +100,11 @@ public struct MIDITimeTableRowData {
   ///   - cells: Data of the cells.
   ///   - headerCellView: Row header cell view reference.
   ///   - cellView: Each view of cell data in row.
-  public init(cells: [MIDITimeTableCellData], headerCellView: MIDITimeTableHeaderCellView, cellView: @escaping (MIDITimeTableCellData) -> MIDITimeTableCellView) {
+  ///   - customData: Other data for your custom objects. It is useful when moving history related custom data back and forth.
+  public init(cells: [MIDITimeTableCellData], headerCellView: MIDITimeTableHeaderCellView, cellView: @escaping (MIDITimeTableCellData) -> MIDITimeTableCellView, customData: Any? = nil) {
     self.cells = cells
     self.headerCellView = headerCellView
     self.cellView = cellView
+    self.customData = customData
   }
 }
