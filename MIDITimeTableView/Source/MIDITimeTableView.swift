@@ -292,8 +292,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
   /// Populates row and cell datas from its data source and redraws time table. Could be invoked with an history item.
   ///
+  /// - Parameter keepHistory: If you specify the history writing even if it is enabled, you can control it from here either.
   /// - Parameter historyItem: Optional history item. Defaults nil.
-  public func reloadData(historyItem: MIDITimeTableHistoryItem? = nil) {
+  public func reloadData(keepHistory: Bool = true, historyItem: MIDITimeTableHistoryItem? = nil) {
     // Reset data source
     rowHeaderCellViews.forEach({ $0.removeFromSuperview() })
     rowHeaderCellViews = []
@@ -333,7 +334,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     gridLayer.setNeedsLayout()
 
     // Keep history
-    if holdsHistory, historyItem == nil {
+    if holdsHistory, keepHistory, historyItem == nil {
       history.append(item: rowData)
     }
   }
