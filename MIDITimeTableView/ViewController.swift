@@ -104,10 +104,10 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   var rowData: [MIDITimeTableRowData] = [
     MIDITimeTableRowData(
       cells: [
-//        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
-//        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
-//        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
-//        MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
+        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
+        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
+        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
+        MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
         ],
       headerCellView: HeaderCellView(title: "Chords"),
       cellView: { cellData in
@@ -117,10 +117,10 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
     MIDITimeTableRowData(
       cells: [
-//        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
-//        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
-//        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
-//        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
+        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
+        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
         ],
       headerCellView: HeaderCellView(title: "Bass"),
       cellView: { cellData in
@@ -130,25 +130,25 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
     MIDITimeTableRowData(
       cells: [
-//        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
-//        MIDITimeTableCellData(data: "C", position: 1, duration: 1),
-//        MIDITimeTableCellData(data: "C", position: 2, duration: 1),
-//        MIDITimeTableCellData(data: "C", position: 3, duration: 1),
-//
-//        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
-//        MIDITimeTableCellData(data: "D", position: 5, duration: 1),
-//        MIDITimeTableCellData(data: "D", position: 6, duration: 1),
-//        MIDITimeTableCellData(data: "D", position: 7, duration: 1),
-//
-//        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
-//        MIDITimeTableCellData(data: "G", position: 9, duration: 1),
-//        MIDITimeTableCellData(data: "G", position: 10, duration: 1),
-//        MIDITimeTableCellData(data: "G", position: 11, duration: 1),
-//
-//        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
-//        MIDITimeTableCellData(data: "C", position: 13, duration: 1),
-//        MIDITimeTableCellData(data: "C", position: 14, duration: 1),
-//        MIDITimeTableCellData(data: "C", position: 15, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 1, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 2, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 3, duration: 1),
+
+        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
+        MIDITimeTableCellData(data: "D", position: 5, duration: 1),
+        MIDITimeTableCellData(data: "D", position: 6, duration: 1),
+        MIDITimeTableCellData(data: "D", position: 7, duration: 1),
+
+        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
+        MIDITimeTableCellData(data: "G", position: 9, duration: 1),
+        MIDITimeTableCellData(data: "G", position: 10, duration: 1),
+        MIDITimeTableCellData(data: "G", position: 11, duration: 1),
+
+        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 13, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 14, duration: 1),
+        MIDITimeTableCellData(data: "C", position: 15, duration: 1),
         ],
       headerCellView: HeaderCellView(title: "Melody"),
       cellView: { cellData in
@@ -159,16 +159,16 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     MIDITimeTableRowData(
       cells: [
         MIDITimeTableCellData(data: "C", position: 0, duration: 0.5),
-//        MIDITimeTableCellData(data: "C", position: 2, duration: 0.5),
-//
-//        MIDITimeTableCellData(data: "D", position: 4, duration: 0.5),
-//        MIDITimeTableCellData(data: "D", position: 6, duration: 0.5),
-//
-//        MIDITimeTableCellData(data: "G", position: 8, duration: 0.5),
-//        MIDITimeTableCellData(data: "G", position: 10, duration: 0.5),
-//
-//        MIDITimeTableCellData(data: "C", position: 12, duration: 0.5),
-//        MIDITimeTableCellData(data: "C", position: 14, duration: 0.5),
+        MIDITimeTableCellData(data: "C", position: 2, duration: 0.5),
+
+        MIDITimeTableCellData(data: "D", position: 4, duration: 0.5),
+        MIDITimeTableCellData(data: "D", position: 6, duration: 0.5),
+
+        MIDITimeTableCellData(data: "G", position: 8, duration: 0.5),
+        MIDITimeTableCellData(data: "G", position: 10, duration: 0.5),
+
+        MIDITimeTableCellData(data: "C", position: 12, duration: 0.5),
+        MIDITimeTableCellData(data: "C", position: 14, duration: 0.5),
         ],
       headerCellView: HeaderCellView(title: "Synths"),
       cellView: { cellData in
@@ -240,20 +240,21 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
-    var deletingIndices = [Int: [Int]]() // [rowIndex: [colIndex]]
-    for cell in cells {
-      if deletingIndices[cell.row] == nil {
-        deletingIndices[cell.row] = [cell.index]
-      } else {
-        deletingIndices[cell.row]?.append(cell.index)
-        deletingIndices[cell.row]?.sort()
-      }
-    }
+//    var deletingIndices = [Int: [Int]]() // [rowIndex: [colIndex]]
+//    for cell in cells {
+//      if deletingIndices[cell.row] == nil {
+//        deletingIndices[cell.row] = [cell.index]
+//      } else {
+//        deletingIndices[cell.row]?.append(cell.index)
+//        deletingIndices[cell.row]?.sort()
+//      }
+//    }
+//
+//    for (row, col) in deletingIndices {
+//      rowData[row].cells = rowData[row].cells.enumerated().filter({ !col.contains($0.offset) }).map({ $0.element })
+//    }
 
-    for (row, col) in deletingIndices {
-      rowData[row].cells = rowData[row].cells.enumerated().filter({ !col.contains($0.offset) }).map({ $0.element })
-    }
-
+    rowData.removeCells(at: cells)
     timeTableView?.reloadData()
     updateHistoryButtons()
   }
