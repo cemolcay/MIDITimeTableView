@@ -63,13 +63,13 @@ open class MIDITimeTableCellView: UIView {
   /// View that holds the pan gesture on right most side in the view to use in resizing cell.
   private let resizeView = UIView()
   /// Inset from the rightmost side on the cell to capture resize gesture.
-  public var resizePanThreshold: CGFloat = 10
+  open var resizePanThreshold: CGFloat = 10
   /// Delegate that informs about editing cell.
-  public weak var delegate: MIDITimeTableCellViewDelegate?
+  open weak var delegate: MIDITimeTableCellViewDelegate?
   /// Custom items other than delete, when you long press cell.
-  public var customMenuItems = [MIDITimeTableCellViewCustomMenuItem]()
+  open var customMenuItems = [MIDITimeTableCellViewCustomMenuItem]()
   /// When cell's position or duration editing, is selected.
-  public var isSelected: Bool = false
+  open var isSelected: Bool = false
 
   open override var canBecomeFirstResponder: Bool {
     return true
