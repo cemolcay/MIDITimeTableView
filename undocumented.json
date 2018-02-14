@@ -177,28 +177,28 @@
     },
     {
       "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 358,
+      "line": 359,
       "symbol": "MIDITimeTableView.touchesBegan(_:with:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 405,
+      "line": 406,
       "symbol": "MIDITimeTableView.touchesMoved(_:with:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 531,
+      "line": 532,
       "symbol": "MIDITimeTableView.touchesCancelled(_:with:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
       "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 536,
+      "line": 537,
       "symbol": "MIDITimeTableView.touchesEnded(_:with:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
