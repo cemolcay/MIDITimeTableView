@@ -240,20 +240,6 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
-//    var deletingIndices = [Int: [Int]]() // [rowIndex: [colIndex]]
-//    for cell in cells {
-//      if deletingIndices[cell.row] == nil {
-//        deletingIndices[cell.row] = [cell.index]
-//      } else {
-//        deletingIndices[cell.row]?.append(cell.index)
-//        deletingIndices[cell.row]?.sort()
-//      }
-//    }
-//
-//    for (row, col) in deletingIndices {
-//      rowData[row].cells = rowData[row].cells.enumerated().filter({ !col.contains($0.offset) }).map({ $0.element })
-//    }
-
     rowData.removeCells(at: cells)
     timeTableView?.reloadData()
     updateHistoryButtons()
@@ -280,6 +266,10 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double) {
+    return
+  }
+
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdateRangeHead position: Double) {
     return
   }
 

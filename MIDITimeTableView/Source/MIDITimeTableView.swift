@@ -105,6 +105,11 @@ public protocol MIDITimeTableViewDelegate: class {
   /// - Parameter midiTimeTableView: Time table that updated.
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double)
 
+  /// Informs about user updated range head position.
+  ///
+  /// - Parameter midiTimeTableView: Time table that updated.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdateRangeHead position: Double)
+
   /// Informs about history has been changed. You need to update your `rowData` with history's `currentItem`.
   ///
   /// - Parameters:
@@ -123,9 +128,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   public var showsGrid: Bool = true
   /// Property to show playhead. Defaults true.
   public var showsPlayhead: Bool = true
+  /// Property to show range head that sets the playable are on the timetable. Defaults true.
+  public var showsRangeHead: Bool = true
   /// Property to enable/disable history feature. Deafults true.
   public var holdsHistory: Bool = true
-
 
   /// Speed of zooming by pinch gesture.
   public var zoomSpeed: CGFloat = 0.4
@@ -150,6 +156,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   public private(set) var measureView = MIDITimeTableMeasureView()
   /// Playhead view that shows the current position in timetable. You can set is hidden or movable status as well as its position.
   public private(set) var playheadView = MIDITimeTablePlayheadView()
+  /// Rangehead view that shows or adjusts the playable area on the timetable.
+  public private(set) var rangeheadView = MIDITimeTablePlayheadView()
 
   // Delegate and data source references
   /// Current data to display of the time table.
@@ -204,16 +212,28 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   }
 
   private func commonInit() {
+    // Measure
     addSubview(measureView)
-    addSubview(playheadView)
+    // History
     history.delegate = self
+    // Playhead
+    addSubview(playheadView)
     playheadView.delegate = self
     playheadView.layer.zPosition = 10
+    playheadView.shapeType = .playhead
+    // Rangehead
+    addSubview(rangeheadView)
+    rangeheadView.delegate = self
+    rangeheadView.layer.zPosition = 10
+    rangeheadView.shapeType = .range
+    // Grid
     layer.insertSublayer(gridLayer, at: 0)
+    // Zoom gesture
     let pinch = UIPinchGestureRecognizer(
       target: self,
       action: #selector(didPinch(pinch:)))
     addGestureRecognizer(pinch)
+    // Tap gesture
     let tap = UITapGestureRecognizer(
       target: self,
       action: #selector(didTap(tap:)))
@@ -258,6 +278,12 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let minBarCount = Int(ceil(frame.size.width / measureWidth))
     var barCount = Int(ceil(duration / Double(measureView.beatCount))) + 1
     barCount = max(barCount, minBarCount)
+    // Check if range is set.
+    if showsRangeHead {
+      let rangePosition = rangeheadView.position
+      let rangedBarCount = Int(ceil(rangePosition / Double(measureView.beatCount))) + 1
+      barCount = max(barCount, rangedBarCount)
+    }
     measureView.barCount = barCount
 
     measureView.frame = CGRect(
@@ -276,6 +302,13 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     playheadView.lineHeight = contentSize.height - measureHeight
     playheadView.measureBeatWidth = measureWidth / CGFloat(measureView.beatCount)
     playheadView.isHidden = !showsPlayhead
+
+    // Rangehead
+    rangeheadView.rowHeaderWidth = headerCellWidth
+    rangeheadView.measureHeight = measureHeight
+    rangeheadView.lineHeight = contentSize.height - measureHeight
+    rangeheadView.measureBeatWidth = measureWidth / CGFloat(measureView.beatCount)
+    rangeheadView.isHidden = !showsPlayhead
 
     // Grid layer
     gridLayer.rowCount = rowHeaderCellViews.count
@@ -693,12 +726,22 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // Horizontal move
     if translation.x > subbeatWidth, playheadView.frame.maxX < contentSize.width {
       playheadView.position += 0.25
-      timeTableDelegate?.midiTimeTableView(self, didUpdatePlayhead: playheadView.position)
       panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+      // Fire delegate
+      if playheadView == self.playheadView {
+        timeTableDelegate?.midiTimeTableView(self, didUpdatePlayhead: playheadView.position)
+      } else if playheadView == rangeheadView {
+        timeTableDelegate?.midiTimeTableView(self, didUpdateRangeHead: rangeheadView.position)
+      }
     } else if translation.x < -subbeatWidth, playheadView.frame.minX > headerCellWidth {
       playheadView.position -= 0.25
-      timeTableDelegate?.midiTimeTableView(self, didUpdatePlayhead: playheadView.position)
       panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
+      // Fire delegate
+      if playheadView == self.playheadView {
+        timeTableDelegate?.midiTimeTableView(self, didUpdatePlayhead: playheadView.position)
+      } else if playheadView == rangeheadView {
+        timeTableDelegate?.midiTimeTableView(self, didUpdateRangeHead: rangeheadView.position)
+      }
     }
   }
 
