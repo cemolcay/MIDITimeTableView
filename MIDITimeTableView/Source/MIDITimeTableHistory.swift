@@ -26,7 +26,7 @@ public protocol MIDITimeTableHistoryDelegate: class {
 public class MIDITimeTableHistory {
   /// Items holding in the history queue.
   public private(set) var items = [MIDITimeTableHistoryItem]()
-  /// Current index of history. Defaults first item, 0.
+  /// Current index of history. Defaults nothing, -1.
   public private(set) var currentIndex = -1
   /// Limit of the history items. Defaults 10.
   public var limit: Int { didSet{ limitDidChange() }}
@@ -84,15 +84,10 @@ public class MIDITimeTableHistory {
   ///
   /// - Parameter item: Item to add to history.
   public func append(item: MIDITimeTableHistoryItem) {
-    // If we hit the limit, remove first item.
-    if items.count >= limit {
-      items.remove(at: 0)
-    }
-    // Append item to history.
-    currentIndex += 1
-    if currentIndex >= limit {
-      currentIndex = limit - 1
-    }
-    items.insert(item, at: currentIndex)
+    var newHistory = items.enumerated().filter({ $0.offset <= currentIndex }).map({ $0.element })
+    newHistory.append(item)
+    newHistory = Array(newHistory.suffix(limit))
+    currentIndex = newHistory.count - 1
+    items = newHistory
   }
 }

@@ -179,12 +179,12 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
   override func viewDidLoad() {
     super.viewDidLoad()
-    updateHistoryButtons()
     
     timeTableView?.dataSource = self
     timeTableView?.timeTableDelegate = self
     timeTableView?.gridLayer.showsSubbeatLines = false
     timeTableView?.reloadData()
+    updateHistoryButtons()
     
     timeTableView?.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
     timeTableView?.measureView.backgroundColor = UIColor(red: 26.0/255.0, green: 28.0/255.0, blue: 27.0/255.0, alpha: 1)
@@ -240,20 +240,21 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
-    var deletingIndices = [Int: [Int]]() // [rowIndex: [colIndex]]
-    for cell in cells {
-      if deletingIndices[cell.row] == nil {
-        deletingIndices[cell.row] = [cell.index]
-      } else {
-        deletingIndices[cell.row]?.append(cell.index)
-        deletingIndices[cell.row]?.sort()
-      }
-    }
+//    var deletingIndices = [Int: [Int]]() // [rowIndex: [colIndex]]
+//    for cell in cells {
+//      if deletingIndices[cell.row] == nil {
+//        deletingIndices[cell.row] = [cell.index]
+//      } else {
+//        deletingIndices[cell.row]?.append(cell.index)
+//        deletingIndices[cell.row]?.sort()
+//      }
+//    }
+//
+//    for (row, col) in deletingIndices {
+//      rowData[row].cells = rowData[row].cells.enumerated().filter({ !col.contains($0.offset) }).map({ $0.element })
+//    }
 
-    for (row, col) in deletingIndices {
-      rowData[row].cells = rowData[row].cells.enumerated().filter({ !col.contains($0.offset) }).map({ $0.element })
-    }
-
+    rowData.removeCells(at: cells)
     timeTableView?.reloadData()
     updateHistoryButtons()
   }
