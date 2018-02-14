@@ -18,6 +18,13 @@ public protocol MIDITimeTablePlayheadViewDelegate: class {
   func playheadView(_ playheadView: MIDITimeTablePlayheadView, didPan panGestureRecognizer: UIPanGestureRecognizer)
 }
 
+public enum MIDITimeTablePlayheadShape {
+  /// Down arrow shape for showing or adjusting current time on the timetable.
+  case playhead
+  /// Left arrow shape for adjusting range of the playable area on the timetable.
+  case range
+}
+
 /// Draws a triangle, movable playhead that customisable with a custom shape layer or an image.
 public class MIDITimeTablePlayheadView: UIView {
   /// Current position on timetable. Based on beats.
@@ -33,6 +40,8 @@ public class MIDITimeTablePlayheadView: UIView {
   public var image: UIImage? { didSet{ updateImage() }}
   /// Shape layer that draws triangle playhead shape. You can change the default shape.
   public var shapeLayer = CAShapeLayer() { didSet{ setNeedsLayout() } }
+  /// Shape of the playhead triangle.
+  public var shapeType: MIDITimeTablePlayheadShape = .range
 
   /// Playhead's guide line color that draws on timetable.
   public var lineColor: UIColor = .white { didSet{ setNeedsLayout() }}
@@ -102,26 +111,38 @@ public class MIDITimeTablePlayheadView: UIView {
   }
 
   private func drawShapeLayer() {
-    let width = frame.size.width
-    let height = frame.size.height / 2
-    let cornerRadius: CGFloat = 3
-    let x = (frame.size.width - width) / 2
-    let rectPath = UIBezierPath(
-      roundedRect: CGRect(x: x, y: 0, width: width, height: height),
-      byRoundingCorners: [.topLeft, .topRight],
-      cornerRadii: CGSize(width: cornerRadius, height: cornerRadius))
-    let trianglePath = UIBezierPath()
-    trianglePath.move(to: CGPoint(x: rectPath.bounds.minX + 0.5, y: rectPath.bounds.maxY))
-    trianglePath.addLine(to: CGPoint(x: (frame.size.width/2) - (lineWidth / 2), y: rectPath.bounds.maxY + height))
-    trianglePath.addLine(to: CGPoint(x: (frame.size.width/2) + lineWidth, y: rectPath.bounds.maxY + height))
-    trianglePath.addLine(to: CGPoint(x: rectPath.bounds.maxX - 0.5, y: rectPath.bounds.maxY))
-    trianglePath.close()
-    rectPath.append(trianglePath)
+    let cornerRadius: CGFloat = 1
+    let path = CGMutablePath()
 
-    shapeLayer.path = rectPath.cgPath
+    switch shapeType {
+    case .playhead:
+      let point1 = CGPoint(x: 0, y: 0)
+      let point2 = CGPoint(x: 0, y: frame.size.height / 2)
+      let point3 = CGPoint(x: frame.size.width / 2, y: frame.size.height)
+      let point4 = CGPoint(x: frame.size.width, y: frame.size.height / 2)
+      let point5 = CGPoint(x: frame.size.width, y: 0)
+
+      path.move(to: point2)
+      path.addArc(tangent1End: point2, tangent2End: point3, radius: cornerRadius)
+      path.addArc(tangent1End: point3, tangent2End: point4, radius: cornerRadius)
+      path.addArc(tangent1End: point4, tangent2End: point5, radius: cornerRadius)
+      path.addArc(tangent1End: point5, tangent2End: point1, radius: cornerRadius)
+      path.addArc(tangent1End: point1, tangent2End: point2, radius: cornerRadius)
+
+    case .range:
+      let point1 = CGPoint(x: frame.size.width, y: 0)
+      let point2 = CGPoint(x: frame.size.width / 2, y: frame.size.height / 2)
+      let point3 = CGPoint(x: frame.size.width, y: frame.size.height)
+
+      path.move(to: point2)
+      path.addArc(tangent1End: point2, tangent2End: point3, radius: cornerRadius)
+      path.addArc(tangent1End: point3, tangent2End: point1, radius: cornerRadius)
+      path.addArc(tangent1End: point1, tangent2End: point2, radius: cornerRadius)
+    }
+
+    shapeLayer.path = path
+    shapeLayer.shadowPath = path
     shapeLayer.fillColor = tintColor.cgColor
-
-    shapeLayer.shadowPath = rectPath.cgPath
     shapeLayer.shadowColor = UIColor.black.cgColor
     shapeLayer.shadowRadius = 1
   }

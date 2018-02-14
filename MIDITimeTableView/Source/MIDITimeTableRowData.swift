@@ -10,7 +10,7 @@ import UIKit
 
 extension Collection where Iterator.Element == MIDITimeTableRowData {
 
-  /// Returns a cell data at the index of a row, if available. If not, returns nil.
+  /// Returns a cell data at the index of a row.
   ///
   /// - Parameters:
   ///   - row: Row index of the cell data.
@@ -28,7 +28,7 @@ extension Collection where Iterator.Element == MIDITimeTableRowData {
     }
   }
 
-  /// Returns a cell data with `MIDITimeTableCellIndex`, if available. If not returns nil.
+  /// Returns a cell data with `MIDITimeTableCellIndex`.
   ///
   /// - Parameter index: Cell index of the cell data.
   public subscript(index: MIDITimeTableCellIndex) -> MIDITimeTableCellData {
