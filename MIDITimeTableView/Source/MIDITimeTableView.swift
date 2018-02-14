@@ -385,6 +385,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// Unselects all cells if tapped an empty area of the time table.
   @objc private func didTap(tap: UITapGestureRecognizer) {
     unselectAllCells()
+    endDragging()
   }
 
   // MARK: Drag to select multiple cells

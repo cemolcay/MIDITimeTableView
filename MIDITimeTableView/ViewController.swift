@@ -193,6 +193,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     timeTableView?.gridLayer.barLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
     timeTableView?.gridLayer.beatLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
     timeTableView?.playheadView.tintColor = UIColor.gray.withAlphaComponent(0.5)
+    timeTableView?.rangeheadView.tintColor = UIColor.gray.withAlphaComponent(0.3)
   }
 
   @IBAction func redoDidPress(sender: UIButton) {
