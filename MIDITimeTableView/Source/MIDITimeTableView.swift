@@ -309,6 +309,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     rangeheadView.lineHeight = contentSize.height - measureHeight
     rangeheadView.measureBeatWidth = measureWidth / CGFloat(measureView.beatCount)
     rangeheadView.isHidden = !showsPlayhead
+    bringSubview(toFront: rangeheadView)
 
     // Grid layer
     gridLayer.rowCount = rowHeaderCellViews.count
@@ -727,8 +728,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // Horizontal move
     if translation.x > subbeatWidth, playheadView.frame.maxX < contentSize.width {
       playheadView.position += 0.25
+      panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
     } else if translation.x < -subbeatWidth, playheadView.frame.minX > headerCellWidth {
       playheadView.position -= 0.25
+      panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
     }
 
     // Fire delegate
@@ -739,9 +742,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
         timeTableDelegate?.midiTimeTableView(self, didUpdateRangeHead: rangeheadView.position)
       }
     }
-
-    // Reset translation
-    panGestureRecognizer.setTranslation(.zero, in: self)
   }
 
   // MARK: MIDITimeTableHistoryDelegate

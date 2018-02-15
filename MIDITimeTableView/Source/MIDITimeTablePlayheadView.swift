@@ -55,6 +55,10 @@ public class MIDITimeTablePlayheadView: UIView {
   private var imageView: UIImageView?
   /// Delegate of playhead.
   public weak var delegate: MIDITimeTablePlayheadViewDelegate?
+  /// The view for panning.
+  private var panningView = UIView()
+  /// The hit are offset for panning.
+  public var panningOffset: CGFloat = 20
 
   // MARK: Init
 
@@ -73,7 +77,8 @@ public class MIDITimeTablePlayheadView: UIView {
   }
 
   private func commonInit() {
-    addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(didPan(pan:))))
+    panningView.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(didPan(pan:))))
+    addSubview(panningView)
     layer.addSublayer(lineLayer)
     layer.addSublayer(shapeLayer)
   }
@@ -82,6 +87,7 @@ public class MIDITimeTablePlayheadView: UIView {
 
   public override func layoutSubviews() {
     super.layoutSubviews()
+    panningView.frame = CGRect(x: -panningOffset, y: -panningOffset, width: frame.size.width + (panningOffset * 2), height: frame.size.height + (panningOffset * 2))
     lineLayer.frame.size = CGSize(width: lineWidth, height: lineHeight + (frame.height / 2))
     lineLayer.frame.origin.y = frame.height - (frame.height / 2)
     lineLayer.position.x = frame.width / 2
@@ -89,6 +95,21 @@ public class MIDITimeTablePlayheadView: UIView {
     imageView?.frame = CGRect(origin: .zero, size: frame.size)
     shapeLayer.frame = CGRect(origin: .zero, size: frame.size)
     drawShapeLayer()
+  }
+
+  public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
+    if clipsToBounds || isHidden || alpha == 0 {
+      return nil
+    }
+
+    for subview in subviews.reversed() {
+      let subPoint = subview.convert(point, from: self)
+      if let result = subview.hitTest(subPoint, with: event) {
+        return result
+      }
+    }
+
+    return nil
   }
 
   private func updatePosition() {
