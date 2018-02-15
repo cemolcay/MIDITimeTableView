@@ -727,23 +727,21 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // Horizontal move
     if translation.x > subbeatWidth, playheadView.frame.maxX < contentSize.width {
       playheadView.position += 0.25
-      panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
-      // Fire delegate
-      if playheadView == self.playheadView {
-        timeTableDelegate?.midiTimeTableView(self, didUpdatePlayhead: playheadView.position)
-      } else if playheadView == rangeheadView {
-        timeTableDelegate?.midiTimeTableView(self, didUpdateRangeHead: rangeheadView.position)
-      }
     } else if translation.x < -subbeatWidth, playheadView.frame.minX > headerCellWidth {
       playheadView.position -= 0.25
-      panGestureRecognizer.setTranslation(CGPoint(x: 0, y: translation.y), in: self)
-      // Fire delegate
+    }
+
+    // Fire delegate
+    if panGestureRecognizer.state == .ended || panGestureRecognizer.state == .cancelled || panGestureRecognizer.state == .failed {
       if playheadView == self.playheadView {
         timeTableDelegate?.midiTimeTableView(self, didUpdatePlayhead: playheadView.position)
       } else if playheadView == rangeheadView {
         timeTableDelegate?.midiTimeTableView(self, didUpdateRangeHead: rangeheadView.position)
       }
     }
+
+    // Reset translation
+    panGestureRecognizer.setTranslation(.zero, in: self)
   }
 
   // MARK: MIDITimeTableHistoryDelegate
