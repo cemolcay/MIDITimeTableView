@@ -51,7 +51,7 @@ open class MIDITimeTableMeasureLayer: CALayer {
     textLayer.fontSize = frame.height/2
     textLayer.foregroundColor = tintColor.cgColor
     textLayer.contentsScale = UIScreen.main.scale
-    textLayer.alignmentMode = kCAAlignmentLeft
+    textLayer.alignmentMode = .left
     textLayer.string = showsBarNumber ? "\(barNumber)" : ""
     // Shape layer
     shapeLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)

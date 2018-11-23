@@ -309,7 +309,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     rangeheadView.lineHeight = contentSize.height - measureHeight
     rangeheadView.measureBeatWidth = measureWidth / CGFloat(measureView.beatCount)
     rangeheadView.isHidden = !showsPlayhead
-    bringSubview(toFront: rangeheadView)
+    bringSubviewToFront(rangeheadView)
 
     // Grid layer
     gridLayer.rowCount = rowHeaderCellViews.count
@@ -613,13 +613,16 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
   public func midiTimeTableCellViewDidMove(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer) {
     let translation = pan.translation(in: self)
-    bringSubview(toFront: midiTimeTableCellView)
+    bringSubviewToFront(midiTimeTableCellView)
 
     let selectedCells = cellViews.flatMap({ $0 }).filter({ $0.isSelected })
 
     if case .began = pan.state {
       midiTimeTableCellView.isSelected = true
-      editingCellIndices = cellViews.flatMap({ $0 }).filter({ $0.isSelected }).flatMap({ cellIndex(of: $0) })
+      editingCellIndices = cellViews
+        .flatMap({ $0 })
+        .filter({ $0.isSelected })
+        .compactMap({ cellIndex(of: $0) })
     }
 
     isMoving = true
@@ -660,14 +663,17 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
   public func midiTimeTableCellViewDidResize(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer) {
     let translation = pan.translation(in: self)
-    bringSubview(toFront: midiTimeTableCellView)
+    bringSubviewToFront(midiTimeTableCellView)
 
     let selectedCells = cellViews.flatMap({ $0 }).filter({ $0.isSelected })
 
     if case .began = pan.state {
       isResizing = true
       midiTimeTableCellView.isSelected = true
-      editingCellIndices = cellViews.flatMap({ $0 }).filter({ $0.isSelected }).flatMap({ cellIndex(of: $0) })
+      editingCellIndices = cellViews
+        .flatMap({ $0 })
+        .filter({ $0.isSelected })
+        .compactMap({ cellIndex(of: $0) })
     }
 
     for cell in selectedCells {
@@ -716,7 +722,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let deletingCellIndices = cellViews
       .flatMap({ $0 })
       .filter({ $0.isSelected })
-      .flatMap({ cellIndex(of: $0) })
+      .compactMap({ cellIndex(of: $0) })
     timeTableDelegate?.midiTimeTableView(self, didDelete: deletingCellIndices)
   }
 

@@ -16,8 +16,9 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "MIDITimeTableView"
-  s.version      = "1.0.1"
+  s.version      = "1.0.2"
   s.summary      = "Customisable and editable time table grid for showing midi or audio related data with a measure."
+  s.swift_version = "4.2"
 
   # This description is used to generate tags and improve search results.
   #   * Think: What does it do? Why did you write it? What is the focus?
@@ -38,7 +39,7 @@ Demo
 Requirements
 ----
 
-- Swift 3+
+- Swift 4.2+
 - iOS 9.0+
 
 Install

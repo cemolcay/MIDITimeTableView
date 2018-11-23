@@ -103,7 +103,7 @@ open class MIDITimeTableCellView: UIView {
 
     NotificationCenter.default.addObserver(self,
       selector: #selector(menuControllerWillHideNotification),
-      name: .UIMenuControllerWillHideMenu,
+      name: UIMenuController.willHideMenuNotification,
       object: nil)
   }
 
