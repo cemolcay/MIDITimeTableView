@@ -14,8 +14,6 @@ public struct MIDITimeTableCellIndex: Hashable {
   public var row: Int
   /// Index number in the row. Does not represent column.
   public var index: Int
-  /// Hashable value
-  public var hashValue: Int
 
   /// Initilizes the index with row and column indices.
   ///
@@ -24,7 +22,13 @@ public struct MIDITimeTableCellIndex: Hashable {
   public init(row: Int, index: Int) {
     self.row = row
     self.index = index
-    hashValue = row.hashValue ^ index.hashValue &* 16777619
+  }
+
+  // MARK: Hashable
+
+  public func hash(into hasher: inout Hasher) {
+    hasher.combine(row)
+    hasher.combine(index)
   }
 
   // MARK: Equatable

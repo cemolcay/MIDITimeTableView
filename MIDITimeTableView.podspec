@@ -16,7 +16,7 @@ Pod::Spec.new do |s|
   #
 
   s.name         = "MIDITimeTableView"
-  s.version      = "1.0.2"
+  s.version      = "1.0.3"
   s.summary      = "Customisable and editable time table grid for showing midi or audio related data with a measure."
   s.swift_version = "4.2"
 

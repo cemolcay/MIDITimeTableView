@@ -11,7 +11,7 @@ Demo
 Requirements
 ----
 
-- Swift 3+
+- Swift 5.0+
 - iOS 9.0+
 
 Install
