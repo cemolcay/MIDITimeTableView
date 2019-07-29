@@ -379,7 +379,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// - Returns: Returns a row and column index Int pair in a tuple.
   public func cellIndex(of cell: MIDITimeTableCellView) -> MIDITimeTableCellIndex? {
     let row = Int((cell.frame.minY - measureHeight) / rowHeight)
-    guard let index = cellViews[row].index(of: cell), row < cellViews.count else { return nil }
+    guard let index = cellViews[row].firstIndex(of: cell), row < cellViews.count else { return nil }
     return MIDITimeTableCellIndex(row: row, index: index)
   }
 
