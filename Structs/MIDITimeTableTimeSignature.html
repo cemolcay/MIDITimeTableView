@@ -8,20 +8,29 @@
     <script src="../js/jquery.min.js" defer></script>
     <script src="../js/jazzy.js" defer></script>
     
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
   </head>
   <body>
     <a name="//apple_ref/swift/Struct/MIDITimeTableTimeSignature" class="dashAnchor"></a>
     <a title="MIDITimeTableTimeSignature Structure Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">MIDITimeTableView Docs</a> (84% documented)</p>
-        <p class="header-right"><a href="https://github.com/cemolcay/MIDITimeTableView"><img src="../img/gh.png"/>View on GitHub</a></p>
+        <p><a href="../index.html">MIDITimeTableView Docs</a> (78% documented)</p>
+        <div class="header-right">
+          <form role="search" action="../search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
       </div>
     </header>
     <div class="content-wrapper">
       <p id="breadcrumbs">
-        <a href="../index.html">MIDITimeTableView Reference</a>
-        <img id="carat" src="../img/carat.png" />
+        <a href="../index.html">MIDITimeTableView</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
+        <a href="../Structs.html">Structures</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
         MIDITimeTableTimeSignature Structure Reference
       </p>
     </div>
@@ -38,10 +47,7 @@
                 <a href="../Classes/MIDITimeTableGridLayer.html">MIDITimeTableGridLayer</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Classes.html#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableHeaderCellView">MIDITimeTableHeaderCellView</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Classes/MIDITimeTableHistory.html">MIDITimeTableHistory</a>
+                <a href="../Classes/MIDITimeTableHeaderCellView.html">MIDITimeTableHeaderCellView</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Classes/MIDITimeTableMeasureLayer.html">MIDITimeTableMeasureLayer</a>
@@ -61,6 +67,9 @@
             <a href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Enums.html#/s:17MIDITimeTableView0aB19CellOverlapResolverO">MIDITimeTableCellOverlapResolver</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a>
               </li>
               <li class="nav-group-task">
@@ -72,7 +81,10 @@
             <a href="../Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Extensions/Collection.html">Collection</a>
+                <a href="../Extensions/Array.html">Array</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Sequence.html">Sequence</a>
               </li>
             </ul>
           </li>
@@ -80,13 +92,19 @@
             <a href="../Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableCellRepresentable.html">MIDITimeTableCellRepresentable</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Protocols/MIDITimeTableHistoryDelegate.html">MIDITimeTableHistoryDelegate</a>
+                <a href="../Protocols/MIDITimeTableHistoryRepresentable.html">MIDITimeTableHistoryRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTablePlayheadViewDelegate.html">MIDITimeTablePlayheadViewDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableRowRepresentable.html">MIDITimeTableRowRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a>
@@ -100,16 +118,19 @@
             <a href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a>
+                <a href="../Structs/MIDITimeTableCellEditResult.html">MIDITimeTableCellEditResult</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a>
               </li>
               <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableCellInsertion.html">MIDITimeTableCellInsertion</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableCellViewCustomMenuItem.html">MIDITimeTableCellViewCustomMenuItem</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Structs/MIDITimeTableRowData.html">MIDITimeTableRowData</a>
+                <a href="../Structs/MIDITimeTableHistoryStack.html">MIDITimeTableHistoryStack</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableTimeSignature.html">MIDITimeTableTimeSignature</a>
@@ -117,16 +138,16 @@
               <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableViewAutoScrollDirection.html">MIDITimeTableViewAutoScrollDirection</a>
               </li>
+              <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableViewEditedCellData.html">MIDITimeTableViewEditedCellData</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
             <a href="../Typealiases.html">Type Aliases</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Typealiases.html#/s:17MIDITimeTableView0aB11HistoryItema">MIDITimeTableHistoryItem</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Typealiases.html#/s:17MIDITimeTableView0abC14EditedCellDataa">MIDITimeTableViewEditedCellData</a>
+                <a href="../Typealiases.html#/s:17MIDITimeTableView0aB6CellIDa">MIDITimeTableCellID</a>
               </li>
             </ul>
           </li>
@@ -138,7 +159,8 @@
             <h1>MIDITimeTableTimeSignature</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableTimeSignature</span></code></pre>
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableTimeSignature</span></code></pre>
 
                 </div>
               </div>
@@ -151,9 +173,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB13TimeSignatureV5beatsSiv"></a>
+                    <a name="/s:17MIDITimeTableView0aB13TimeSignatureV5beatsSivp"></a>
                     <a name="//apple_ref/swift/Property/beats" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB13TimeSignatureV5beatsSiv">beats</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB13TimeSignatureV5beatsSivp">beats</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -168,7 +190,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">beats</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">beats</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
 
                         </div>
                       </div>
@@ -178,9 +200,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB13TimeSignatureV9noteValueAA0ab4NoteG0Ov"></a>
+                    <a name="/s:17MIDITimeTableView0aB13TimeSignatureV9noteValueAA0ab4NoteG0Ovp"></a>
                     <a name="//apple_ref/swift/Property/noteValue" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB13TimeSignatureV9noteValueAA0ab4NoteG0Ov">noteValue</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB13TimeSignatureV9noteValueAA0ab4NoteG0Ovp">noteValue</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -195,7 +217,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">noteValue</span><span class="p">:</span> <span class="kt"><a href="../Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a></span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">noteValue</span><span class="p">:</span> <span class="kt"><a href="../Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a></span></code></pre>
 
                         </div>
                       </div>
@@ -205,9 +227,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB13TimeSignatureVACSi5beats_AA0aB9NoteValueO04noteH0tcfc"></a>
+                    <a name="/s:17MIDITimeTableView0aB13TimeSignatureV5beats9noteValueACSi_AA0ab4NoteH0Otcfc"></a>
                     <a name="//apple_ref/swift/Method/init(beats:noteValue:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB13TimeSignatureVACSi5beats_AA0aB9NoteValueO04noteH0tcfc">init(beats:noteValue:)</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB13TimeSignatureV5beats9noteValueACSi_AA0ab4NoteH0Otcfc">init(beats:<wbr>noteValue:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -222,7 +244,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">beats</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">noteValue</span><span class="p">:</span> <span class="kt"><a href="../Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a></span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="nf">init</span><span class="p">(</span><span class="nv">beats</span><span class="p">:</span> <span class="kt">Int</span><span class="p">,</span> <span class="nv">noteValue</span><span class="p">:</span> <span class="kt"><a href="../Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a></span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -265,11 +287,10 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2018 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2018-02-14)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>&copy; 2026 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2026-07-21)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>
     </div>
   </body>
-</div>
 </html>

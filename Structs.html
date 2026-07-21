@@ -8,19 +8,27 @@
     <script src="js/jquery.min.js" defer></script>
     <script src="js/jazzy.js" defer></script>
     
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
   </head>
   <body>
+    <a name="//apple_ref/swift/Section/Structures" class="dashAnchor"></a>
     <a title="Structures  Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="index.html">MIDITimeTableView Docs</a> (84% documented)</p>
-        <p class="header-right"><a href="https://github.com/cemolcay/MIDITimeTableView"><img src="img/gh.png"/>View on GitHub</a></p>
+        <p><a href="index.html">MIDITimeTableView Docs</a> (78% documented)</p>
+        <div class="header-right">
+          <form role="search" action="search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
       </div>
     </header>
     <div class="content-wrapper">
       <p id="breadcrumbs">
-        <a href="index.html">MIDITimeTableView Reference</a>
-        <img id="carat" src="img/carat.png" />
+        <a href="index.html">MIDITimeTableView</a>
+        <img id="carat" src="img/carat.png" alt=""/>
         Structures  Reference
       </p>
     </div>
@@ -37,10 +45,7 @@
                 <a href="Classes/MIDITimeTableGridLayer.html">MIDITimeTableGridLayer</a>
               </li>
               <li class="nav-group-task">
-                <a href="Classes.html#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableHeaderCellView">MIDITimeTableHeaderCellView</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Classes/MIDITimeTableHistory.html">MIDITimeTableHistory</a>
+                <a href="Classes/MIDITimeTableHeaderCellView.html">MIDITimeTableHeaderCellView</a>
               </li>
               <li class="nav-group-task">
                 <a href="Classes/MIDITimeTableMeasureLayer.html">MIDITimeTableMeasureLayer</a>
@@ -60,6 +65,9 @@
             <a href="Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="Enums.html#/s:17MIDITimeTableView0aB19CellOverlapResolverO">MIDITimeTableCellOverlapResolver</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a>
               </li>
               <li class="nav-group-task">
@@ -71,7 +79,10 @@
             <a href="Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Extensions/Collection.html">Collection</a>
+                <a href="Extensions/Array.html">Array</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/Sequence.html">Sequence</a>
               </li>
             </ul>
           </li>
@@ -79,13 +90,19 @@
             <a href="Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="Protocols/MIDITimeTableCellRepresentable.html">MIDITimeTableCellRepresentable</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a>
               </li>
               <li class="nav-group-task">
-                <a href="Protocols/MIDITimeTableHistoryDelegate.html">MIDITimeTableHistoryDelegate</a>
+                <a href="Protocols/MIDITimeTableHistoryRepresentable.html">MIDITimeTableHistoryRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="Protocols/MIDITimeTablePlayheadViewDelegate.html">MIDITimeTablePlayheadViewDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/MIDITimeTableRowRepresentable.html">MIDITimeTableRowRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a>
@@ -99,16 +116,19 @@
             <a href="Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a>
+                <a href="Structs/MIDITimeTableCellEditResult.html">MIDITimeTableCellEditResult</a>
               </li>
               <li class="nav-group-task">
                 <a href="Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a>
               </li>
               <li class="nav-group-task">
+                <a href="Structs/MIDITimeTableCellInsertion.html">MIDITimeTableCellInsertion</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Structs/MIDITimeTableCellViewCustomMenuItem.html">MIDITimeTableCellViewCustomMenuItem</a>
               </li>
               <li class="nav-group-task">
-                <a href="Structs/MIDITimeTableRowData.html">MIDITimeTableRowData</a>
+                <a href="Structs/MIDITimeTableHistoryStack.html">MIDITimeTableHistoryStack</a>
               </li>
               <li class="nav-group-task">
                 <a href="Structs/MIDITimeTableTimeSignature.html">MIDITimeTableTimeSignature</a>
@@ -116,16 +136,16 @@
               <li class="nav-group-task">
                 <a href="Structs/MIDITimeTableViewAutoScrollDirection.html">MIDITimeTableViewAutoScrollDirection</a>
               </li>
+              <li class="nav-group-task">
+                <a href="Structs/MIDITimeTableViewEditedCellData.html">MIDITimeTableViewEditedCellData</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
             <a href="Typealiases.html">Type Aliases</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Typealiases.html#/s:17MIDITimeTableView0aB11HistoryItema">MIDITimeTableHistoryItem</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Typealiases.html#/s:17MIDITimeTableView0abC14EditedCellDataa">MIDITimeTableViewEditedCellData</a>
+                <a href="Typealiases.html#/s:17MIDITimeTableView0aB6CellIDa">MIDITimeTableCellID</a>
               </li>
             </ul>
           </li>
@@ -162,7 +182,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableCellIndex</span><span class="p">:</span> <span class="kt">Hashable</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableCellIndex</span> <span class="p">:</span> <span class="kt">Hashable</span></code></pre>
 
                         </div>
                       </div>
@@ -172,9 +192,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB8CellDataV"></a>
-                    <a name="//apple_ref/swift/Struct/MIDITimeTableCellData" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB8CellDataV">MIDITimeTableCellData</a>
+                    <a name="/s:17MIDITimeTableView0aB12HistoryStackV"></a>
+                    <a name="//apple_ref/swift/Struct/MIDITimeTableHistoryStack" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB12HistoryStackV">MIDITimeTableHistoryStack</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -182,121 +202,21 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Data of each cell in the rows of <code><a href="Classes/MIDITimeTableView.html">MIDITimeTableView</a></code>.</p>
+                        <p>Generic history storage for app-owned time table snapshots.</p>
 
-                        <a href="Structs/MIDITimeTableCellData.html" class="slightly-smaller">See more</a>
+                        <a href="Structs/MIDITimeTableHistoryStack.html" class="slightly-smaller">See more</a>
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableCellData</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableHistoryStack</span><span class="o">&lt;</span><span class="kt">Item</span><span class="o">&gt;</span></code></pre>
 
                         </div>
                       </div>
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0abC19AutoScrollDirectionV"></a>
-                    <a name="//apple_ref/swift/Struct/MIDITimeTableViewAutoScrollDirection" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC19AutoScrollDirectionV">MIDITimeTableViewAutoScrollDirection</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Auto scrolling direction type</p>
-
-                        <a href="Structs/MIDITimeTableViewAutoScrollDirection.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableViewAutoScrollDirection</span><span class="p">:</span> <span class="kt">OptionSet</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB13TimeSignatureV"></a>
-                    <a name="//apple_ref/swift/Struct/MIDITimeTableTimeSignature" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB13TimeSignatureV">MIDITimeTableTimeSignature</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Defines time signature with number of beats and their note value in a measure.</p>
-
-                        <a href="Structs/MIDITimeTableTimeSignature.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableTimeSignature</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0aB7RowDataV"></a>
-                    <a name="//apple_ref/swift/Struct/MIDITimeTableRowData" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB7RowDataV">MIDITimeTableRowData</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Data for each row of <code><a href="Classes/MIDITimeTableView.html">MIDITimeTableView</a></code>.</p>
-
-                        <a href="Structs/MIDITimeTableRowData.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableRowData</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
                 <li class="item">
                   <div>
                     <code>
@@ -318,7 +238,153 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableCellViewCustomMenuItem</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableCellViewCustomMenuItem</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB13CellInsertionV"></a>
+                    <a name="//apple_ref/swift/Struct/MIDITimeTableCellInsertion" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB13CellInsertionV">MIDITimeTableCellInsertion</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>A new cell layout created by splitting an existing cell that had an edited cell land inside it.</p>
+
+                        <a href="Structs/MIDITimeTableCellInsertion.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableCellInsertion</span> <span class="p">:</span> <span class="kt">Equatable</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB14CellEditResultV"></a>
+                    <a name="//apple_ref/swift/Struct/MIDITimeTableCellEditResult" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB14CellEditResultV">MIDITimeTableCellEditResult</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Result of an edit (move or resize), including its effect on the cells it now overlaps.</p>
+
+                        <a href="Structs/MIDITimeTableCellEditResult.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableCellEditResult</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB13TimeSignatureV"></a>
+                    <a name="//apple_ref/swift/Struct/MIDITimeTableTimeSignature" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB13TimeSignatureV">MIDITimeTableTimeSignature</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Defines time signature with number of beats and their note value in a measure.</p>
+
+                        <a href="Structs/MIDITimeTableTimeSignature.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableTimeSignature</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0abC19AutoScrollDirectionV"></a>
+                    <a name="//apple_ref/swift/Struct/MIDITimeTableViewAutoScrollDirection" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC19AutoScrollDirectionV">MIDITimeTableViewAutoScrollDirection</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Auto scrolling direction type</p>
+
+                        <a href="Structs/MIDITimeTableViewAutoScrollDirection.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableViewAutoScrollDirection</span> <span class="p">:</span> <span class="kt">OptionSet</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0abC14EditedCellDataV"></a>
+                    <a name="//apple_ref/swift/Struct/MIDITimeTableViewEditedCellData" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC14EditedCellDataV">MIDITimeTableViewEditedCellData</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Edited cell data. Holds the edited cell&rsquo;s stable id and its index before editing, and new row
+index, position and duration data after editing.</p>
+
+<p>Prefer <code>id</code> to locate the cell in your own data going forward — it stays valid regardless of
+how many other cells were added, removed or reordered since. <code>index</code> is a snapshot of the
+cell&rsquo;s (row, array-position) at the moment the edit was reported and can go stale the instant
+another edit in the same batch shifts it.</p>
+
+                        <a href="Structs/MIDITimeTableViewEditedCellData.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">struct</span> <span class="kt">MIDITimeTableViewEditedCellData</span> <span class="p">:</span> <span class="kt">Equatable</span></code></pre>
 
                         </div>
                       </div>
@@ -330,11 +396,10 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2018 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2018-02-14)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>&copy; 2026 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2026-07-21)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>
     </div>
   </body>
-</div>
 </html>

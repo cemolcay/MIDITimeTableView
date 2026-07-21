@@ -1,215 +1,383 @@
 {
   "warnings": [
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableCellView.swift",
-      "line": 74,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 84,
+      "symbol": "MIDITimeTableRowRepresentable.Cell",
+      "symbol_kind": "source.lang.swift.decl.associatedtype",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 166,
+      "symbol": "MIDITimeTableHistoryRepresentable.Item",
+      "symbol_kind": "source.lang.swift.decl.associatedtype",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 167,
+      "symbol": "MIDITimeTableHistoryRepresentable.history",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 172,
+      "symbol": "MIDITimeTableHistoryStack.items",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 173,
+      "symbol": "MIDITimeTableHistoryStack.currentIndex",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 174,
+      "symbol": "MIDITimeTableHistoryStack.limit",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 176,
+      "symbol": "MIDITimeTableHistoryStack.init(limit:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 182,
+      "symbol": "MIDITimeTableHistoryStack.currentItem",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 187,
+      "symbol": "MIDITimeTableHistoryStack.hasPreviousItem",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 191,
+      "symbol": "MIDITimeTableHistoryStack.hasNextItem",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 195,
+      "symbol": "MIDITimeTableHistoryStack.append(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 203,
+      "symbol": "MIDITimeTableHistoryStack.undo()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 209,
+      "symbol": "MIDITimeTableHistoryStack.redo()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 217,
+      "symbol": "MIDITimeTableHistoryRepresentable.hasPreviousHistoryItem",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 221,
+      "symbol": "MIDITimeTableHistoryRepresentable.hasNextHistoryItem",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 225,
+      "symbol": "MIDITimeTableHistoryRepresentable.currentHistoryItem",
+      "symbol_kind": "source.lang.swift.decl.var.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 229,
+      "symbol": "MIDITimeTableHistoryRepresentable.append(_:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 233,
+      "symbol": "MIDITimeTableHistoryRepresentable.undo()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellData.swift",
+      "line": 237,
+      "symbol": "MIDITimeTableHistoryRepresentable.redo()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 81,
       "symbol": "MIDITimeTableCellView.canBecomeFirstResponder",
       "symbol_kind": "source.lang.swift.decl.var.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableCellView.swift",
-      "line": 80,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 87,
+      "symbol": "MIDITimeTableCellView.init(reuseIdentifier:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 93,
       "symbol": "MIDITimeTableCellView.init(frame:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableCellView.swift",
-      "line": 85,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 98,
       "symbol": "MIDITimeTableCellView.init(coder:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableCellView.swift",
-      "line": 112,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 131,
       "symbol": "MIDITimeTableCellView.layoutSubviews()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableCellView.swift",
-      "line": 122,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 141,
       "symbol": "MIDITimeTableCellView.didTap(tap:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableCellView.swift",
-      "line": 126,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 145,
       "symbol": "MIDITimeTableCellView.didMove(pan:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableCellView.swift",
-      "line": 130,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 149,
       "symbol": "MIDITimeTableCellView.didResize(pan:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableCellView.swift",
-      "line": 134,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 161,
       "symbol": "MIDITimeTableCellView.didLongPress(longPress:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableCellView.swift",
-      "line": 150,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 176,
       "symbol": "MIDITimeTableCellView.didPressDeleteButton()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableCellView.swift",
-      "line": 154,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableCellView.swift",
+      "line": 180,
       "symbol": "MIDITimeTableCellView.menuControllerWillHideNotification()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableGridLayer.swift",
-      "line": 64,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableGridLayer.swift",
+      "line": 76,
       "symbol": "MIDITimeTableGridLayer.init()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableGridLayer.swift",
-      "line": 69,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableGridLayer.swift",
+      "line": 81,
       "symbol": "MIDITimeTableGridLayer.init(layer:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableGridLayer.swift",
-      "line": 74,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableGridLayer.swift",
+      "line": 86,
       "symbol": "MIDITimeTableGridLayer.init(coder:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableGridLayer.swift",
-      "line": 86,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableGridLayer.swift",
+      "line": 98,
       "symbol": "MIDITimeTableGridLayer.layoutSublayers()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableMeasureLayer.swift",
-      "line": 32,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableHeaderCellView.swift",
+      "line": 16,
+      "symbol": "MIDITimeTableHeaderCellView.init(reuseIdentifier:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableHeaderCellView.swift",
+      "line": 21,
+      "symbol": "MIDITimeTableHeaderCellView.init(frame:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableHeaderCellView.swift",
+      "line": 25,
+      "symbol": "MIDITimeTableHeaderCellView.init(coder:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableLayoutData.swift",
+      "line": 24,
+      "symbol": "MIDITimeTableCellInsertion.init(row:sourceID:id:position:duration:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableLayoutData.swift",
+      "line": 43,
+      "symbol": "MIDITimeTableCellEditResult.init(updates:removals:insertions:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableMeasureLayer.swift",
+      "line": 38,
       "symbol": "MIDITimeTableMeasureLayer.init(layer:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableMeasureLayer.swift",
-      "line": 37,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableMeasureLayer.swift",
+      "line": 43,
       "symbol": "MIDITimeTableMeasureLayer.init(coder:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableMeasureLayer.swift",
-      "line": 47,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableMeasureLayer.swift",
+      "line": 53,
       "symbol": "MIDITimeTableMeasureLayer.layoutSublayers()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableMeasureView.swift",
-      "line": 29,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableMeasureView.swift",
+      "line": 43,
       "symbol": "MIDITimeTableMeasureView.layoutSubviews()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTablePlayheadView.swift",
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTablePlayheadView.swift",
       "line": 21,
       "symbol": "MIDITimeTablePlayheadShape",
       "symbol_kind": "source.lang.swift.decl.enum",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTablePlayheadView.swift",
-      "line": 61,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTablePlayheadView.swift",
+      "line": 77,
       "symbol": "MIDITimeTablePlayheadView.init(frame:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTablePlayheadView.swift",
-      "line": 66,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTablePlayheadView.swift",
+      "line": 82,
       "symbol": "MIDITimeTablePlayheadView.init(coder:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTablePlayheadView.swift",
-      "line": 71,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTablePlayheadView.swift",
+      "line": 87,
       "symbol": "MIDITimeTablePlayheadView.init()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTablePlayheadView.swift",
-      "line": 83,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTablePlayheadView.swift",
+      "line": 100,
       "symbol": "MIDITimeTablePlayheadView.layoutSubviews()",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 204,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTablePlayheadView.swift",
+      "line": 112,
+      "symbol": "MIDITimeTablePlayheadView.didMoveToWindow()",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTablePlayheadView.swift",
+      "line": 124,
+      "symbol": "MIDITimeTablePlayheadView.hitTest(_:with:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableView.swift",
+      "line": 111,
+      "symbol": "MIDITimeTableViewEditedCellData.init(id:index:newRowIndex:newPosition:newDuration:)",
+      "symbol_kind": "source.lang.swift.decl.function.method.instance",
+      "warning": "undocumented"
+    },
+    {
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableView.swift",
+      "line": 300,
       "symbol": "MIDITimeTableView.init(frame:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 209,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableView.swift",
+      "line": 305,
       "symbol": "MIDITimeTableView.init(coder:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     },
     {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 245,
+      "file": "/Users/cemolcay/Desktop/MIDITimeTableView/Sources/MIDITimeTableView/MIDITimeTableView.swift",
+      "line": 351,
       "symbol": "MIDITimeTableView.layoutSubviews()",
-      "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 393,
-      "symbol": "MIDITimeTableView.touchesBegan(_:with:)",
-      "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 440,
-      "symbol": "MIDITimeTableView.touchesMoved(_:with:)",
-      "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 566,
-      "symbol": "MIDITimeTableView.touchesCancelled(_:with:)",
-      "symbol_kind": "source.lang.swift.decl.function.method.instance",
-      "warning": "undocumented"
-    },
-    {
-      "file": "/Users/Cem/Desktop/MIDITimeTableView/MIDITimeTableView/Source/MIDITimeTableView.swift",
-      "line": 571,
-      "symbol": "MIDITimeTableView.touchesEnded(_:with:)",
       "symbol_kind": "source.lang.swift.decl.function.method.instance",
       "warning": "undocumented"
     }
   ],
-  "source_directory": "/Users/Cem/Desktop/MIDITimeTableView"
+  "source_directory": "/Users/cemolcay/Desktop/MIDITimeTableView"
 }

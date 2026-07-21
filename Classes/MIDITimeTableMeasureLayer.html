@@ -8,20 +8,29 @@
     <script src="../js/jquery.min.js" defer></script>
     <script src="../js/jazzy.js" defer></script>
     
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
   </head>
   <body>
     <a name="//apple_ref/swift/Class/MIDITimeTableMeasureLayer" class="dashAnchor"></a>
     <a title="MIDITimeTableMeasureLayer Class Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">MIDITimeTableView Docs</a> (84% documented)</p>
-        <p class="header-right"><a href="https://github.com/cemolcay/MIDITimeTableView"><img src="../img/gh.png"/>View on GitHub</a></p>
+        <p><a href="../index.html">MIDITimeTableView Docs</a> (78% documented)</p>
+        <div class="header-right">
+          <form role="search" action="../search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
       </div>
     </header>
     <div class="content-wrapper">
       <p id="breadcrumbs">
-        <a href="../index.html">MIDITimeTableView Reference</a>
-        <img id="carat" src="../img/carat.png" />
+        <a href="../index.html">MIDITimeTableView</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
+        <a href="../Classes.html">Classes</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
         MIDITimeTableMeasureLayer Class Reference
       </p>
     </div>
@@ -38,10 +47,7 @@
                 <a href="../Classes/MIDITimeTableGridLayer.html">MIDITimeTableGridLayer</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Classes.html#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableHeaderCellView">MIDITimeTableHeaderCellView</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Classes/MIDITimeTableHistory.html">MIDITimeTableHistory</a>
+                <a href="../Classes/MIDITimeTableHeaderCellView.html">MIDITimeTableHeaderCellView</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Classes/MIDITimeTableMeasureLayer.html">MIDITimeTableMeasureLayer</a>
@@ -61,6 +67,9 @@
             <a href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Enums.html#/s:17MIDITimeTableView0aB19CellOverlapResolverO">MIDITimeTableCellOverlapResolver</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a>
               </li>
               <li class="nav-group-task">
@@ -72,7 +81,10 @@
             <a href="../Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Extensions/Collection.html">Collection</a>
+                <a href="../Extensions/Array.html">Array</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Sequence.html">Sequence</a>
               </li>
             </ul>
           </li>
@@ -80,13 +92,19 @@
             <a href="../Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableCellRepresentable.html">MIDITimeTableCellRepresentable</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Protocols/MIDITimeTableHistoryDelegate.html">MIDITimeTableHistoryDelegate</a>
+                <a href="../Protocols/MIDITimeTableHistoryRepresentable.html">MIDITimeTableHistoryRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTablePlayheadViewDelegate.html">MIDITimeTablePlayheadViewDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableRowRepresentable.html">MIDITimeTableRowRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a>
@@ -100,16 +118,19 @@
             <a href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a>
+                <a href="../Structs/MIDITimeTableCellEditResult.html">MIDITimeTableCellEditResult</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a>
               </li>
               <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableCellInsertion.html">MIDITimeTableCellInsertion</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableCellViewCustomMenuItem.html">MIDITimeTableCellViewCustomMenuItem</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Structs/MIDITimeTableRowData.html">MIDITimeTableRowData</a>
+                <a href="../Structs/MIDITimeTableHistoryStack.html">MIDITimeTableHistoryStack</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableTimeSignature.html">MIDITimeTableTimeSignature</a>
@@ -117,16 +138,16 @@
               <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableViewAutoScrollDirection.html">MIDITimeTableViewAutoScrollDirection</a>
               </li>
+              <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableViewEditedCellData.html">MIDITimeTableViewEditedCellData</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
             <a href="../Typealiases.html">Type Aliases</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Typealiases.html#/s:17MIDITimeTableView0aB11HistoryItema">MIDITimeTableHistoryItem</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Typealiases.html#/s:17MIDITimeTableView0abC14EditedCellDataa">MIDITimeTableViewEditedCellData</a>
+                <a href="../Typealiases.html#/s:17MIDITimeTableView0aB6CellIDa">MIDITimeTableCellID</a>
               </li>
             </ul>
           </li>
@@ -138,7 +159,8 @@
             <h1>MIDITimeTableMeasureLayer</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="n">open</span> <span class="kd">class</span> <span class="kt">MIDITimeTableMeasureLayer</span><span class="p">:</span> <span class="kt">CALayer</span></code></pre>
+                  
+                  <pre class="highlight swift"><code><span class="kd">open</span> <span class="kd">class</span> <span class="kt">MIDITimeTableMeasureLayer</span> <span class="p">:</span> <span class="kt">CALayer</span></code></pre>
 
                 </div>
               </div>
@@ -151,9 +173,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC04textE0So06CATextE0Cv"></a>
+                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC04textE0So06CATextE0Cvp"></a>
                     <a name="//apple_ref/swift/Property/textLayer" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC04textE0So06CATextE0Cv">textLayer</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC04textE0So06CATextE0Cvp">textLayer</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -168,7 +190,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">textLayer</span> <span class="o">=</span> <span class="kt">CATextLayer</span><span class="p">()</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">textLayer</span><span class="p">:</span> <span class="kt">CATextLayer</span></code></pre>
 
                         </div>
                       </div>
@@ -178,9 +200,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC05shapeE0So07CAShapeE0Cv"></a>
+                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC05shapeE0So07CAShapeE0Cvp"></a>
                     <a name="//apple_ref/swift/Property/shapeLayer" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC05shapeE0So07CAShapeE0Cv">shapeLayer</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC05shapeE0So07CAShapeE0Cvp">shapeLayer</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -195,7 +217,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">shapeLayer</span> <span class="o">=</span> <span class="kt">CAShapeLayer</span><span class="p">()</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">shapeLayer</span><span class="p">:</span> <span class="kt">CAShapeLayer</span></code></pre>
 
                         </div>
                       </div>
@@ -205,9 +227,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC14showsBarNumberSbv"></a>
+                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC14showsBarNumberSbvp"></a>
                     <a name="//apple_ref/swift/Property/showsBarNumber" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC14showsBarNumberSbv">showsBarNumber</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC14showsBarNumberSbvp">showsBarNumber</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -222,7 +244,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">showsBarNumber</span> <span class="o">=</span> <span class="kc">true</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">showsBarNumber</span><span class="p">:</span> <span class="kt">Bool</span></code></pre>
 
                         </div>
                       </div>
@@ -232,9 +254,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC9beatCountSiv"></a>
+                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC9beatCountSivp"></a>
                     <a name="//apple_ref/swift/Property/beatCount" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC9beatCountSiv">beatCount</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC9beatCountSivp">beatCount</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -249,7 +271,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">beatCount</span> <span class="o">=</span> <span class="mi">4</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">beatCount</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
 
                         </div>
                       </div>
@@ -259,9 +281,36 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC9barNumberSiv"></a>
+                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC14snapResolutionSivp"></a>
+                    <a name="//apple_ref/swift/Property/snapResolution" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC14snapResolutionSivp">snapResolution</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Number of grid subdivisions per beat, used for drawing the small snap ticks. Defaults 4.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">snapResolution</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC9barNumberSivp"></a>
                     <a name="//apple_ref/swift/Property/barNumber" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC9barNumberSiv">barNumber</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC9barNumberSivp">barNumber</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -276,7 +325,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">barNumber</span> <span class="o">=</span> <span class="mi">0</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">barNumber</span><span class="p">:</span> <span class="kt">Int</span></code></pre>
 
                         </div>
                       </div>
@@ -286,9 +335,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC9tintColorSo7UIColorCv"></a>
+                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC9tintColorSo7UIColorCvp"></a>
                     <a name="//apple_ref/swift/Property/tintColor" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC9tintColorSo7UIColorCv">tintColor</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC9tintColorSo7UIColorCvp">tintColor</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -303,7 +352,36 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">tintColor</span><span class="p">:</span> <span class="kt">UIColor</span> <span class="o">=</span> <span class="o">.</span><span class="n">black</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">tintColor</span><span class="p">:</span> <span class="kt">UIColor</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0aB12MeasureLayerC12displayScale14CoreFoundation7CGFloatVvp"></a>
+                    <a name="//apple_ref/swift/Property/displayScale" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB12MeasureLayerC12displayScale14CoreFoundation7CGFloatVvp">displayScale</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Rendering scale used for the bar-number text layer&rsquo;s crispness. A plain <code>CALayer</code> has no
+<code>traitCollection</code> of its own, so this is propagated down from the owning
+<code><a href="../Classes/MIDITimeTableMeasureView.html">MIDITimeTableMeasureView</a></code>&lsquo;s <code>traitCollection.displayScale</code> rather than read here directly.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">var</span> <span class="nv">displayScale</span><span class="p">:</span> <span class="kt">CGFloat</span></code></pre>
 
                         </div>
                       </div>
@@ -330,7 +408,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="k">override</span> <span class="nf">init</span><span class="p">()</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">override</span> <span class="nf">init</span><span class="p">()</span></code></pre>
 
                         </div>
                       </div>
@@ -342,7 +420,7 @@
                     <code>
                     <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableMeasureLayer(im)initWithLayer:"></a>
                     <a name="//apple_ref/swift/Method/init(layer:)" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableMeasureLayer(im)initWithLayer:">init(layer:)</a>
+                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableMeasureLayer(im)initWithLayer:">init(layer:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -357,7 +435,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="n">open</span> <span class="kd">class</span> <span class="kt">MIDITimeTableMeasureLayer</span><span class="p">:</span> <span class="kt">CALayer</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="k">override</span> <span class="nf">init</span><span class="p">(</span><span class="nv">layer</span><span class="p">:</span> <span class="kt">Any</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -369,7 +447,7 @@
                     <code>
                     <a name="/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableMeasureLayer(im)initWithCoder:"></a>
                     <a name="//apple_ref/swift/Method/init(coder:)" class="dashAnchor"></a>
-                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableMeasureLayer(im)initWithCoder:">init(coder:)</a>
+                    <a class="token" href="#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableMeasureLayer(im)initWithCoder:">init(coder:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -384,7 +462,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="n">open</span> <span class="kd">class</span> <span class="kt">MIDITimeTableMeasureLayer</span><span class="p">:</span> <span class="kt">CALayer</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">required</span> <span class="nf">init</span><span class="p">?(</span><span class="n">coder</span> <span class="nv">aDecoder</span><span class="p">:</span> <span class="kt">NSCoder</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -411,7 +489,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="n">open</span> <span class="kd">class</span> <span class="kt">MIDITimeTableMeasureLayer</span><span class="p">:</span> <span class="kt">CALayer</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">open</span> <span class="k">override</span> <span class="kd">func</span> <span class="nf">layoutSublayers</span><span class="p">()</span></code></pre>
 
                         </div>
                       </div>
@@ -423,11 +501,10 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2018 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2018-02-14)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>&copy; 2026 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2026-07-21)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>
     </div>
   </body>
-</div>
 </html>

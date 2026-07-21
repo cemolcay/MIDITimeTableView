@@ -8,20 +8,29 @@
     <script src="../js/jquery.min.js" defer></script>
     <script src="../js/jazzy.js" defer></script>
     
+    <script src="../js/lunr.min.js" defer></script>
+    <script src="../js/typeahead.jquery.js" defer></script>
+    <script src="../js/jazzy.search.js" defer></script>
   </head>
   <body>
     <a name="//apple_ref/swift/Protocol/MIDITimeTableViewDelegate" class="dashAnchor"></a>
     <a title="MIDITimeTableViewDelegate Protocol Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="../index.html">MIDITimeTableView Docs</a> (84% documented)</p>
-        <p class="header-right"><a href="https://github.com/cemolcay/MIDITimeTableView"><img src="../img/gh.png"/>View on GitHub</a></p>
+        <p><a href="../index.html">MIDITimeTableView Docs</a> (78% documented)</p>
+        <div class="header-right">
+          <form role="search" action="../search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
       </div>
     </header>
     <div class="content-wrapper">
       <p id="breadcrumbs">
-        <a href="../index.html">MIDITimeTableView Reference</a>
-        <img id="carat" src="../img/carat.png" />
+        <a href="../index.html">MIDITimeTableView</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
+        <a href="../Protocols.html">Protocols</a>
+        <img id="carat" src="../img/carat.png" alt=""/>
         MIDITimeTableViewDelegate Protocol Reference
       </p>
     </div>
@@ -38,10 +47,7 @@
                 <a href="../Classes/MIDITimeTableGridLayer.html">MIDITimeTableGridLayer</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Classes.html#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableHeaderCellView">MIDITimeTableHeaderCellView</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Classes/MIDITimeTableHistory.html">MIDITimeTableHistory</a>
+                <a href="../Classes/MIDITimeTableHeaderCellView.html">MIDITimeTableHeaderCellView</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Classes/MIDITimeTableMeasureLayer.html">MIDITimeTableMeasureLayer</a>
@@ -61,6 +67,9 @@
             <a href="../Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Enums.html#/s:17MIDITimeTableView0aB19CellOverlapResolverO">MIDITimeTableCellOverlapResolver</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a>
               </li>
               <li class="nav-group-task">
@@ -72,7 +81,10 @@
             <a href="../Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Extensions/Collection.html">Collection</a>
+                <a href="../Extensions/Array.html">Array</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Extensions/Sequence.html">Sequence</a>
               </li>
             </ul>
           </li>
@@ -80,13 +92,19 @@
             <a href="../Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableCellRepresentable.html">MIDITimeTableCellRepresentable</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Protocols/MIDITimeTableHistoryDelegate.html">MIDITimeTableHistoryDelegate</a>
+                <a href="../Protocols/MIDITimeTableHistoryRepresentable.html">MIDITimeTableHistoryRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTablePlayheadViewDelegate.html">MIDITimeTablePlayheadViewDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="../Protocols/MIDITimeTableRowRepresentable.html">MIDITimeTableRowRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a>
@@ -100,16 +118,19 @@
             <a href="../Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a>
+                <a href="../Structs/MIDITimeTableCellEditResult.html">MIDITimeTableCellEditResult</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a>
               </li>
               <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableCellInsertion.html">MIDITimeTableCellInsertion</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableCellViewCustomMenuItem.html">MIDITimeTableCellViewCustomMenuItem</a>
               </li>
               <li class="nav-group-task">
-                <a href="../Structs/MIDITimeTableRowData.html">MIDITimeTableRowData</a>
+                <a href="../Structs/MIDITimeTableHistoryStack.html">MIDITimeTableHistoryStack</a>
               </li>
               <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableTimeSignature.html">MIDITimeTableTimeSignature</a>
@@ -117,16 +138,16 @@
               <li class="nav-group-task">
                 <a href="../Structs/MIDITimeTableViewAutoScrollDirection.html">MIDITimeTableViewAutoScrollDirection</a>
               </li>
+              <li class="nav-group-task">
+                <a href="../Structs/MIDITimeTableViewEditedCellData.html">MIDITimeTableViewEditedCellData</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
             <a href="../Typealiases.html">Type Aliases</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="../Typealiases.html#/s:17MIDITimeTableView0aB11HistoryItema">MIDITimeTableHistoryItem</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="../Typealiases.html#/s:17MIDITimeTableView0abC14EditedCellDataa">MIDITimeTableViewEditedCellData</a>
+                <a href="../Typealiases.html#/s:17MIDITimeTableView0aB6CellIDa">MIDITimeTableCellID</a>
               </li>
             </ul>
           </li>
@@ -138,11 +159,12 @@
             <h1>MIDITimeTableViewDelegate</h1>
               <div class="declaration">
                 <div class="language">
-                  <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableViewDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
+                  
+                  <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableViewDelegate</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
 
                 </div>
               </div>
-            <p>Delegate functions to inform about editing cells and sizing of the time table.</p>
+            <p>Delegate functions to inform about changed cells and sizing of the time table.</p>
 
           </section>
           <section class="section task-group-section">
@@ -151,24 +173,38 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_SayAA0aB9CellIndexV5index_Si06newRowH0Sd0J8PositionSd0J8DurationtG7didEdittF"></a>
-                    <a name="//apple_ref/swift/Method/midiTimeTableView(_:didEdit:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_SayAA0aB9CellIndexV5index_Si06newRowH0Sd0J8PositionSd0J8DurationtG7didEdittF">midiTimeTableView(_:didEdit:)</a>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0_9didChangeyA2AC_AA0aB14CellEditResultVtF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableView(_:didChange:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0_9didChangeyA2AC_AA0aB14CellEditResultVtF">midiTimeTableView(_:<wbr>didChange:<wbr>)</a>
                     </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
                   </div>
                   <div class="height-container">
                     <div class="pointer-container"></div>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Informs about the cell is either moved to another position, changed duration or changed position in a current or a new row.</p>
+                        <p>Informs about a user-driven table change: moves, resizes, overlap trims, split insertions,
+and deletions all flow through this single result.</p>
+
+<p>The delegate should apply <code>result</code> to its backing data source synchronously during this
+callback. <code><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></code> updates its internal layout immediately after this returns, so
+any newly inserted split cells can be dequeued and configured from the updated data source.</p>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        <p>Default no-op implementation, so existing conformers of <code>MIDITimeTableViewDelegate</code> don&rsquo;t
+need to adopt it unless they want to receive resolved table changes.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">,</span> <span class="n">didEdit</span> <span class="nv">cells</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Typealiases.html#/s:17MIDITimeTableView0abC14EditedCellDataa">MIDITimeTableViewEditedCellData</a></span><span class="p">])</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">,</span> <span class="n">didChange</span> <span class="nv">result</span><span class="p">:</span> <span class="kt"><a href="../Structs/MIDITimeTableCellEditResult.html">MIDITimeTableCellEditResult</a></span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -191,12 +227,12 @@
                             <tr>
                               <td>
                                 <code>
-                                <em>cells</em>
+                                <em>result</em>
                                 </code>
                               </td>
                               <td>
                                 <div>
-                                  <p>Edited cells data with changes before and after.</p>
+                                  <p>Resolved change result with updated, removed and newly split cells.</p>
                                 </div>
                               </td>
                             </tr>
@@ -209,67 +245,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_SayAA0aB9CellIndexVG9didDeletetF"></a>
-                    <a name="//apple_ref/swift/Method/midiTimeTableView(_:didDelete:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_SayAA0aB9CellIndexVG9didDeletetF">midiTimeTableView(_:didDelete:)</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Informs about the cell is being deleted.</p>
-
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">,</span> <span class="n">didDelete</span> <span class="nv">cells</span><span class="p">:</span> <span class="p">[</span><span class="kt"><a href="../Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a></span><span class="p">])</span></code></pre>
-
-                        </div>
-                      </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>midiTimeTableView</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Time table that performed changes on.</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>cells</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Row and column indices of the cells will be deleting.</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebc16HeightForMeasureC012CoreGraphics7CGFloatVA2ACF"></a>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebc16HeightForMeasureC0y14CoreFoundation7CGFloatVA2ACF"></a>
                     <a name="//apple_ref/swift/Method/midiTimeTableViewHeightForMeasureView(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebc16HeightForMeasureC012CoreGraphics7CGFloatVA2ACF">midiTimeTableViewHeightForMeasureView(_:)</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebc16HeightForMeasureC0y14CoreFoundation7CGFloatVA2ACF">midiTimeTableViewHeightForMeasureView(_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -284,7 +262,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewHeightForMeasureView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGFloat</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewHeightForMeasureView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGFloat</span></code></pre>
 
                         </div>
                       </div>
@@ -317,9 +295,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC13HeightForRows12CoreGraphics7CGFloatVA2ACF"></a>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC13HeightForRowsy14CoreFoundation7CGFloatVA2ACF"></a>
                     <a name="//apple_ref/swift/Method/midiTimeTableViewHeightForRows(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC13HeightForRows12CoreGraphics7CGFloatVA2ACF">midiTimeTableViewHeightForRows(_:)</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC13HeightForRowsy14CoreFoundation7CGFloatVA2ACF">midiTimeTableViewHeightForRows(_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -334,7 +312,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewHeightForRows</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGFloat</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewHeightForRows</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGFloat</span></code></pre>
 
                         </div>
                       </div>
@@ -367,9 +345,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC22WidthForRowHeaderCells12CoreGraphics7CGFloatVA2ACF"></a>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC22WidthForRowHeaderCellsy14CoreFoundation7CGFloatVA2ACF"></a>
                     <a name="//apple_ref/swift/Method/midiTimeTableViewWidthForRowHeaderCells(_:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC22WidthForRowHeaderCells12CoreGraphics7CGFloatVA2ACF">midiTimeTableViewWidthForRowHeaderCells(_:)</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC22WidthForRowHeaderCellsy14CoreFoundation7CGFloatVA2ACF">midiTimeTableViewWidthForRowHeaderCells(_:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -384,7 +362,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewWidthForRowHeaderCells</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGFloat</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewWidthForRowHeaderCells</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">CGFloat</span></code></pre>
 
                         </div>
                       </div>
@@ -417,9 +395,75 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_Sd17didUpdatePlayheadtF"></a>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC14SnapResolutionySiA2ACF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableViewSnapResolution(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC14SnapResolutionySiA2ACF">midiTimeTableViewSnapResolution(_:<wbr>)</a>
+                    </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Number of grid subdivisions per beat, used for snapping cell moves/resizes and
+playhead/range head drags, and for drawing the finest (&ldquo;subbeat&rdquo;) grid lines. For example,
+4 snaps to sixteenth notes within a quarter-note beat.</p>
+
+<p>Has a default implementation returning 4, so existing conformers don&rsquo;t need to adopt it. If
+you want snapping to follow your time signature&rsquo;s note value, return
+<code>timeSignature(of:).noteValue.rawValue</code> (or any other subdivision count you prefer — the two
+are independent: note value describes the meter, this describes the editing grid).</p>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        <p>Default implementation returning 4 (sixteenth notes in a quarter-note beat), matching the
+time table&rsquo;s long-standing built-in behavior. Override to customise snapping.</p>
+
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewSnapResolution</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kt">Int</span></code></pre>
+
+                        </div>
+                      </div>
+                      <div>
+                        <h4>Parameters</h4>
+                        <table class="graybox">
+                          <tbody>
+                            <tr>
+                              <td>
+                                <code>
+                                <em>midiTimeTableView</em>
+                                </code>
+                              </td>
+                              <td>
+                                <div>
+                                  <p>Time table to set its snap resolution.</p>
+                                </div>
+                              </td>
+                            </tr>
+                          </tbody>
+                        </table>
+                      </div>
+                      <div>
+                        <h4>Return Value</h4>
+                        <p>Number of subdivisions per beat. Values below 1 are treated as 1.</p>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0_17didUpdatePlayheadyA2AC_SdtF"></a>
                     <a name="//apple_ref/swift/Method/midiTimeTableView(_:didUpdatePlayhead:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_Sd17didUpdatePlayheadtF">midiTimeTableView(_:didUpdatePlayhead:)</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0_17didUpdatePlayheadyA2AC_SdtF">midiTimeTableView(_:<wbr>didUpdatePlayhead:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -434,7 +478,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">,</span> <span class="n">didUpdatePlayhead</span> <span class="nv">position</span><span class="p">:</span> <span class="kt">Double</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">,</span> <span class="n">didUpdatePlayhead</span> <span class="nv">position</span><span class="p">:</span> <span class="kt">Double</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -463,9 +507,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_Sd18didUpdateRangeHeadtF"></a>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0_18didUpdateRangeHeadyA2AC_SdtF"></a>
                     <a name="//apple_ref/swift/Method/midiTimeTableView(_:didUpdateRangeHead:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_Sd18didUpdateRangeHeadtF">midiTimeTableView(_:didUpdateRangeHead:)</a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0_18didUpdateRangeHeadyA2AC_SdtF">midiTimeTableView(_:<wbr>didUpdateRangeHead:<wbr>)</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -480,7 +524,7 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">,</span> <span class="n">didUpdateRangeHead</span> <span class="nv">position</span><span class="p">:</span> <span class="kt">Double</span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">,</span> <span class="n">didUpdateRangeHead</span> <span class="nv">position</span><span class="p">:</span> <span class="kt">Double</span><span class="p">)</span></code></pre>
 
                         </div>
                       </div>
@@ -509,57 +553,35 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_AA0aB7HistoryC16historyDidChangetF"></a>
-                    <a name="//apple_ref/swift/Method/midiTimeTableView(_:historyDidChange:)" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC0yA2AC_AA0aB7HistoryC16historyDidChangetF">midiTimeTableView(_:historyDidChange:)</a>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP08midiTimebC17ShouldPushHistoryyyA2ACF"></a>
+                    <a name="//apple_ref/swift/Method/midiTimeTableViewShouldPushHistory(_:)" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC17ShouldPushHistoryyyA2ACF">midiTimeTableViewShouldPushHistory(_:<wbr>)</a>
                     </code>
+                      <span class="declaration-note">
+                        Default implementation
+                      </span>
                   </div>
                   <div class="height-container">
                     <div class="pointer-container"></div>
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Informs about history has been changed. You need to update your <code>rowData</code> with history&rsquo;s <code>currentItem</code>.</p>
+                        <p>Called after the time table reports a change, giving apps one optional hook for
+committing their own undo/redo snapshot.</p>
+
+                      </div>
+                      <h4>Default Implementation</h4>
+                      <div class="default_impl abstract">
+                        <p>Default no-op implementation.</p>
 
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">func</span> <span class="nf">midiTimeTableView</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">,</span> <span class="n">historyDidChange</span> <span class="nv">history</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableHistory.html">MIDITimeTableHistory</a></span><span class="p">)</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">func</span> <span class="nf">midiTimeTableViewShouldPushHistory</span><span class="p">(</span><span class="n">_</span> <span class="nv">midiTimeTableView</span><span class="p">:</span> <span class="kt"><a href="../Classes/MIDITimeTableView.html">MIDITimeTableView</a></span><span class="p">)</span></code></pre>
 
                         </div>
-                      </div>
-                      <div>
-                        <h4>Parameters</h4>
-                        <table class="graybox">
-                          <tbody>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>midiTimeTableView</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>Time table taht updated.</p>
-                                </div>
-                              </td>
-                            </tr>
-                            <tr>
-                              <td>
-                                <code>
-                                <em>history</em>
-                                </code>
-                              </td>
-                              <td>
-                                <div>
-                                  <p>History object of the time table.</p>
-                                </div>
-                              </td>
-                            </tr>
-                          </tbody>
-                        </table>
                       </div>
                     </section>
                   </div>
@@ -569,11 +591,10 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2018 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2018-02-14)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>&copy; 2026 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2026-07-21)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>
     </div>
   </body>
-</div>
 </html>

@@ -8,19 +8,27 @@
     <script src="js/jquery.min.js" defer></script>
     <script src="js/jazzy.js" defer></script>
     
+    <script src="js/lunr.min.js" defer></script>
+    <script src="js/typeahead.jquery.js" defer></script>
+    <script src="js/jazzy.search.js" defer></script>
   </head>
   <body>
+    <a name="//apple_ref/swift/Section/Protocols" class="dashAnchor"></a>
     <a title="Protocols  Reference"></a>
     <header>
       <div class="content-wrapper">
-        <p><a href="index.html">MIDITimeTableView Docs</a> (84% documented)</p>
-        <p class="header-right"><a href="https://github.com/cemolcay/MIDITimeTableView"><img src="img/gh.png"/>View on GitHub</a></p>
+        <p><a href="index.html">MIDITimeTableView Docs</a> (78% documented)</p>
+        <div class="header-right">
+          <form role="search" action="search.json">
+            <input type="text" placeholder="Search documentation" data-typeahead>
+          </form>
+        </div>
       </div>
     </header>
     <div class="content-wrapper">
       <p id="breadcrumbs">
-        <a href="index.html">MIDITimeTableView Reference</a>
-        <img id="carat" src="img/carat.png" />
+        <a href="index.html">MIDITimeTableView</a>
+        <img id="carat" src="img/carat.png" alt=""/>
         Protocols  Reference
       </p>
     </div>
@@ -37,10 +45,7 @@
                 <a href="Classes/MIDITimeTableGridLayer.html">MIDITimeTableGridLayer</a>
               </li>
               <li class="nav-group-task">
-                <a href="Classes.html#/c:@M@MIDITimeTableView@objc(cs)MIDITimeTableHeaderCellView">MIDITimeTableHeaderCellView</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Classes/MIDITimeTableHistory.html">MIDITimeTableHistory</a>
+                <a href="Classes/MIDITimeTableHeaderCellView.html">MIDITimeTableHeaderCellView</a>
               </li>
               <li class="nav-group-task">
                 <a href="Classes/MIDITimeTableMeasureLayer.html">MIDITimeTableMeasureLayer</a>
@@ -60,6 +65,9 @@
             <a href="Enums.html">Enumerations</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="Enums.html#/s:17MIDITimeTableView0aB19CellOverlapResolverO">MIDITimeTableCellOverlapResolver</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Enums/MIDITimeTableNoteValue.html">MIDITimeTableNoteValue</a>
               </li>
               <li class="nav-group-task">
@@ -71,7 +79,10 @@
             <a href="Extensions.html">Extensions</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Extensions/Collection.html">Collection</a>
+                <a href="Extensions/Array.html">Array</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Extensions/Sequence.html">Sequence</a>
               </li>
             </ul>
           </li>
@@ -79,13 +90,19 @@
             <a href="Protocols.html">Protocols</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
+                <a href="Protocols/MIDITimeTableCellRepresentable.html">MIDITimeTableCellRepresentable</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Protocols/MIDITimeTableCellViewDelegate.html">MIDITimeTableCellViewDelegate</a>
               </li>
               <li class="nav-group-task">
-                <a href="Protocols/MIDITimeTableHistoryDelegate.html">MIDITimeTableHistoryDelegate</a>
+                <a href="Protocols/MIDITimeTableHistoryRepresentable.html">MIDITimeTableHistoryRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="Protocols/MIDITimeTablePlayheadViewDelegate.html">MIDITimeTablePlayheadViewDelegate</a>
+              </li>
+              <li class="nav-group-task">
+                <a href="Protocols/MIDITimeTableRowRepresentable.html">MIDITimeTableRowRepresentable</a>
               </li>
               <li class="nav-group-task">
                 <a href="Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a>
@@ -99,16 +116,19 @@
             <a href="Structs.html">Structures</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Structs/MIDITimeTableCellData.html">MIDITimeTableCellData</a>
+                <a href="Structs/MIDITimeTableCellEditResult.html">MIDITimeTableCellEditResult</a>
               </li>
               <li class="nav-group-task">
                 <a href="Structs/MIDITimeTableCellIndex.html">MIDITimeTableCellIndex</a>
               </li>
               <li class="nav-group-task">
+                <a href="Structs/MIDITimeTableCellInsertion.html">MIDITimeTableCellInsertion</a>
+              </li>
+              <li class="nav-group-task">
                 <a href="Structs/MIDITimeTableCellViewCustomMenuItem.html">MIDITimeTableCellViewCustomMenuItem</a>
               </li>
               <li class="nav-group-task">
-                <a href="Structs/MIDITimeTableRowData.html">MIDITimeTableRowData</a>
+                <a href="Structs/MIDITimeTableHistoryStack.html">MIDITimeTableHistoryStack</a>
               </li>
               <li class="nav-group-task">
                 <a href="Structs/MIDITimeTableTimeSignature.html">MIDITimeTableTimeSignature</a>
@@ -116,16 +136,16 @@
               <li class="nav-group-task">
                 <a href="Structs/MIDITimeTableViewAutoScrollDirection.html">MIDITimeTableViewAutoScrollDirection</a>
               </li>
+              <li class="nav-group-task">
+                <a href="Structs/MIDITimeTableViewEditedCellData.html">MIDITimeTableViewEditedCellData</a>
+              </li>
             </ul>
           </li>
           <li class="nav-group-name">
             <a href="Typealiases.html">Type Aliases</a>
             <ul class="nav-group-tasks">
               <li class="nav-group-task">
-                <a href="Typealiases.html#/s:17MIDITimeTableView0aB11HistoryItema">MIDITimeTableHistoryItem</a>
-              </li>
-              <li class="nav-group-task">
-                <a href="Typealiases.html#/s:17MIDITimeTableView0abC14EditedCellDataa">MIDITimeTableViewEditedCellData</a>
+                <a href="Typealiases.html#/s:17MIDITimeTableView0aB6CellIDa">MIDITimeTableCellID</a>
               </li>
             </ul>
           </li>
@@ -144,9 +164,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0aB15HistoryDelegateP"></a>
-                    <a name="//apple_ref/swift/Protocol/MIDITimeTableHistoryDelegate" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0aB15HistoryDelegateP">MIDITimeTableHistoryDelegate</a>
+                    <a name="/s:17MIDITimeTableView0aB17CellRepresentableP"></a>
+                    <a name="//apple_ref/swift/Protocol/MIDITimeTableCellRepresentable" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB17CellRepresentableP">MIDITimeTableCellRepresentable</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -154,47 +174,19 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Informs about changes on history.</p>
+                        <p>Optional protocol for app-owned cell models that can be displayed in a <code><a href="Classes/MIDITimeTableView.html">MIDITimeTableView</a></code>.</p>
 
-                        <a href="Protocols/MIDITimeTableHistoryDelegate.html" class="slightly-smaller">See more</a>
+<p><code><a href="Classes/MIDITimeTableView.html">MIDITimeTableView</a></code> does not require this protocol; its data source remains the source of
+truth. Conforming your own model can make the data source implementation and app-side history
+code more structured without forcing your data to inherit from framework-owned model classes.</p>
+
+                        <a href="Protocols/MIDITimeTableCellRepresentable.html" class="slightly-smaller">See more</a>
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableHistoryDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
-
-                        </div>
-                      </div>
-                    </section>
-                  </div>
-                </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
-                <li class="item">
-                  <div>
-                    <code>
-                    <a name="/s:17MIDITimeTableView0abC10DataSourceP"></a>
-                    <a name="//apple_ref/swift/Protocol/MIDITimeTableViewDataSource" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC10DataSourceP">MIDITimeTableViewDataSource</a>
-                    </code>
-                  </div>
-                  <div class="height-container">
-                    <div class="pointer-container"></div>
-                    <section class="section">
-                      <div class="pointer"></div>
-                      <div class="abstract">
-                        <p>Populates the <code><a href="Classes/MIDITimeTableView.html">MIDITimeTableView</a></code> with the datas of rows and cells.</p>
-
-                        <a href="Protocols/MIDITimeTableViewDataSource.html" class="slightly-smaller">See more</a>
-                      </div>
-                      <div class="declaration">
-                        <h4>Declaration</h4>
-                        <div class="language">
-                          <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableViewDataSource</span><span class="p">:</span> <span class="kd">class</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableCellRepresentable</span></code></pre>
 
                         </div>
                       </div>
@@ -204,9 +196,9 @@
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0abC8DelegateP"></a>
-                    <a name="//apple_ref/swift/Protocol/MIDITimeTableViewDelegate" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP">MIDITimeTableViewDelegate</a>
+                    <a name="/s:17MIDITimeTableView0aB16RowRepresentableP"></a>
+                    <a name="//apple_ref/swift/Protocol/MIDITimeTableRowRepresentable" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB16RowRepresentableP">MIDITimeTableRowRepresentable</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -214,31 +206,30 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Delegate functions to inform about editing cells and sizing of the time table.</p>
+                        <p>Optional protocol for app-owned row models that group time table cells.</p>
 
-                        <a href="Protocols/MIDITimeTableViewDelegate.html" class="slightly-smaller">See more</a>
+<p>This is only a convenience contract. <code><a href="Protocols/MIDITimeTableViewDataSource.html">MIDITimeTableViewDataSource</a></code> still asks for row/cell
+counts and geometry explicitly so apps remain free to use any backing model shape.</p>
+
+                        <a href="Protocols/MIDITimeTableRowRepresentable.html" class="slightly-smaller">See more</a>
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableViewDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableRowRepresentable</span></code></pre>
 
                         </div>
                       </div>
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
                 <li class="item">
                   <div>
                     <code>
-                    <a name="/s:17MIDITimeTableView0ab8PlayheadC8DelegateP"></a>
-                    <a name="//apple_ref/swift/Protocol/MIDITimeTablePlayheadViewDelegate" class="dashAnchor"></a>
-                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC8DelegateP">MIDITimeTablePlayheadViewDelegate</a>
+                    <a name="/s:17MIDITimeTableView0aB20HistoryRepresentableP"></a>
+                    <a name="//apple_ref/swift/Protocol/MIDITimeTableHistoryRepresentable" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0aB20HistoryRepresentableP">MIDITimeTableHistoryRepresentable</a>
                     </code>
                   </div>
                   <div class="height-container">
@@ -246,25 +237,26 @@
                     <section class="section">
                       <div class="pointer"></div>
                       <div class="abstract">
-                        <p>Delegate that informs about playhead is going to move.</p>
+                        <p>Optional protocol for app-owned history stacks used with
+<code><a href="Protocols/MIDITimeTableViewDelegate.html#/s:17MIDITimeTableView0abC8DelegateP08midiTimebC17ShouldPushHistoryyyA2ACF">MIDITimeTableViewDelegate.midiTimeTableViewShouldPushHistory(_:)</a></code>.</p>
 
-                        <a href="Protocols/MIDITimeTablePlayheadViewDelegate.html" class="slightly-smaller">See more</a>
+<p>The core view intentionally does not own history snapshots because app models may include
+arbitrary domain data. This protocol provides a small, consistent shape for apps that want to
+keep their own undo/redo manager near their time table data.</p>
+
+                        <a href="Protocols/MIDITimeTableHistoryRepresentable.html" class="slightly-smaller">See more</a>
                       </div>
                       <div class="declaration">
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTablePlayheadViewDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableHistoryRepresentable</span></code></pre>
 
                         </div>
                       </div>
                     </section>
                   </div>
                 </li>
-              </ul>
-            </div>
-            <div class="task-group">
-              <ul>
                 <li class="item">
                   <div>
                     <code>
@@ -286,7 +278,91 @@
                         <h4>Declaration</h4>
                         <div class="language">
                           <p class="aside-title">Swift</p>
-                          <pre class="highlight"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableCellViewDelegate</span><span class="p">:</span> <span class="kd">class</span></code></pre>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableCellViewDelegate</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0ab8PlayheadC8DelegateP"></a>
+                    <a name="//apple_ref/swift/Protocol/MIDITimeTablePlayheadViewDelegate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0ab8PlayheadC8DelegateP">MIDITimeTablePlayheadViewDelegate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Delegate that informs about playhead is going to move.</p>
+
+                        <a href="Protocols/MIDITimeTablePlayheadViewDelegate.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTablePlayheadViewDelegate</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0abC10DataSourceP"></a>
+                    <a name="//apple_ref/swift/Protocol/MIDITimeTableViewDataSource" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC10DataSourceP">MIDITimeTableViewDataSource</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Populates the <code><a href="Classes/MIDITimeTableView.html">MIDITimeTableView</a></code> with row/cell data and rendered views.</p>
+
+                        <a href="Protocols/MIDITimeTableViewDataSource.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableViewDataSource</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
+
+                        </div>
+                      </div>
+                    </section>
+                  </div>
+                </li>
+                <li class="item">
+                  <div>
+                    <code>
+                    <a name="/s:17MIDITimeTableView0abC8DelegateP"></a>
+                    <a name="//apple_ref/swift/Protocol/MIDITimeTableViewDelegate" class="dashAnchor"></a>
+                    <a class="token" href="#/s:17MIDITimeTableView0abC8DelegateP">MIDITimeTableViewDelegate</a>
+                    </code>
+                  </div>
+                  <div class="height-container">
+                    <div class="pointer-container"></div>
+                    <section class="section">
+                      <div class="pointer"></div>
+                      <div class="abstract">
+                        <p>Delegate functions to inform about changed cells and sizing of the time table.</p>
+
+                        <a href="Protocols/MIDITimeTableViewDelegate.html" class="slightly-smaller">See more</a>
+                      </div>
+                      <div class="declaration">
+                        <h4>Declaration</h4>
+                        <div class="language">
+                          <p class="aside-title">Swift</p>
+                          <pre class="highlight swift"><code><span class="kd">public</span> <span class="kd">protocol</span> <span class="kt">MIDITimeTableViewDelegate</span> <span class="p">:</span> <span class="kt">AnyObject</span></code></pre>
 
                         </div>
                       </div>
@@ -298,11 +374,10 @@
           </section>
         </section>
         <section id="footer">
-          <p>&copy; 2018 <a class="link" href="https://github.com/cemolcay/MIDITimeTableView" target="_blank" rel="external">cemolcay</a>. All rights reserved. (Last updated: 2018-02-14)</p>
-          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external">jazzy ♪♫ v0.8.4</a>, a <a class="link" href="http://realm.io" target="_blank" rel="external">Realm</a> project.</p>
+          <p>&copy; 2026 <a class="link" href="" target="_blank" rel="external noopener"></a>. All rights reserved. (Last updated: 2026-07-21)</p>
+          <p>Generated by <a class="link" href="https://github.com/realm/jazzy" target="_blank" rel="external noopener">jazzy ♪♫ v0.15.4</a>, a <a class="link" href="https://realm.io" target="_blank" rel="external noopener">Realm</a> project.</p>
         </section>
       </article>
     </div>
   </body>
-</div>
 </html>
