@@ -42,6 +42,9 @@ Features
 * Long press any cell to show customisable menu.
 * Holds history with a customisable limit and make undo/redo (optional).
 * Customise grid and show bar, beat and subbeat lines with any style (optional).
+* Viewport virtualization: cell views, grid lines and measure bars are only realized near what's
+  actually on screen, so documents with hundreds or thousands of cells scroll smoothly instead of
+  paying for every cell up front.
 
 
 Usage
@@ -90,6 +93,37 @@ You can customise the measure bar, the grid, each header and data cell. Check ou
 `MIDITimeTableCellView`'s are editable, you can move around them on the grid, resize their duration or long press to open a delete menu. Also, you need to subclass yourself to present your own data on it.
   
 You can set the `minMeasureWidth` and `maxMeasureWidth` to set zoom levels of the time table.
+
+### Viewport virtualization & cell reuse
+
+`MIDITimeTableView` only keeps live `MIDITimeTableCellView`s for cells that are actually near the
+viewport (plus a small overscan margin, tunable via `virtualizationOverscanMultiplier`), or that
+are currently selected. This is what `visibleCells` (`public private(set) var`) reflects — it's
+**not** every cell in your data, only the ones currently realized as views. A cell that isn't in
+`visibleCells` still exists in your data source; it just isn't on screen right now. Look a
+specific cell's view up by its stable id with `midiTimeTableView.cellView(for: cellData.id)`,
+which returns `nil` for a cell that isn't currently realized.
+
+To get `UITableView`-style cell reuse instead of a fresh view per cell every time one scrolls into
+view, provide `configureCellView` alongside `cellView` on `MIDITimeTableRowData`:
+
+``` swift
+MIDITimeTableRowData(
+  cells: cells,
+  headerCellView: HeaderCellView(title: "Chords"),
+  cellView: { cellData in
+    let title = cellData.data as? String ?? ""
+    return CellView(title: title)
+  },
+  configureCellView: { view, cellData in
+    (view as? CellView)?.configure(with: cellData)
+  })
+```
+
+Views are pooled per row, so a dequeued instance is always the exact subclass that row's
+`cellView` produces. Leave `configureCellView` `nil` to opt out — the time table still only
+realizes what's near the viewport, it just creates a fresh view each time instead of reusing an
+instance.
 
 Documentation
 ----

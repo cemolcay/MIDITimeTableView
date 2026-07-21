@@ -143,6 +143,19 @@ public struct MIDITimeTableRowData {
   public var headerCellView: MIDITimeTableHeaderCellView
   /// View of each cell in the row.
   public var cellView: (MIDITimeTableCellData) -> MIDITimeTableCellView
+  /// Reconfigures a cell view that's being recycled from the time table's internal reuse pool for
+  /// a different cell in this row (e.g. after scrolling), instead of creating a new instance via
+  /// `cellView`. Optional — a `UITableView`-style `cellForRowAt` hook for the pooled-instance case.
+  ///
+  /// Pools are kept per-row, so the view passed in is always the exact subclass this row's
+  /// `cellView` factory produces. Leave `nil` to opt out of instance reuse: the time table falls
+  /// back to creating a fresh view via `cellView` every time one is needed (still viewport-bounded,
+  /// just without reusing instances).
+  ///
+  /// - Parameters:
+  ///   - view: The recycled view instance to reconfigure.
+  ///   - cell: The cell it should now represent.
+  public var configureCellView: ((MIDITimeTableCellView, MIDITimeTableCellData) -> Void)?
   /// Other data for your custom objects. It is useful when moving history related custom data back and forth.
   public var customData: Any?
 
@@ -162,11 +175,14 @@ public struct MIDITimeTableRowData {
   ///   - cells: Data of the cells.
   ///   - headerCellView: Row header cell view reference.
   ///   - cellView: Each view of cell data in row.
+  ///   - configureCellView: Reconfigures a pooled view recycled for a different cell in this row.
+  ///     Defaults `nil` (no instance reuse). See its documentation above.
   ///   - customData: Other data for your custom objects. It is useful when moving history related custom data back and forth.
-  public init(cells: [MIDITimeTableCellData], headerCellView: MIDITimeTableHeaderCellView, cellView: @escaping (MIDITimeTableCellData) -> MIDITimeTableCellView, customData: Any? = nil) {
+  public init(cells: [MIDITimeTableCellData], headerCellView: MIDITimeTableHeaderCellView, cellView: @escaping (MIDITimeTableCellData) -> MIDITimeTableCellView, configureCellView: ((MIDITimeTableCellView, MIDITimeTableCellData) -> Void)? = nil, customData: Any? = nil) {
     self.cells = cells
     self.headerCellView = headerCellView
     self.cellView = cellView
+    self.configureCellView = configureCellView
     self.customData = customData
   }
 }

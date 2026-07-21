@@ -92,6 +92,13 @@ class CellView: MIDITimeTableCellView {
     titleLabel.frame = CGRect(origin: .zero, size: frame.size)
   }
 
+  /// Applies a cell's data to this view, whether it's freshly created or being reconfigured
+  /// after being dequeued from `MIDITimeTableView`'s reuse pool for a different cell in the same
+  /// row (see `MIDITimeTableRowData.configureCellView`).
+  func configure(with cellData: MIDITimeTableCellData) {
+    titleLabel.text = cellData.data as? String ?? ""
+  }
+
   @objc func didPressCustomMenuItem() {
     print("custom menu item pressed")
   }
@@ -114,6 +121,12 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
         return CellView(title: title)
+    },
+      // Reconfigures a `CellView` dequeued from the time table's reuse pool for a different
+      // cell in this row (e.g. after scrolling), instead of a fresh instance being created via
+      // `cellView` above every time one's needed.
+      configureCellView: { view, cellData in
+        (view as? CellView)?.configure(with: cellData)
     }),
 
     MIDITimeTableRowData(
@@ -127,6 +140,12 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
         return CellView(title: title)
+    },
+      // Reconfigures a `CellView` dequeued from the time table's reuse pool for a different
+      // cell in this row (e.g. after scrolling), instead of a fresh instance being created via
+      // `cellView` above every time one's needed.
+      configureCellView: { view, cellData in
+        (view as? CellView)?.configure(with: cellData)
     }),
 
     MIDITimeTableRowData(
@@ -155,6 +174,12 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
         return CellView(title: title)
+    },
+      // Reconfigures a `CellView` dequeued from the time table's reuse pool for a different
+      // cell in this row (e.g. after scrolling), instead of a fresh instance being created via
+      // `cellView` above every time one's needed.
+      configureCellView: { view, cellData in
+        (view as? CellView)?.configure(with: cellData)
     }),
 
     MIDITimeTableRowData(
@@ -175,6 +200,9 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
       cellView: { cellData in
         let title = cellData.data as? String ?? ""
         return CellView(title: title)
+    },
+      configureCellView: { view, cellData in
+        (view as? CellView)?.configure(with: cellData)
     })
   ]
 

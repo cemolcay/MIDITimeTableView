@@ -62,6 +62,16 @@ public class MIDITimeTableGridLayer: CALayer {
   public var measureWidth: CGFloat = 0
   /// Heigth of the measure view in the time table.
   public var measureHeight: CGFloat = 0
+  /// The rect (in this layer's own coordinate space, i.e. content coordinates) to draw grid lines
+  /// within. Everything outside it is skipped entirely rather than built and clipped visually, so
+  /// the number of line segments this layer builds tracks what's on screen, not the size of the
+  /// whole document. The owning `MIDITimeTableView` keeps this in sync with its visible viewport
+  /// (plus a small overscan margin) on every layout pass, including on scroll. Defaults to a large
+  /// placeholder so a layer used standalone, before anything sets a real value, still draws.
+  ///
+  /// Named distinctly from `CALayer`'s own (unrelated, read-only) `visibleRect` to avoid
+  /// colliding with it.
+  public var virtualizationRect = CGRect(x: 0, y: 0, width: 100_000, height: 100_000)
 
   public override init() {
     super.init()
@@ -88,14 +98,28 @@ public class MIDITimeTableGridLayer: CALayer {
   public override func layoutSublayers() {
     super.layoutSublayers()
 
+    // Clip every path to `virtualizationRect` instead of spanning the whole (potentially huge)
+    // content, so the number of line segments built here tracks what's on screen, not document size.
+    let clipMinX = max(0, virtualizationRect.minX)
+    let clipMaxX = min(frame.size.width, virtualizationRect.maxX)
+    let clipMinY = max(0, virtualizationRect.minY)
+    let clipMaxY = min(frame.size.height, virtualizationRect.maxY)
+    guard clipMaxX > clipMinX, clipMaxY > clipMinY else {
+      // Nothing intersects the visible rect (e.g. not laid out yet) — draw nothing rather than
+      // fall through to `CGFloat.nan`-poisoned ranges below.
+      rowLineLayer.path = nil
+      barLineLayer.path = nil
+      beatLineLayer.path = nil
+      subbeatLineLayer.path = nil
+      return
+    }
+
     // Row lines
     let rowPath = UIBezierPath()
-    rowPath.move(to: CGPoint(x: 0, y: measureHeight))
-    rowPath.addLine(to: CGPoint(x: frame.size.width, y: measureHeight))
-    rowPath.close()
-    for i in 0..<rowCount {
-      rowPath.move(to: CGPoint(x: 0, y: measureHeight + rowHeight + (CGFloat(i) * rowHeight)))
-      rowPath.addLine(to: CGPoint(x: frame.size.width, y: measureHeight + rowHeight + (CGFloat(i) * rowHeight)))
+    let rowLineYs = [measureHeight] + (0..<rowCount).map { measureHeight + rowHeight + (CGFloat($0) * rowHeight) }
+    for y in rowLineYs where y >= clipMinY && y <= clipMaxY {
+      rowPath.move(to: CGPoint(x: clipMinX, y: y))
+      rowPath.addLine(to: CGPoint(x: clipMaxX, y: y))
       rowPath.close()
     }
     rowLineLayer.path = rowPath.cgPath
@@ -103,28 +127,32 @@ public class MIDITimeTableGridLayer: CALayer {
     rowLineLayer.lineWidth = rowLineWidth
     rowLineLayer.isHidden = !showsRowLines
 
-    // Bar lines
+    // Bar lines. `barCount + 1` lines total: one at each bar boundary, plus the trailing edge.
     let barPath = UIBezierPath()
-    for i in 0..<barCount {
-      barPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth), y: 0))
-      barPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth), y: frame.height))
+    let barRange = Self.visibleIndexRange(clipMinX: clipMinX, clipMaxX: clipMaxX, offset: rowHeaderWidth, unitWidth: measureWidth, count: barCount + 1)
+    for i in barRange {
+      let x = rowHeaderWidth + (CGFloat(i) * measureWidth)
+      barPath.move(to: CGPoint(x: x, y: clipMinY))
+      barPath.addLine(to: CGPoint(x: x, y: clipMaxY))
       barPath.close()
     }
-    barPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(barCount) * measureWidth), y: 0))
-    barPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(barCount) * measureWidth), y: frame.height))
-    barPath.close()
     barLineLayer.path = barPath.cgPath
     barLineLayer.strokeColor = barLineColor.cgColor
     barLineLayer.lineWidth = barLineWidth
     barLineLayer.isHidden = !showsBarLines
 
-    // Beat lines
+    // Beat lines. Beat ticks only start below the measure header.
     let beatPath = UIBezierPath()
-    for i in 0..<barCount*beatCount {
-      if i%beatCount == 0 { continue }
-      beatPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / CGFloat(beatCount)), y: measureHeight))
-      beatPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / CGFloat(beatCount)), y: frame.height))
-      beatPath.close()
+    let beatLineMinY = max(measureHeight, clipMinY)
+    if beatCount > 0, beatLineMinY < clipMaxY {
+      let beatWidth = measureWidth / CGFloat(beatCount)
+      let beatRange = Self.visibleIndexRange(clipMinX: clipMinX, clipMaxX: clipMaxX, offset: rowHeaderWidth, unitWidth: beatWidth, count: barCount * beatCount)
+      for i in beatRange where i % beatCount != 0 {
+        let x = rowHeaderWidth + (CGFloat(i) * beatWidth)
+        beatPath.move(to: CGPoint(x: x, y: beatLineMinY))
+        beatPath.addLine(to: CGPoint(x: x, y: clipMaxY))
+        beatPath.close()
+      }
     }
     beatLineLayer.path = beatPath.cgPath
     beatLineLayer.strokeColor = beatLineColor.cgColor
@@ -134,11 +162,15 @@ public class MIDITimeTableGridLayer: CALayer {
     // Subbeat lines
     let subbeatPath = UIBezierPath()
     let subdivisions = max(1, snapResolution)
-    for i in 0..<barCount*beatCount*subdivisions {
-      if i%subdivisions == 0 { continue }
-      subbeatPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / (CGFloat(beatCount) * CGFloat(subdivisions))), y: measureHeight))
-      subbeatPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / (CGFloat(beatCount) * CGFloat(subdivisions))), y: frame.height))
-      subbeatPath.close()
+    if beatCount > 0, beatLineMinY < clipMaxY {
+      let subbeatWidth = measureWidth / (CGFloat(beatCount) * CGFloat(subdivisions))
+      let subbeatRange = Self.visibleIndexRange(clipMinX: clipMinX, clipMaxX: clipMaxX, offset: rowHeaderWidth, unitWidth: subbeatWidth, count: barCount * beatCount * subdivisions)
+      for i in subbeatRange where i % subdivisions != 0 {
+        let x = rowHeaderWidth + (CGFloat(i) * subbeatWidth)
+        subbeatPath.move(to: CGPoint(x: x, y: beatLineMinY))
+        subbeatPath.addLine(to: CGPoint(x: x, y: clipMaxY))
+        subbeatPath.close()
+      }
     }
     subbeatLineLayer.path = subbeatPath.cgPath
     subbeatLineLayer.strokeColor = subbeatLineColor.cgColor
@@ -150,5 +182,17 @@ public class MIDITimeTableGridLayer: CALayer {
     barLineLayer.frame = bounds
     beatLineLayer.frame = bounds
     subbeatLineLayer.frame = bounds
+  }
+
+  /// Returns the index range (clamped to `0..<count`) of lines at `offset + i * unitWidth` that
+  /// intersect `[clipMinX, clipMaxX]`, with a one-unit margin on each side so a line sitting
+  /// exactly at the clip edge is never dropped. Used to bound each grid tier's loop to only the
+  /// visible span instead of iterating the whole document.
+  private static func visibleIndexRange(clipMinX: CGFloat, clipMaxX: CGFloat, offset: CGFloat, unitWidth: CGFloat, count: Int) -> Range<Int> {
+    guard unitWidth > 0, count > 0 else { return 0..<0 }
+    let lower = max(0, Int(floor((clipMinX - offset) / unitWidth)) - 1)
+    let upper = min(count, Int(ceil((clipMaxX - offset) / unitWidth)) + 1)
+    guard upper > lower else { return 0..<0 }
+    return lower..<upper
   }
 }

@@ -40,7 +40,9 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
   }
 
   /// Builds a time table with the given rows already loaded, plus the stub keeping it alive
-  /// (dataSource/delegate are weak).
+  /// (dataSource/delegate are weak). All the cells used across this file sit well within the
+  /// small test frame, so they're realized (see `MIDITimeTableView.visibleCells`) right after
+  /// `reloadData()` and stay that way — none of these tests are about virtualization itself.
   private func makeLoadedTimeTable(_ rows: [MIDITimeTableRowData]) -> (MIDITimeTableView, StubDataSource) {
     let stub = StubDataSource(rows: rows)
     let view = MIDITimeTableView(frame: CGRect(x: 0, y: 0, width: 400, height: 400))
@@ -51,69 +53,75 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
   }
 
   func testApplyEditResultReusesExistingViewInstanceForUnrelatedCell() {
-    let (timeTable, stub) = makeLoadedTimeTable([makeRow([(position: 0, duration: 4), (position: 10, duration: 2)])])
+    let row = makeRow([(position: 0, duration: 4), (position: 10, duration: 2)])
+    let (timeTable, stub) = makeLoadedTimeTable([row])
     _ = stub // keep alive
-    let untouchedID = timeTable.cellViews[0][1].cellID!
-    let untouchedView = timeTable.cellViews[0][1]
-    let movedID = timeTable.cellViews[0][0].cellID!
+    let untouchedID = row.cells[1].id
+    let untouchedView = timeTable.cellView(for: untouchedID)
+    XCTAssertNotNil(untouchedView)
+    let movedID = row.cells[0].id
 
     let result = MIDITimeTableCellEditResult(
       updates: [(id: movedID, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 2, newDuration: 4)])
     timeTable.applyEditResult(result)
 
-    XCTAssertEqual(timeTable.cellViews[0].count, 2)
     // The untouched cell keeps its exact same view instance — no teardown/recreate.
-    XCTAssertTrue(timeTable.cellViews[0].contains(where: { $0 === untouchedView && $0.cellID == untouchedID }))
+    XCTAssertTrue(timeTable.cellView(for: untouchedID) === untouchedView)
   }
 
   func testApplyEditResultMovesViewToNewRowKeepingIdentity() {
-    let (timeTable, stub) = makeLoadedTimeTable([makeRow([(position: 0, duration: 4)]), makeRow([])])
+    let row = makeRow([(position: 0, duration: 4)])
+    let (timeTable, stub) = makeLoadedTimeTable([row, makeRow([])])
     _ = stub
-    let cellView = timeTable.cellViews[0][0]
-    let id = cellView.cellID!
+    let id = row.cells[0].id
+    guard let cellView = timeTable.cellView(for: id) else {
+      return XCTFail("expected the cell to be realized right after reloadData()")
+    }
 
     let result = MIDITimeTableCellEditResult(
       updates: [(id: id, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 1, newPosition: 6, newDuration: 4)])
     timeTable.applyEditResult(result)
 
-    XCTAssertEqual(timeTable.cellViews[0].count, 0)
-    XCTAssertEqual(timeTable.cellViews[1].count, 1)
     // Same view instance moved to the new row, not a freshly created one.
-    XCTAssertTrue(timeTable.cellViews[1][0] === cellView)
-    XCTAssertEqual(timeTable.cellViews[1][0].cellID, id)
+    XCTAssertTrue(timeTable.cellView(for: id) === cellView)
+    XCTAssertEqual(timeTable.cellIndex(of: cellView)?.row, 1)
   }
 
   func testApplyEditResultRemovesCoveredCellView() {
-    let (timeTable, stub) = makeLoadedTimeTable([makeRow([(position: 0, duration: 4), (position: 4, duration: 2)])])
+    let row = makeRow([(position: 0, duration: 4), (position: 4, duration: 2)])
+    let (timeTable, stub) = makeLoadedTimeTable([row])
     _ = stub
-    let removedID = timeTable.cellViews[0][1].cellID!
-    let removedView = timeTable.cellViews[0][1]
+    let removedID = row.cells[1].id
+    let removedView = timeTable.cellView(for: removedID)
+    XCTAssertNotNil(removedView)
 
     timeTable.applyEditResult(MIDITimeTableCellEditResult(removals: [removedID]))
 
-    XCTAssertEqual(timeTable.cellViews[0].count, 1)
-    XCTAssertNil(removedView.superview, "removed cell's view should be taken out of the hierarchy")
+    XCTAssertNil(timeTable.cellView(for: removedID))
+    XCTAssertNil(removedView?.superview, "removed cell's view should be taken out of the hierarchy")
   }
 
   func testApplyEditResultInsertsNewViewForSplitRemainder() {
-    let (timeTable, stub) = makeLoadedTimeTable([makeRow([(position: 0, duration: 4)])])
+    let row = makeRow([(position: 0, duration: 4)])
+    let (timeTable, stub) = makeLoadedTimeTable([row])
     _ = stub
 
     let newCell = MIDITimeTableCellData(data: 0, position: 8, duration: 2)
     timeTable.applyEditResult(MIDITimeTableCellEditResult(insertions: [(row: 0, cell: newCell)]))
 
-    XCTAssertEqual(timeTable.cellViews[0].count, 2)
-    XCTAssertTrue(timeTable.cellViews[0].contains(where: { $0.cellID == newCell.id }))
+    XCTAssertNotNil(timeTable.cellView(for: newCell.id))
   }
 
   func testRemoveCellsAtIndicesRemovesIncrementally() {
-    let (timeTable, stub) = makeLoadedTimeTable([makeRow([(position: 0, duration: 4), (position: 4, duration: 2)])])
+    let row = makeRow([(position: 0, duration: 4), (position: 4, duration: 2)])
+    let (timeTable, stub) = makeLoadedTimeTable([row])
     _ = stub
-    let keptView = timeTable.cellViews[0][0]
+    let keptID = row.cells[0].id
+    let keptView = timeTable.cellView(for: keptID)
+    XCTAssertNotNil(keptView)
 
     timeTable.removeCells(at: [MIDITimeTableCellIndex(row: 0, index: 1)])
 
-    XCTAssertEqual(timeTable.cellViews[0].count, 1)
-    XCTAssertTrue(timeTable.cellViews[0][0] === keptView)
+    XCTAssertTrue(timeTable.cellView(for: keptID) === keptView)
   }
 }

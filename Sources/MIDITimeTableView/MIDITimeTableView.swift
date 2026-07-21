@@ -202,8 +202,25 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   public private(set) var history = MIDITimeTableHistory()
   /// All row header cell views currently displaying.
   public private(set) var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
-  /// All data cell views currently displaying.
-  public private(set) var cellViews = [[MIDITimeTableCellView]]()
+  /// Cell views currently realized: on screen (plus a small overscan margin, see
+  /// `virtualizationOverscanMultiplier`) or pinned because their cell is selected. Renamed from
+  /// the old, fully-dense `cellViews` — a cell being absent here doesn't mean it doesn't exist in
+  /// the data source, only that it isn't currently rendered as a view. Kept in sync by the
+  /// windowing pass in `layoutSubviews`.
+  public private(set) var visibleCells = [MIDITimeTableCellView]()
+  /// Realized cell views keyed by their cell's stable id, for O(1) lookup (`cellView(for:)`).
+  /// Kept in sync with `visibleCells`.
+  private var realizedCellViewsByID = [MIDITimeTableCellID: MIDITimeTableCellView]()
+  /// Freed cell views available to be dequeued and reconfigured (via a row's
+  /// `configureCellView`) for a different cell in the same row, instead of being deallocated and
+  /// recreated from scratch. Keyed by row index; a row only accumulates entries here if it
+  /// opted into `configureCellView`.
+  private var cellViewReusePools = [Int: [MIDITimeTableCellView]]()
+  /// Multiplier applied to the current viewport size to compute the overscan margin used to
+  /// decide which cells/grid lines/measure bars to realize. Defaults `1`, i.e. content within one
+  /// extra screen's worth of scrolling in every direction is realized ahead of time, so fast
+  /// scrolling doesn't show a pop-in edge.
+  public var virtualizationOverscanMultiplier: CGFloat = 1
 
   /// Data source object of the time table to populate its data.
   public weak var dataSource: MIDITimeTableViewDataSource?
@@ -305,21 +322,65 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
         height: rowHeight)
     }
 
+    // Realize only the cells within the viewport (plus an overscan margin) or pinned by
+    // selection; recycle everything else into its row's reuse pool instead of keeping every
+    // cell's view alive regardless of document size. See `dequeueCellView`/`recycleCellView`.
+    //
+    // Done in two passes rather than one: first work out *which* cells need to end up realized
+    // (pure frame math, no view work), then recycle whatever's no longer needed, and only then
+    // dequeue/create views for anything newly needed. That ordering matters — it's what lets a
+    // view freed by a cell leaving the window in this same pass be immediately reused for a
+    // different cell entering it, instead of only becoming available on the pass after.
+    let overscanRect = CGRect(origin: contentOffset, size: bounds.size)
+      .insetBy(dx: -bounds.width * virtualizationOverscanMultiplier, dy: -bounds.height * virtualizationOverscanMultiplier)
+
     var duration = 0.0
+    var toRealize: [(id: MIDITimeTableCellID, rowIndex: Int, indexInRow: Int, frame: CGRect)] = []
+    var neededIDs = Set<MIDITimeTableCellID>()
+
     for i in 0..<rowData.count {
-      let row = rowData[i]
-      duration = row.duration > duration ? row.duration : duration
-      for (index, cell) in row.cells.enumerated() {
-        let cellView = cellViews[i][index]
+      let currentRow = rowData[i]
+      duration = currentRow.duration > duration ? currentRow.duration : duration
+      for (index, cell) in currentRow.cells.enumerated() {
         let startX = beatWidth * CGFloat(cell.position)
         let width = beatWidth * CGFloat(cell.duration)
-        cellView.frame = CGRect(
+        let cellFrame = CGRect(
           x: headerCellWidth + startX,
           y: measureHeight + (CGFloat(i) * rowHeight),
           width: width,
           height: rowHeight)
+
+        // A selected cell is pinned: kept realized regardless of the viewport so drag/resize
+        // (which reads and writes geometry through the view, not the model, mid-gesture) always
+        // has a live view to work with, even mid-scroll.
+        guard overscanRect.intersects(cellFrame) || realizedCellViewsByID[cell.id]?.isSelected == true else { continue }
+        neededIDs.insert(cell.id)
+        toRealize.append((cell.id, i, index, cellFrame))
       }
     }
+
+    for (id, view) in realizedCellViewsByID where !neededIDs.contains(id) {
+      recycleCellView(view, id: id)
+    }
+
+    var newRealizedByID = [MIDITimeTableCellID: MIDITimeTableCellView]()
+    newRealizedByID.reserveCapacity(toRealize.count)
+    var newVisibleCells = [MIDITimeTableCellView]()
+    newVisibleCells.reserveCapacity(toRealize.count)
+
+    for placement in toRealize {
+      let owningRow = rowData[placement.rowIndex]
+      let cell = owningRow.cells[placement.indexInRow]
+      let cellView = realizedCellViewsByID[placement.id] ?? dequeueCellView(for: cell, rowIndex: placement.rowIndex, owningRow: owningRow)
+      cellView.frame = placement.frame
+      cellView.tag = placement.indexInRow
+      cellView.cellID = placement.id
+      newRealizedByID[placement.id] = cellView
+      newVisibleCells.append(cellView)
+    }
+
+    realizedCellViewsByID = newRealizedByID
+    visibleCells = newVisibleCells
 
     // Auto-extend the range head so it never sits behind the furthest cell. Only ever pushes it
     // forward; a manual drag can still bring it further out than the content requires.
@@ -376,9 +437,22 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     gridLayer.snapResolution = snapResolution
     gridLayer.isHidden = !showsGrid
     gridLayer.frame = CGRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height)
+    // Clip line drawing to the viewport. Unlike the rest of this method, this needs to redraw on
+    // a pure scroll too (the grid's `frame` itself doesn't change), so ask explicitly rather than
+    // rely on the frame assignment above to (not) trigger it.
+    gridLayer.virtualizationRect = overscanRect
+    gridLayer.setNeedsLayout()
 
     // Measure view's per-bar snap ticks.
     measureView.snapResolution = snapResolution
+    // Same reasoning as the grid layer: only realize bar layers within the viewport, and force a
+    // relayout on pure scroll since `measureView.frame` itself doesn't change from it.
+    measureView.virtualizationRect = CGRect(
+      x: overscanRect.minX - headerCellWidth,
+      y: 0,
+      width: overscanRect.width,
+      height: measureHeight)
+    measureView.setNeedsLayout()
   }
 
 
@@ -390,8 +464,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // Reset data source
     rowHeaderCellViews.forEach({ $0.removeFromSuperview() })
     rowHeaderCellViews = []
-    cellViews.flatMap({ $0 }).forEach({ $0.removeFromSuperview() })
-    cellViews = []
+    realizedCellViewsByID.values.forEach({ $0.removeFromSuperview() })
+    realizedCellViewsByID = [:]
+    cellViewReusePools = [:]
+    visibleCells = []
 
     let numberOfRows = historyItem?.count ?? dataSource?.numberOfRows(in: self) ?? 0
     let timeSignature = dataSource?.timeSignature(of: self) ?? MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
@@ -405,17 +481,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       let rowHeaderCell = row.headerCellView
       rowHeaderCellViews.append(rowHeaderCell)
       addSubview(rowHeaderCell)
-
-      var cells = [MIDITimeTableCellView]()
-      for (index, cell) in row.cells.enumerated() {
-        let cellView = row.cellView(cell)
-        cellView.tag = index
-        cellView.cellID = cell.id
-        cellView.delegate = self
-        cells.append(cellView)
-        addSubview(cellView)
-      }
-      cellViews.append(cells)
     }
 
     // Delegate
@@ -424,8 +489,13 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     headerCellWidth = showsHeaders ? timeTableDelegate?.midiTimeTableViewWidthForRowHeaderCells(self) ?? headerCellWidth : 0
     snapResolution = max(1, timeTableDelegate?.midiTimeTableViewSnapResolution(self) ?? snapResolution)
 
-    // Update grid
-    gridLayer.setNeedsLayout()
+    // Cell views aren't created here anymore — the next layout pass's windowing logic (see
+    // `layoutSubviews`) realizes only the cells within the viewport on demand, instead of
+    // eagerly instantiating one for every cell in every row regardless of what's on screen.
+    // Forced synchronously so callers see up-to-date `visibleCells` immediately, matching the
+    // old eager behavior's guarantee.
+    setNeedsLayout()
+    layoutIfNeeded()
 
     // Keep history
     if holdsHistory, keepHistory, historyItem == nil {
@@ -445,46 +515,25 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   ///
   /// - Parameter result: The edit result to apply.
   public func applyEditResult(_ result: MIDITimeTableCellEditResult) {
-    // Look up every currently-displayed cell view by its stable id before mutating anything, so
-    // cells untouched by this edit — the common case, usually all but one — get their exact same
-    // view instance reused rather than torn down and recreated.
-    var existingViewsByID = [MIDITimeTableCellID: MIDITimeTableCellView]()
-    for views in cellViews {
-      for view in views {
-        if let id = view.cellID { existingViewsByID[id] = view }
+    // A removed cell no longer belongs to any row, so its view is dropped outright — removed
+    // from the hierarchy and not pooled, since there's nothing left to dequeue it for.
+    for id in result.removals {
+      if let view = realizedCellViewsByID.removeValue(forKey: id) {
+        view.isSelected = false
+        view.removeFromSuperview()
       }
     }
 
     rowData.apply(result)
 
-    var newCellViews = [[MIDITimeTableCellView]]()
-    newCellViews.reserveCapacity(rowData.count)
-    for row in rowData.indices {
-      var rowViews = [MIDITimeTableCellView]()
-      rowViews.reserveCapacity(rowData[row].cells.count)
-      for (index, cell) in rowData[row].cells.enumerated() {
-        let cellView: MIDITimeTableCellView
-        if let existing = existingViewsByID.removeValue(forKey: cell.id) {
-          cellView = existing
-        } else {
-          // No prior view shares this id: a brand new cell (e.g. a split-off remainder).
-          cellView = rowData[row].cellView(cell)
-          cellView.cellID = cell.id
-          cellView.delegate = self
-          addSubview(cellView)
-        }
-        cellView.tag = index
-        rowViews.append(cellView)
-      }
-      newCellViews.append(rowViews)
-    }
-
-    // Anything left unclaimed no longer has a corresponding cell — removed, or fully covered by
-    // the edit — so its view is no longer needed.
-    existingViewsByID.values.forEach({ $0.removeFromSuperview() })
-
-    cellViews = newCellViews
+    // Everything else — updates (including moves across rows) and insertions — is picked up by
+    // the next layout pass's windowing logic (see `layoutSubviews`): a cell untouched by this
+    // edit keeps its existing view instance exactly as it was; a moved/resized cell's view (same
+    // instance, found by id) is simply repositioned; a brand new cell (e.g. a split-off
+    // remainder) gets a view dequeued from its row's reuse pool or created fresh. Forced
+    // synchronously so callers see up-to-date `visibleCells` immediately after this call returns.
     setNeedsLayout()
+    layoutIfNeeded()
 
     if holdsHistory {
       history.append(item: rowData)
@@ -506,14 +555,51 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     applyEditResult(MIDITimeTableCellEditResult(removals: ids))
   }
 
+  /// Returns a cell's currently realized view, if any. `nil` if the cell exists in the data but
+  /// isn't currently realized — off-screen and unselected, see `visibleCells`.
+  ///
+  /// - Parameter id: Stable id of the cell to look up.
+  /// - Returns: The cell's realized view, or `nil`.
+  public func cellView(for id: MIDITimeTableCellID) -> MIDITimeTableCellView? {
+    return realizedCellViewsByID[id]
+  }
+
   /// Gets the row and column index of the cell view in the data source.
   ///
   /// - Parameter cell: The cell you want to get row and column info.
   /// - Returns: Returns a row and column index Int pair in a tuple.
   public func cellIndex(of cell: MIDITimeTableCellView) -> MIDITimeTableCellIndex? {
-    let row = Int(((cell.frame.minY - measureHeight) / rowHeight).rounded())
-    guard row >= 0, row < cellViews.count, let index = cellViews[row].firstIndex(of: cell) else { return nil }
-    return MIDITimeTableCellIndex(row: row, index: index)
+    guard let id = cell.cellID else { return nil }
+    return rowData.index(ofCellID: id)
+  }
+
+  /// Returns a view for `cell` in row `rowIndex`: a view dequeued from that row's reuse pool and
+  /// reconfigured via `owningRow.configureCellView` when one's available, otherwise a freshly
+  /// created instance via `owningRow.cellView`. Pools are kept per-row, so a dequeued instance is
+  /// always the exact subclass `owningRow.cellView` would have produced.
+  private func dequeueCellView(for cell: MIDITimeTableCellData, rowIndex: Int, owningRow: MIDITimeTableRowData) -> MIDITimeTableCellView {
+    let cellView: MIDITimeTableCellView
+    if var pool = cellViewReusePools[rowIndex], let reused = pool.popLast() {
+      cellViewReusePools[rowIndex] = pool
+      owningRow.configureCellView?(reused, cell)
+      cellView = reused
+    } else {
+      cellView = owningRow.cellView(cell)
+    }
+    cellView.delegate = self
+    addSubview(cellView)
+    return cellView
+  }
+
+  /// Frees a realized cell view no longer needed this layout pass: clears its selection, removes
+  /// it from the hierarchy, and — only if the cell it represented still exists in `rowData` and
+  /// that row opted into `configureCellView` — returns it to that row's reuse pool for a future
+  /// dequeue. Otherwise the view is simply discarded.
+  private func recycleCellView(_ view: MIDITimeTableCellView, id: MIDITimeTableCellID) {
+    view.isSelected = false
+    view.removeFromSuperview()
+    guard let owningRowIndex = rowData.index(ofCellID: id)?.row, rowData[owningRowIndex].configureCellView != nil else { return }
+    cellViewReusePools[owningRowIndex, default: []].append(view)
   }
 
   /// Unselects all cells if tapped an empty area of the time table.
@@ -621,9 +707,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
         height: touchLocation.y - origin.y)
     }
 
-    // Make cells selected.
-    cellViews
-      .flatMap({ $0 })
+    // Make cells selected. Only cells currently realized can possibly intersect a marquee that's
+    // itself bounded to the (auto-)scrollable viewport, so `visibleCells` — not the full data
+    // source — is exactly the right set to check.
+    visibleCells
       .forEach({ $0.isSelected = dragView.frame.intersects($0.frame) })
   }
 
@@ -693,9 +780,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     dragView = nil
   }
 
-  /// Makes all cells unselected.
+  /// Makes all cells unselected. A selected cell is always realized (see `visibleCells`), so
+  /// this reaches every selected cell in the whole document, not just the ones on screen.
   public func unselectAllCells() {
-    cellViews.flatMap({ $0 }).forEach({ $0.isSelected = false })
+    visibleCells.forEach({ $0.isSelected = false })
   }
 
   // MARK: Zooming
@@ -723,15 +811,16 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     if case .began = pan.state {
       midiTimeTableCellView.isSelected = true
-      editingCellIndices = cellViews
-        .flatMap({ $0 })
+      editingCellIndices = visibleCells
         .filter({ $0.isSelected })
         .compactMap({ cellIndex(of: $0) })
     }
 
     isMoving = true
 
-    let selectedCells = cellViews.flatMap({ $0 }).filter({ $0.isSelected })
+    // A selected cell is always realized (see `visibleCells`), so this is the complete selection
+    // regardless of how much of it is currently on screen.
+    let selectedCells = visibleCells.filter({ $0.isSelected })
     guard !selectedCells.isEmpty else { return }
 
     // Bounding box of the whole selection so the group moves as one unit
@@ -740,7 +829,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let groupMaxX = selectedCells.map({ $0.frame.maxX }).max() ?? headerCellWidth
     let groupMinY = selectedCells.map({ $0.frame.minY }).min() ?? measureHeight
     let groupMaxY = selectedCells.map({ $0.frame.maxY }).max() ?? measureHeight
-    let rowsBottom = measureHeight + (rowHeight * CGFloat(cellViews.count))
+    let rowsBottom = measureHeight + (rowHeight * CGFloat(rowData.count))
 
     // Fully catch up with the pan translation instead of moving a single
     // quantized step per callback, so the selection never trails the finger.
@@ -781,13 +870,12 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     if case .began = pan.state {
       isResizing = true
       midiTimeTableCellView.isSelected = true
-      editingCellIndices = cellViews
-        .flatMap({ $0 })
+      editingCellIndices = visibleCells
         .filter({ $0.isSelected })
         .compactMap({ cellIndex(of: $0) })
     }
 
-    let selectedCells = cellViews.flatMap({ $0 }).filter({ $0.isSelected })
+    let selectedCells = visibleCells.filter({ $0.isSelected })
     guard !selectedCells.isEmpty else { return }
 
     // Fully catch up with the pan translation instead of resizing a single
@@ -822,17 +910,21 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     var editedCells = [MIDITimeTableViewEditedCellData]()
 
     for cell in cells {
-      let cellView = cellViews[cell.row][cell.index]
+      // `cells` is a snapshot of (row, array-position) taken when the gesture began; `rowData`
+      // hasn't been mutated since (only view frames were, mid-gesture), so it's still valid here.
+      guard cell.row >= 0, cell.row < rowData.count,
+        cell.index >= 0, cell.index < rowData[cell.row].cells.count
+        else { continue }
+      let id = rowData[cell.row].cells[cell.index].id
+      // Edited cells are selected, and a selected cell is always realized (see `visibleCells`),
+      // so this lookup is guaranteed to succeed barring a caller-side inconsistency.
+      guard let cellView = realizedCellViewsByID[id] else { continue }
+
       let newCellPosition = Double(cellView.frame.minX - headerCellWidth) / Double(beatWidth)
       let newCellDuration = Double(cellView.frame.size.width / beatWidth)
       let newCellRow = Int(((cellView.frame.minY - measureHeight) / rowHeight).rounded())
 
-      editedCells.append((
-        cellView.cellID ?? MIDITimeTableCellID(),
-        cell,
-        newCellRow,
-        newCellPosition,
-        newCellDuration))
+      editedCells.append((id, cell, newCellRow, newCellPosition, newCellDuration))
     }
 
     editingCellIndices = []
@@ -851,14 +943,15 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   }
 
   public func midiTimeTableCellViewDidTap(_ midiTimeTableCellView: MIDITimeTableCellView) {
-    for cell in cellViews.flatMap({ $0 }) {
+    // A selected cell is always realized (see `visibleCells`), so this correctly deselects every
+    // previously-selected cell, on screen or not.
+    for cell in visibleCells {
       cell.isSelected = cell == midiTimeTableCellView
     }
   }
 
   public func midiTimeTableCellViewDidDelete(_ midiTimeTableCellView: MIDITimeTableCellView) {
-    let deletingCellIndices = cellViews
-      .flatMap({ $0 })
+    let deletingCellIndices = visibleCells
       .filter({ $0.isSelected })
       .compactMap({ cellIndex(of: $0) })
     timeTableDelegate?.midiTimeTableView(self, didDelete: deletingCellIndices)
