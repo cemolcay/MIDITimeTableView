@@ -8,7 +8,29 @@
 
 import UIKit
 
-extension Collection where Iterator.Element == MIDITimeTableRowData {
+/// A new cell created by splitting an existing cell that had an edited cell land inside it.
+public typealias MIDITimeTableCellInsertion = (row: Int, cell: MIDITimeTableCellData)
+
+/// Result of an edit (move or resize), including its effect on the cells it now overlaps.
+/// Self-sufficient: `apply(_:)` is the only call a host needs to keep its data in sync, in
+/// place of hand-rolling overlap resolution.
+public struct MIDITimeTableCellEditResult {
+  /// Every cell whose position/duration changed: the cells that were directly moved or resized,
+  /// plus any other cells trimmed because one of those edits now overlaps them.
+  public var updates: [MIDITimeTableViewEditedCellData]
+  /// Cells fully covered by an edited cell; these should be removed entirely.
+  public var removals: [MIDITimeTableCellIndex]
+  /// New cells created by splitting a cell that had an edited cell land inside it.
+  public var insertions: [MIDITimeTableCellInsertion]
+
+  public init(updates: [MIDITimeTableViewEditedCellData] = [], removals: [MIDITimeTableCellIndex] = [], insertions: [MIDITimeTableCellInsertion] = []) {
+    self.updates = updates
+    self.removals = removals
+    self.insertions = insertions
+  }
+}
+
+extension Array where Element == MIDITimeTableRowData {
 
   /// Returns a cell data at the index of a row.
   ///
@@ -16,16 +38,8 @@ extension Collection where Iterator.Element == MIDITimeTableRowData {
   ///   - row: Row index of the cell data.
   ///   - index: Index number in the row of the cell data.
   public subscript(row: Int, index: Int) -> MIDITimeTableCellData {
-    get {
-      guard let this = self as? [MIDITimeTableRowData] // immutable copy of self.
-        else { fatalError("This is not a 'MIDITimeTableRowData' collection type.") }
-      return this[row].cells[index]
-    } set {
-      guard var this = self as? [MIDITimeTableRowData] // mutable copy of self.
-        else { fatalError("This is not a 'MIDITimeTableRowData' collection type.") }
-      this[row].cells[index] = newValue
-      self = this as! Self
-    }
+    get { return self[row].cells[index] }
+    set { self[row].cells[index] = newValue }
   }
 
   /// Returns a cell data with `MIDITimeTableCellIndex`.
@@ -45,31 +59,83 @@ extension Collection where Iterator.Element == MIDITimeTableRowData {
   ///   - cell: Cell data to append.
   ///   - at: The row index to append cell data.
   public mutating func appendCell(_ cell: MIDITimeTableCellData, row at: Int) {
-    guard var this = self as? [MIDITimeTableRowData] else { return }
-    this[at].cells.append(cell)
-    self = this as! Self
+    self[at].cells.append(cell)
   }
 
   /// Removes a cell from an index.
   ///
   /// - Parameter index: Cell index of the cell will be removed.
   /// - Returns: Returns the removed cell.
+  @discardableResult
   public mutating func removeCell(at index: MIDITimeTableCellIndex) -> MIDITimeTableCellData {
-    guard var this = self as? [MIDITimeTableRowData] else { fatalError() }
-    let cell = this[index.row].cells.remove(at: index.index)
-    self = this as! Self
-    return cell
+    return self[index.row].cells.remove(at: index.index)
   }
 
   /// Removes multiple cells from multiple indices.
   ///
   /// - Parameter indicies: Indices of cells that will be removed.
   public mutating func removeCells(at indicies: [MIDITimeTableCellIndex]) {
-    guard var this = self as? [MIDITimeTableRowData] else { fatalError() }
     for (row, index) in indicies.ordered {
-      this[row].cells = this[row].cells.enumerated().filter({ !index.contains($0.offset) }).map({ $0.element })
+      self[row].cells = self[row].cells.enumerated().filter({ !index.contains($0.offset) }).map({ $0.element })
     }
-    self = this as! Self
+  }
+
+  /// Applies an edit result — moved/resized/trimmed cells, cells fully covered by the edit, and
+  /// split remainders — coming from `MIDITimeTableView`'s overlap resolution. This is the
+  /// single call a host needs in `midiTimeTableView(_:didEdit:)` to keep its data in sync;
+  /// see `Example/MIDITimeTableView/ViewController.swift` for the reference usage.
+  ///
+  /// - Parameter result: The edit result reported by the time table view.
+  public mutating func apply(_ result: MIDITimeTableCellEditResult) {
+    guard !isEmpty else { return }
+
+    // Resolve every update against its ORIGINAL index first (before any structural change),
+    // splitting into "stays in the same row" (safe to update in place) and "moves to another
+    // row" (needs a remove + append). Keying by the original index keeps this correct even when
+    // multiple cells in the same row are edited at once — nothing shifts until `removeCells`
+    // below, which removes a whole row's indices in one pass.
+    var sameRowUpdates = [MIDITimeTableCellIndex: MIDITimeTableCellData]()
+    var movedAway = [MIDITimeTableCellIndex: (row: Int, cell: MIDITimeTableCellData)]()
+
+    for update in result.updates {
+      let index = update.index
+      guard index.row >= 0, index.row < count,
+        index.index >= 0, index.index < self[index.row].cells.count
+        else { continue }
+      var cell = self[index]
+      cell.position = update.newPosition
+      cell.duration = update.newDuration
+      if index.row == update.newRowIndex {
+        sameRowUpdates[index] = cell
+      } else {
+        movedAway[index] = (update.newRowIndex, cell)
+      }
+    }
+
+    var appendedByRow = [Int: [MIDITimeTableCellData]]()
+    for (_, moved) in movedAway {
+      appendedByRow[moved.row, default: []].append(moved.cell)
+    }
+    for insertion in result.insertions {
+      appendedByRow[insertion.row, default: []].append(insertion.cell)
+    }
+
+    // In-place updates don't change row length/order, so they're safe to apply before removal.
+    for (index, cell) in sameRowUpdates {
+      self[index] = cell
+    }
+
+    // Remove fully covered cells and cells that moved to another row in one grouped pass per row.
+    var removalIndices = result.removals
+    removalIndices.append(contentsOf: movedAway.keys)
+    removeCells(at: removalIndices)
+
+    // Append moved and split-off cells to their destination rows.
+    for (row, cells) in appendedByRow where row >= 0 && row < count {
+      for cell in cells {
+        appendCell(cell, row: row)
+      }
+    }
   }
 }
 

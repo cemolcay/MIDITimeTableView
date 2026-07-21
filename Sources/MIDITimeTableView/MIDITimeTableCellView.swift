@@ -9,7 +9,7 @@
 import UIKit
 
 /// Delegate functions to inform about editing or deleting cell.
-public protocol MIDITimeTableCellViewDelegate: class {
+public protocol MIDITimeTableCellViewDelegate: AnyObject {
   /// Informs about moving the cell with the pan gesture.
   ///
   /// - Parameters:
@@ -131,6 +131,8 @@ open class MIDITimeTableCellView: UIView {
     delegate?.midiTimeTableCellViewDidResize(self, pan: pan)
   }
 
+  // Note: `UIMenuController` is deprecated in favor of `UIEditMenuInteraction` (iOS 16+).
+  // Kept as-is to preserve the iOS 13 floor without introducing an `#available` fork here.
   @objc public func didLongPress(longPress: UILongPressGestureRecognizer) {
     guard let superview = superview else { return }
     becomeFirstResponder()

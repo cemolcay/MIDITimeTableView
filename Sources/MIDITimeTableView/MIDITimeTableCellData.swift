@@ -44,15 +44,13 @@ public struct MIDITimeTableCellIndex: Hashable {
   }
 }
 
-extension Collection where Iterator.Element == MIDITimeTableCellIndex {
+extension Sequence where Element == MIDITimeTableCellIndex {
 
   /// Creates a dictionary that rows as key and indices of same rows as their value.
   public var ordered: [Int: [Int]] {
-    guard let this = self as? [MIDITimeTableCellIndex] else { fatalError() }
     var dict = [Int: [Int]]()
-    let keys = Set(this.map({ $0.row })).sorted()
-    for key in keys {
-      dict[key] = this.filter({ $0.row == key }).map({ $0.index })
+    for cellIndex in self {
+      dict[cellIndex.row, default: []].append(cellIndex.index)
     }
     return dict
   }
@@ -81,5 +79,18 @@ public struct MIDITimeTableCellData {
     self.data = data
     self.position = position
     self.duration = duration
+  }
+
+  /// End position of the cell in the row in beats. Equals `position + duration`.
+  public var endPosition: Double {
+    return position + duration
+  }
+
+  /// Checks if this cell overlaps another cell's beat range.
+  ///
+  /// - Parameter other: The other cell to check overlap against.
+  /// - Returns: Returns true if the two cells' beat ranges intersect.
+  public func overlaps(_ other: MIDITimeTableCellData) -> Bool {
+    return position < other.endPosition && endPosition > other.position
   }
 }

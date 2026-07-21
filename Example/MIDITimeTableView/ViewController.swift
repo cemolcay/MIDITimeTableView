@@ -248,21 +248,13 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
   }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData]) {
-    var removingCells = [MIDITimeTableCellIndex]()
+    // Overlap resolution is handled in `didEdit result:` below via `rowData.apply(result)`,
+    // which supersedes this method's data. Left as a no-op since it's still a required
+    // delegate method for source compatibility with existing conformers.
+  }
 
-    for cell in cells {
-      // Update edited cell
-      rowData[cell.index].duration = cell.newDuration
-      rowData[cell.index].position = cell.newPosition
-
-      // update cell row
-      if cell.index.row != cell.newRowIndex {
-        rowData.appendCell(rowData[cell.index], row: cell.newRowIndex)
-        removingCells.append(cell.index)
-      }
-    }
-
-    rowData.removeCells(at: removingCells)
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {
+    rowData.apply(result)
     timeTableView?.reloadData()
     updateHistoryButtons()
   }

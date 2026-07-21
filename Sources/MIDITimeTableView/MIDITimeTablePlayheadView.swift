@@ -9,7 +9,7 @@
 import UIKit
 
 /// Delegate that informs about playhead is going to move.
-public protocol MIDITimeTablePlayheadViewDelegate: class {
+public protocol MIDITimeTablePlayheadViewDelegate: AnyObject {
   /// Delegate method that should update playhead's position based on pan gesture translation in timetable view.
   ///
   /// - Parameters:

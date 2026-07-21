@@ -12,7 +12,7 @@ import UIKit
 public typealias MIDITimeTableHistoryItem = [MIDITimeTableRowData]
 
 /// Informs about changes on history.
-public protocol MIDITimeTableHistoryDelegate: class {
+public protocol MIDITimeTableHistoryDelegate: AnyObject {
 
   /// Informs about current index of history is changed. It means either user did undo or redo.
   ///
@@ -33,8 +33,10 @@ public class MIDITimeTableHistory {
   /// Delegate that informs about changes.
   public weak var delegate: MIDITimeTableHistoryDelegate?
 
-  /// Returns current history item.
+  /// Returns current history item. Empty if the history doesn't hold any items yet, rather than
+  /// crashing on the otherwise out-of-bounds `currentIndex == -1` default.
   public var currentItem: MIDITimeTableHistoryItem {
+    guard currentIndex >= 0, currentIndex < items.count else { return [] }
     return items[currentIndex]
   }
 
