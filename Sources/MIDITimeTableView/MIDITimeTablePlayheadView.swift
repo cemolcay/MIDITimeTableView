@@ -9,7 +9,7 @@
 import UIKit
 
 /// Delegate that informs about playhead is going to move.
-public protocol MIDITimeTablePlayheadViewDelegate: class {
+public protocol MIDITimeTablePlayheadViewDelegate: AnyObject {
   /// Delegate method that should update playhead's position based on pan gesture translation in timetable view.
   ///
   /// - Parameters:
@@ -47,8 +47,20 @@ public class MIDITimeTablePlayheadView: UIView {
   public var lineColor: UIColor = .white { didSet{ setNeedsLayout() }}
   /// Playhead's guide line height that draws on timetable. It's best to match timetable's content height.
   public var lineHeight: CGFloat = 0 { didSet{ setNeedsLayout() }}
-  /// Playhead's guide line width that draws on timetable.
-  public var lineWidth: CGFloat = 1 / UIScreen.main.scale { didSet{ setNeedsLayout() }}
+  /// Playhead's guide line width that draws on timetable. Defaults to a device hairline (one
+  /// physical pixel). The default is refreshed for the actual display scale once the view enters a
+  /// window (see `didMoveToWindow`); an explicit value assigned by the caller always wins.
+  public var lineWidth: CGFloat = 1 / UITraitCollection.current.displayScale {
+    didSet {
+      if !isRefreshingDefaultLineWidth { usesDefaultLineWidth = false }
+      setNeedsLayout()
+    }
+  }
+  /// Tracks whether `lineWidth` still holds its trait-derived default, so the hairline can be
+  /// refreshed for the real display scale without clobbering a caller-supplied value.
+  private var usesDefaultLineWidth = true
+  /// Guards the internal refresh assignment so it doesn't mark `lineWidth` as caller-overridden.
+  private var isRefreshingDefaultLineWidth = false
   /// Line layer that draws playhead's position guide on timetable.
   private var lineLayer = CALayer()
   /// Optional image view that initilizes if an image assings.
@@ -97,8 +109,20 @@ public class MIDITimeTablePlayheadView: UIView {
     drawShapeLayer()
   }
 
+  public override func didMoveToWindow() {
+    super.didMoveToWindow()
+    // Now attached to a real screen, so refresh the hairline default to that screen's scale. Only
+    // touches the value while it's still the default; a caller-set width is left alone.
+    guard usesDefaultLineWidth, window != nil else { return }
+    let hairline = 1 / traitCollection.displayScale
+    guard lineWidth != hairline else { return }
+    isRefreshingDefaultLineWidth = true
+    lineWidth = hairline
+    isRefreshingDefaultLineWidth = false
+  }
+
   public override func hitTest(_ point: CGPoint, with event: UIEvent?) -> UIView? {
-    if clipsToBounds || isHidden || alpha == 0 {
+    if !isUserInteractionEnabled || isHidden || alpha == 0 {
       return nil
     }
 
