@@ -60,16 +60,31 @@ Keep your own row and cell models. The time table asks your data source only for
 positions and durations.
 
 ``` swift
-struct SongCell {
+struct SongCell: MIDITimeTableCellRepresentable {
   var id = MIDITimeTableCellID()
   var title: String
   var position: Double
   var duration: Double
+
+  var midiTimeTableCellID: MIDITimeTableCellID { id }
+  var midiTimeTablePosition: Double {
+    get { position }
+    set { position = newValue }
+  }
+  var midiTimeTableDuration: Double {
+    get { duration }
+    set { duration = newValue }
+  }
 }
 
-struct SongRow {
+struct SongRow: MIDITimeTableRowRepresentable {
   var title: String
   var cells: [SongCell]
+
+  var midiTimeTableCells: [SongCell] {
+    get { cells }
+    set { cells = newValue }
+  }
 }
 
 var rowData: [SongRow] = [
@@ -94,19 +109,19 @@ func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTime
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, numberOfCellsInRow row: Int) -> Int {
-  return rowData[row].cells.count
+  return rowData[row].midiTimeTableCells.count
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, idForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellID {
-  return rowData[index.row].cells[index.index].id
+  return rowData[index.row].midiTimeTableCells[index.index].midiTimeTableCellID
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, positionForCellAt index: MIDITimeTableCellIndex) -> Double {
-  return rowData[index.row].cells[index.index].position
+  return rowData[index.row].midiTimeTableCells[index.index].midiTimeTablePosition
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, durationForCellAt index: MIDITimeTableCellIndex) -> Double {
-  return rowData[index.row].cells[index.index].duration
+  return rowData[index.row].midiTimeTableCells[index.index].midiTimeTableDuration
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
@@ -142,6 +157,15 @@ func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView) 
 
 func midiTimeTableViewSnapResolution(_ midiTimeTableView: MIDITimeTableView) -> Int {
   return 4
+}
+```
+
+`MIDITimeTableHistoryRepresentable` and `MIDITimeTableHistoryStack` are available if you want an
+app-owned undo/redo stack with default append/undo/redo behavior:
+
+``` swift
+struct SongHistory: MIDITimeTableHistoryRepresentable {
+  var midiTimeTableHistoryStorage = MIDITimeTableHistoryStack<[SongRow]>()
 }
 ```
   
