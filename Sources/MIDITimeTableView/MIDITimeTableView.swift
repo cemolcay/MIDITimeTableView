@@ -102,6 +102,10 @@ public protocol MIDITimeTableViewDelegate: AnyObject {
   /// Informs about the cell edit's resolved overlaps: cells trimmed, removed or split because
   /// the moved/resized cell now covers them.
   ///
+  /// The delegate should apply `result` to its backing data source synchronously during this
+  /// callback. `MIDITimeTableView` updates its internal layout immediately after this returns, so
+  /// any newly inserted split cells can be dequeued and configured from the updated data source.
+  ///
   /// - Parameters:
   ///   - midiTimeTableView: Time table that performed changes on.
   ///   - result: Resolved edit result with updated, removed and newly split cells.
@@ -491,7 +495,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     realizedCellViewsByID = [:]
     visibleCells = []
 
-    let numberOfRows = dataSource?.numberOfRows(in: self) ?? 0
+    let dataSourceRowCount = dataSource?.numberOfRows(in: self) ?? 0
+    assert(dataSourceRowCount >= 0, "MIDITimeTableViewDataSource returned a negative row count.")
+    let numberOfRows = max(0, dataSourceRowCount)
     let timeSignature = dataSource?.timeSignature(of: self) ?? MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
     measureView.beatCount = timeSignature.beats
 
@@ -504,6 +510,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       rowHeaderCellViews.append(rowHeaderCell)
       addSubview(rowHeaderCell)
     }
+    validateDataSourceSnapshot()
 
     // Delegate
     rowHeight = timeTableDelegate?.midiTimeTableViewHeightForRows(self) ?? rowHeight
@@ -527,9 +534,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// stays in the hierarchy exactly as it was, instead of the whole table being torn down and
   /// rebuilt the way `reloadData()` would.
   ///
-  /// `didEditCells` already calls this for you after every move/resize, so the time table stays
-  /// visually correct on its own. It's exposed publicly in case you want to fold in an edit
-  /// result you produced yourself (e.g. replaying one from persistence).
+  /// `didEditCells` already calls this for you after every move/resize, after first giving your
+  /// delegate a chance to apply the same result to your backing data source. If you call this
+  /// directly with insertions, update your data source first so newly dequeued cell views can be
+  /// configured from the inserted models.
   ///
   /// - Parameter result: The edit result to apply.
   public func applyEditResult(_ result: MIDITimeTableCellEditResult) {
@@ -607,7 +615,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
   private func makeRowDataFromDataSource(row: Int) -> MIDITimeTableRowLayoutData {
     guard let dataSource = dataSource else { return MIDITimeTableRowLayoutData(cells: []) }
-    let cellCount = dataSource.midiTimeTableView(self, numberOfCellsInRow: row)
+    let dataSourceCellCount = dataSource.midiTimeTableView(self, numberOfCellsInRow: row)
+    assert(dataSourceCellCount >= 0, "MIDITimeTableViewDataSource returned a negative cell count for row \(row).")
+    let cellCount = max(0, dataSourceCellCount)
     let cells = (0..<cellCount).map { cellIndex -> MIDITimeTableCellLayoutData in
       let index = MIDITimeTableCellIndex(row: row, index: cellIndex)
       return MIDITimeTableCellLayoutData(
@@ -616,6 +626,28 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
         duration: dataSource.midiTimeTableView(self, durationForCellAt: index))
     }
     return MIDITimeTableRowLayoutData(cells: cells)
+  }
+
+  private func validateDataSourceSnapshot() {
+    var seenIDs = Set<MIDITimeTableCellID>()
+    var validationMessages = [String]()
+
+    for (rowIndex, row) in rowData.enumerated() {
+      for (cellIndex, cell) in row.cells.enumerated() {
+        let index = MIDITimeTableCellIndex(row: rowIndex, index: cellIndex)
+        if !seenIDs.insert(cell.id).inserted {
+          validationMessages.append("Duplicate cell id \(cell.id) at row \(index.row), index \(index.index).")
+        }
+        if !cell.position.isFinite || cell.position < 0 {
+          validationMessages.append("Invalid position \(cell.position) at row \(index.row), index \(index.index). Positions must be finite and non-negative.")
+        }
+        if !cell.duration.isFinite || cell.duration <= 0 {
+          validationMessages.append("Invalid duration \(cell.duration) at row \(index.row), index \(index.index). Durations must be finite and greater than zero.")
+        }
+      }
+    }
+
+    assert(validationMessages.isEmpty, validationMessages.joined(separator: "\n"))
   }
 
   private func makeCellView(at index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
@@ -1085,11 +1117,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     result.updates = editedOverlapResult.updates + result.updates
     result.removals = editedOverlapResult.removals + result.removals
 
-    // Keep the time table's own state correct incrementally before telling anyone about it, so
-    // a delegate inspecting the time table during these callbacks already sees the new state.
-    applyEditResult(result)
-
     timeTableDelegate?.midiTimeTableView(self, didEdit: result)
+    applyEditResult(result)
     timeTableDelegate?.midiTimeTableViewShouldPushHistory(self)
   }
 

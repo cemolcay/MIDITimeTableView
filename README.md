@@ -123,8 +123,9 @@ func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt ind
 ```
 
 Keep your model in sync by applying the edit and delete callbacks from `MIDITimeTableViewDelegate`.
-The time table view applies edits to its internal layout snapshot before calling `didEdit`; your app
-should apply the same result to its own model.
+Your app's model remains the source of truth. Apply edit results synchronously in `didEdit`; the
+time table updates its internal layout immediately after the callback returns, so any newly split
+cells can be dequeued and configured from your already-updated data source.
 
 ``` swift
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {
@@ -145,6 +146,64 @@ func midiTimeTableViewSnapResolution(_ midiTimeTableView: MIDITimeTableView) -> 
 }
 ```
 
+`MIDITimeTableCellEditResult` has three parts:
+
+* `updates`: existing cells whose row, position or duration changed. Locate these in your model by
+  stable `id`, then update their stored geometry.
+* `removals`: existing cell IDs that were fully covered and should be deleted from your model.
+* `insertions`: new split fragments created from an existing cell. Clone the model referenced by
+  `sourceID`, assign the new `id`, `position` and `duration`, then insert it into `row`.
+
+For example:
+
+``` swift
+private func index(ofCellID id: MIDITimeTableCellID) -> MIDITimeTableCellIndex? {
+  for (rowIndex, row) in rowData.enumerated() {
+    if let cellIndex = row.cells.firstIndex(where: { $0.id == id }) {
+      return MIDITimeTableCellIndex(row: rowIndex, index: cellIndex)
+    }
+  }
+  return nil
+}
+
+private func apply(_ result: MIDITimeTableCellEditResult) {
+  for update in result.updates {
+    guard let currentIndex = index(ofCellID: update.id) else { continue }
+    var cell = rowData[currentIndex.row].cells[currentIndex.index]
+    cell.position = update.newPosition
+    cell.duration = update.newDuration
+
+    if currentIndex.row == update.newRowIndex {
+      rowData[currentIndex.row].cells[currentIndex.index] = cell
+    } else if update.newRowIndex >= 0 && update.newRowIndex < rowData.count {
+      rowData[currentIndex.row].cells.remove(at: currentIndex.index)
+      rowData[update.newRowIndex].cells.append(cell)
+    }
+  }
+
+  for id in result.removals {
+    guard let currentIndex = index(ofCellID: id) else { continue }
+    rowData[currentIndex.row].cells.remove(at: currentIndex.index)
+  }
+
+  for insertion in result.insertions {
+    guard insertion.row >= 0 && insertion.row < rowData.count,
+      let sourceIndex = index(ofCellID: insertion.sourceID)
+      else { continue }
+
+    var cell = rowData[sourceIndex.row].cells[sourceIndex.index]
+    cell.id = insertion.id
+    cell.position = insertion.position
+    cell.duration = insertion.duration
+    rowData[insertion.row].cells.append(cell)
+  }
+}
+```
+
+Cell IDs must be unique and stable. Positions must be finite and non-negative; durations must be
+finite and greater than zero. Debug builds assert when a data source snapshot violates those
+contracts.
+
 `MIDITimeTableHistoryRepresentable` and `MIDITimeTableHistoryStack` are available if you want an
 app-owned undo/redo stack with default append/undo/redo behavior:
 
@@ -153,6 +212,11 @@ struct SongHistory: MIDITimeTableHistoryRepresentable {
   var history = MIDITimeTableHistoryStack<[SongRow]>()
 }
 ```
+
+The optional `midiTimeTableViewShouldPushHistory(_:)` delegate callback is called after the table
+has accepted a user edit or after you call `removeCells(at:)` from `didDelete`. Use it to snapshot
+your already-updated model. Programmatic edits that you apply yourself should push their own history
+entry when appropriate.
   
 You can customise the measure bar, the grid, each header and data cell. Check out the example project.
 

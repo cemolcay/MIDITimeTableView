@@ -129,9 +129,11 @@ final class MIDITimeTableCellOverlapResolverTests: XCTestCase {
 
     XCTAssertTrue(result.removals.isEmpty)
     XCTAssertEqual(result.updates.count, 2)
-    let trimmed = result.updates.first(where: { $0.id == secondID })
-    XCTAssertEqual(trimmed?.newPosition, 6, accuracy: 0.0001)
-    XCTAssertEqual(trimmed?.newDuration, 4, accuracy: 0.0001)
+    guard let trimmed = result.updates.first(where: { $0.id == secondID }) else {
+      return XCTFail("expected the later selected cell to be trimmed")
+    }
+    XCTAssertEqual(trimmed.newPosition, 6, accuracy: 0.0001)
+    XCTAssertEqual(trimmed.newDuration, 4, accuracy: 0.0001)
   }
 
   func testEditedCellOverlapRemovesFullyCoveredSelectedCell() {

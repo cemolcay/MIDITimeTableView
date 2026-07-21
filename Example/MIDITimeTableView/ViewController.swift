@@ -239,9 +239,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     }
     
     private func applyHistoryItem(_ item: [RowData]) {
-        for rowIndex in rows.indices where rowIndex < item.count {
-            rows = item
-        }
+        rows = item
         timeTableView?.reloadData()
     }
     
