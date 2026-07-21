@@ -40,7 +40,7 @@ public struct MIDITimeTableViewAutoScrollDirection: OptionSet {
   public static let down = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 3)
 }
 
-/// Populates the `MIDITimeTableView` with the datas of rows and cells.
+/// Populates the `MIDITimeTableView` with row/cell data and rendered views.
 public protocol MIDITimeTableViewDataSource: AnyObject {
   /// Number of rows in the time table.
   ///
@@ -54,13 +54,38 @@ public protocol MIDITimeTableViewDataSource: AnyObject {
   /// - Returns: Time signature of the time table.
   func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature
 
-  /// Row data for each row in the time table.
+  /// Number of cells in a row.
   ///
   /// - Parameters:
-  ///   - midiTimeTableView: Time table that populates row data.
-  ///   - index: Index of row to populate data.
-  /// - Returns: Row data of time table for an index.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData
+  ///   - midiTimeTableView: Time table to populate cells.
+  ///   - row: Index of row to populate.
+  /// - Returns: Number of cells in the row.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, numberOfCellsInRow row: Int) -> Int
+
+  /// Stable identity for a cell.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, idForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellID
+
+  /// Position of a cell in beats.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, positionForCellAt index: MIDITimeTableCellIndex) -> Double
+
+  /// Duration of a cell in beats.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, durationForCellAt index: MIDITimeTableCellIndex) -> Double
+
+  /// Header view for a row. Return a dequeued header view when possible.
+  ///
+  /// - Parameters:
+  ///   - midiTimeTableView: Time table that displays the header.
+  ///   - row: Row index of the header.
+  /// - Returns: Header view for the row.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView
+
+  /// Cell view for a row/index pair. Return a dequeued cell view when possible.
+  ///
+  /// - Parameters:
+  ///   - midiTimeTableView: Time table that displays the cell.
+  ///   - index: Row and array-position of the cell view.
+  /// - Returns: Cell view for the given index.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellView
 }
 
 /// Edited cell data. Holds the edited cell's stable id and its index before editing, and new row
@@ -70,26 +95,41 @@ public protocol MIDITimeTableViewDataSource: AnyObject {
 /// how many other cells were added, removed or reordered since. `index` is a snapshot of the
 /// cell's (row, array-position) at the moment the edit was reported and can go stale the instant
 /// another edit in the same batch shifts it.
-public typealias MIDITimeTableViewEditedCellData = (id: MIDITimeTableCellID, index: MIDITimeTableCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
+public struct MIDITimeTableViewEditedCellData: Equatable {
+  /// Stable identity of the edited cell.
+  public var id: MIDITimeTableCellID
+  /// The cell's (row, array-position) snapshot at the moment the edit was reported. Can go stale;
+  /// prefer `id` to locate the cell going forward.
+  public var index: MIDITimeTableCellIndex
+  /// Row index the cell now belongs to.
+  public var newRowIndex: Int
+  /// Position, in beats, the cell now starts at.
+  public var newPosition: Double
+  /// Duration, in beats, the cell now spans.
+  public var newDuration: Double
 
-/// Delegate functions to inform about editing cells and sizing of the time table.
+  public init(id: MIDITimeTableCellID, index: MIDITimeTableCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double) {
+    self.id = id
+    self.index = index
+    self.newRowIndex = newRowIndex
+    self.newPosition = newPosition
+    self.newDuration = newDuration
+  }
+}
+
+/// Delegate functions to inform about changed cells and sizing of the time table.
 public protocol MIDITimeTableViewDelegate: AnyObject {
-  /// Informs about the cell edit's resolved overlaps: cells trimmed, removed or split because
-  /// the moved/resized cell now covers them. Call `rowData.apply(result)` in your implementation
-  /// to keep your data in sync in a single step. Has a default no-op implementation below, so
-  /// existing conformers don't need to adopt it.
+  /// Informs about a user-driven table change: moves, resizes, overlap trims, split insertions,
+  /// and deletions all flow through this single result.
+  ///
+  /// The delegate should apply `result` to its backing data source synchronously during this
+  /// callback. `MIDITimeTableView` updates its internal layout immediately after this returns, so
+  /// any newly inserted split cells can be dequeued and configured from the updated data source.
   ///
   /// - Parameters:
   ///   - midiTimeTableView: Time table that performed changes on.
-  ///   - result: Resolved edit result with updated, removed and newly split cells.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult)
-
-  /// Informs about the cell is being deleted.
-  ///
-  /// - Parameters:
-  ///   - midiTimeTableView: Time table that performed changes on.
-  ///   - cells: Row and column indices of the cells will be deleting.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex])
+  ///   - result: Resolved change result with updated, removed and newly split cells.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didChange result: MIDITimeTableCellEditResult)
 
   /// Measure view height in the time table.
   ///
@@ -132,26 +172,26 @@ public protocol MIDITimeTableViewDelegate: AnyObject {
   /// - Parameter midiTimeTableView: Time table that updated.
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdateRangeHead position: Double)
 
-  /// Informs about history has been changed. You need to update your `rowData` with history's `currentItem`.
-  ///
-  /// - Parameters:
-  ///   - midiTimeTableView: Time table taht updated.
-  ///   - history: History object of the time table.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, historyDidChange history: MIDITimeTableHistory)
+  /// Called after the time table reports a change, giving apps one optional hook for
+  /// committing their own undo/redo snapshot.
+  func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView)
 }
 
 extension MIDITimeTableViewDelegate {
   /// Default no-op implementation, so existing conformers of `MIDITimeTableViewDelegate` don't
-  /// break when this method was added. Adopt it to receive resolved overlap information.
-  public func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {}
+  /// need to adopt it unless they want to receive resolved table changes.
+  public func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didChange result: MIDITimeTableCellEditResult) {}
 
   /// Default implementation returning 4 (sixteenth notes in a quarter-note beat), matching the
   /// time table's long-standing built-in behavior. Override to customise snapping.
   public func midiTimeTableViewSnapResolution(_ midiTimeTableView: MIDITimeTableView) -> Int { 4 }
+
+  /// Default no-op implementation.
+  public func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView) {}
 }
 
 /// Draws time table with multiple rows and editable cells. Heavily customisable.
-open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDITimeTablePlayheadViewDelegate, MIDITimeTableHistoryDelegate {
+open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDITimeTablePlayheadViewDelegate {
   /// Property to show measure bar. Defaults true.
   public var showsMeasure: Bool = true
   /// Property to show header cells in each row. Defaults true.
@@ -166,8 +206,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// furthest cell, so it never gets left behind as cells are added or extended. It never moves
   /// backwards on its own; dragging it manually still works as before. Defaults true.
   public var autoExtendsRangeHead: Bool = true
-  /// Property to enable/disable history feature. Deafults true.
-  public var holdsHistory: Bool = true
 
   /// Speed of zooming by pinch gesture.
   public var zoomSpeed: CGFloat = 0.4
@@ -196,10 +234,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   public private(set) var rangeheadView = MIDITimeTablePlayheadView()
 
   // Delegate and data source references
-  /// Current data to display of the time table.
-  private var rowData = [MIDITimeTableRowData]()
-  /// History data that holds each `rowData` on each `reloadData` cycle.
-  public private(set) var history = MIDITimeTableHistory()
+  /// Current layout snapshot to display and edit.
+  private var rowData = [MIDITimeTableRowLayoutData]()
   /// All row header cell views currently displaying.
   public private(set) var rowHeaderCellViews = [MIDITimeTableHeaderCellView]()
   /// Cell views currently realized: on screen (plus a small overscan margin, see
@@ -211,11 +247,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// Realized cell views keyed by their cell's stable id, for O(1) lookup (`cellView(for:)`).
   /// Kept in sync with `visibleCells`.
   private var realizedCellViewsByID = [MIDITimeTableCellID: MIDITimeTableCellView]()
-  /// Freed cell views available to be dequeued and reconfigured (via a row's
-  /// `configureCellView`) for a different cell in the same row, instead of being deallocated and
-  /// recreated from scratch. Keyed by row index; a row only accumulates entries here if it
-  /// opted into `configureCellView`.
-  private var cellViewReusePools = [Int: [MIDITimeTableCellView]]()
+  /// Freed cell views available to be dequeued and reconfigured by the data source.
+  private var cellViewReusePools = [String: [MIDITimeTableCellView]]()
+  /// Freed header views available to be dequeued and reconfigured by the data source.
+  private var headerCellViewReusePools = [String: [MIDITimeTableHeaderCellView]]()
   /// Multiplier applied to the current viewport size to compute the overscan margin used to
   /// decide which cells/grid lines/measure bars to realize. Defaults `1`, i.e. content within one
   /// extra screen's worth of scrolling in every direction is realized ahead of time, so fast
@@ -276,8 +311,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     backgroundColor = .clear
     // Measure
     addSubview(measureView)
-    // History
-    history.delegate = self
     // Playhead
     addSubview(playheadView)
     playheadView.delegate = self
@@ -377,9 +410,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     newVisibleCells.reserveCapacity(toRealize.count)
 
     for placement in toRealize {
-      let owningRow = rowData[placement.rowIndex]
-      let cell = owningRow.cells[placement.indexInRow]
-      let cellView = realizedCellViewsByID[placement.id] ?? dequeueCellView(for: cell, rowIndex: placement.rowIndex, owningRow: owningRow)
+      let cellView = realizedCellViewsByID[placement.id] ?? makeCellView(at: MIDITimeTableCellIndex(row: placement.rowIndex, index: placement.indexInRow))
       cellView.frame = placement.frame
       cellView.tag = placement.indexInRow
       cellView.cellID = placement.id
@@ -468,32 +499,34 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   }
 
 
-  /// Populates row and cell datas from its data source and redraws time table. Could be invoked with an history item.
-  ///
-  /// - Parameter keepHistory: If you specify the history writing even if it is enabled, you can control it from here either.
-  /// - Parameter historyItem: Optional history item. Defaults nil.
-  public func reloadData(keepHistory: Bool = true, historyItem: MIDITimeTableHistoryItem? = nil) {
+  /// Populates row and cell layout data from its data source and redraws time table.
+  public func reloadData() {
     // Reset data source
-    rowHeaderCellViews.forEach({ $0.removeFromSuperview() })
+    rowHeaderCellViews.forEach({ recycleHeaderCellView($0) })
     rowHeaderCellViews = []
-    realizedCellViewsByID.values.forEach({ $0.removeFromSuperview() })
+    realizedCellViewsByID.forEach({ recycleCellView($0.value, id: $0.key) })
     realizedCellViewsByID = [:]
-    cellViewReusePools = [:]
     visibleCells = []
 
-    let numberOfRows = historyItem?.count ?? dataSource?.numberOfRows(in: self) ?? 0
+    let dataSourceRowCount = dataSource?.numberOfRows(in: self) ?? 0
+    assert(dataSourceRowCount >= 0, "MIDITimeTableViewDataSource returned a negative row count.")
+    let numberOfRows = max(0, dataSourceRowCount)
     let timeSignature = dataSource?.timeSignature(of: self) ?? MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
-    measureView.beatCount = timeSignature.beats
+    assert(timeSignature.beats >= 1, "MIDITimeTableViewDataSource returned a time signature with \(timeSignature.beats) beats. Beats must be greater than zero.")
+    // Clamp to at least one beat so `beatWidth` (measureWidth / beatCount) can never divide by zero
+    // and poison every cell frame with NaN/inf in release builds where the assert above is stripped.
+    measureView.beatCount = max(1, timeSignature.beats)
 
     // Update rowData
     rowData.removeAll()
     for i in 0..<numberOfRows {
-      guard let row = historyItem?[i] ?? dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
+      let row = makeRowDataFromDataSource(row: i)
       rowData.insert(row, at: i)
-      let rowHeaderCell = row.headerCellView
+      let rowHeaderCell = dataSource?.midiTimeTableView(self, viewForHeaderInRow: i) ?? MIDITimeTableHeaderCellView()
       rowHeaderCellViews.append(rowHeaderCell)
       addSubview(rowHeaderCell)
     }
+    validateDataSourceSnapshot()
 
     // Delegate
     rowHeight = timeTableDelegate?.midiTimeTableViewHeightForRows(self) ?? rowHeight
@@ -509,10 +542,6 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     setNeedsLayout()
     layoutIfNeeded()
 
-    // Keep history
-    if holdsHistory, keepHistory, historyItem == nil {
-      history.append(item: rowData)
-    }
   }
 
   /// Applies an edit result to the time table's own row data and cell views incrementally:
@@ -521,9 +550,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// stays in the hierarchy exactly as it was, instead of the whole table being torn down and
   /// rebuilt the way `reloadData()` would.
   ///
-  /// `didEditCells` already calls this for you after every move/resize, so the time table stays
-  /// visually correct on its own. It's exposed publicly in case you want to fold in an edit
-  /// result you produced yourself (e.g. replaying one from persistence).
+  /// User-driven changes already call this for you after first giving your delegate a chance to
+  /// apply the same result to your backing data source. If you call this directly with insertions,
+  /// update your data source first so newly dequeued cell views can be configured from the
+  /// inserted models.
   ///
   /// - Parameter result: The edit result to apply.
   public func applyEditResult(_ result: MIDITimeTableCellEditResult) {
@@ -542,21 +572,18 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // the next layout pass's windowing logic (see `layoutSubviews`): a cell untouched by this
     // edit keeps its existing view instance exactly as it was; a moved/resized cell's view (same
     // instance, found by id) is simply repositioned; a brand new cell (e.g. a split-off
-    // remainder) gets a view dequeued from its row's reuse pool or created fresh. Forced
+    // remainder) gets a view dequeued from the reuse pool or created fresh. Forced
     // synchronously so callers see up-to-date `visibleCells` immediately after this call returns.
     setNeedsLayout()
     layoutIfNeeded()
 
-    if holdsHistory {
-      history.append(item: rowData)
-    }
   }
 
-  /// Removes the given cells from the time table's own row data and cell views incrementally,
-  /// without rebuilding any cell unaffected by the deletion. Call this from
-  /// `midiTimeTableView(_:didDelete:)` in place of `reloadData()`.
+  /// Removes the given cells by publishing a normal change result. The delegate receives
+  /// `MIDITimeTableCellEditResult(removals:)` first, then the time table removes the cells from
+  /// its internal layout snapshot.
   ///
-  /// - Parameter indices: Row/index pairs of the cells to remove, as reported by `didDelete`.
+  /// - Parameter indices: Row/index pairs of the cells to remove.
   public func removeCells(at indices: [MIDITimeTableCellIndex]) {
     let ids = indices.compactMap { index -> MIDITimeTableCellID? in
       guard index.row >= 0, index.row < rowData.count,
@@ -564,7 +591,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
         else { return nil }
       return rowData[index.row].cells[index.index].id
     }
-    applyEditResult(MIDITimeTableCellEditResult(removals: ids))
+    publishChange(MIDITimeTableCellEditResult(removals: ids))
   }
 
   /// Returns a cell's currently realized view, if any. `nil` if the cell exists in the data but
@@ -585,33 +612,78 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     return rowData.index(ofCellID: id)
   }
 
-  /// Returns a view for `cell` in row `rowIndex`: a view dequeued from that row's reuse pool and
-  /// reconfigured via `owningRow.configureCellView` when one's available, otherwise a freshly
-  /// created instance via `owningRow.cellView`. Pools are kept per-row, so a dequeued instance is
-  /// always the exact subclass `owningRow.cellView` would have produced.
-  private func dequeueCellView(for cell: MIDITimeTableCellData, rowIndex: Int, owningRow: MIDITimeTableRowData) -> MIDITimeTableCellView {
-    let cellView: MIDITimeTableCellView
-    if var pool = cellViewReusePools[rowIndex], let reused = pool.popLast() {
-      cellViewReusePools[rowIndex] = pool
-      owningRow.configureCellView?(reused, cell)
-      cellView = reused
-    } else {
-      cellView = owningRow.cellView(cell)
+  /// Returns a reusable cell view with `identifier`, if one is available.
+  public func dequeueReusableCellView(withIdentifier identifier: String) -> MIDITimeTableCellView? {
+    guard var pool = cellViewReusePools[identifier], let view = pool.popLast() else { return nil }
+    cellViewReusePools[identifier] = pool
+    view.prepareForReuse()
+    return view
+  }
+
+  /// Returns a reusable header view with `identifier`, if one is available.
+  public func dequeueReusableHeaderCellView(withIdentifier identifier: String) -> MIDITimeTableHeaderCellView? {
+    guard var pool = headerCellViewReusePools[identifier], let view = pool.popLast() else { return nil }
+    headerCellViewReusePools[identifier] = pool
+    view.prepareForReuse()
+    return view
+  }
+
+  private func makeRowDataFromDataSource(row: Int) -> MIDITimeTableRowLayoutData {
+    guard let dataSource = dataSource else { return MIDITimeTableRowLayoutData(cells: []) }
+    let dataSourceCellCount = dataSource.midiTimeTableView(self, numberOfCellsInRow: row)
+    assert(dataSourceCellCount >= 0, "MIDITimeTableViewDataSource returned a negative cell count for row \(row).")
+    let cellCount = max(0, dataSourceCellCount)
+    let cells = (0..<cellCount).map { cellIndex -> MIDITimeTableCellLayoutData in
+      let index = MIDITimeTableCellIndex(row: row, index: cellIndex)
+      return MIDITimeTableCellLayoutData(
+        id: dataSource.midiTimeTableView(self, idForCellAt: index),
+        position: dataSource.midiTimeTableView(self, positionForCellAt: index),
+        duration: dataSource.midiTimeTableView(self, durationForCellAt: index))
     }
+    return MIDITimeTableRowLayoutData(cells: cells)
+  }
+
+  private func validateDataSourceSnapshot() {
+    var seenIDs = Set<MIDITimeTableCellID>()
+    var validationMessages = [String]()
+
+    for (rowIndex, row) in rowData.enumerated() {
+      for (cellIndex, cell) in row.cells.enumerated() {
+        let index = MIDITimeTableCellIndex(row: rowIndex, index: cellIndex)
+        if !seenIDs.insert(cell.id).inserted {
+          validationMessages.append("Duplicate cell id \(cell.id) at row \(index.row), index \(index.index).")
+        }
+        if !cell.position.isFinite || cell.position < 0 {
+          validationMessages.append("Invalid position \(cell.position) at row \(index.row), index \(index.index). Positions must be finite and non-negative.")
+        }
+        if !cell.duration.isFinite || cell.duration <= 0 {
+          validationMessages.append("Invalid duration \(cell.duration) at row \(index.row), index \(index.index). Durations must be finite and greater than zero.")
+        }
+      }
+    }
+
+    assert(validationMessages.isEmpty, validationMessages.joined(separator: "\n"))
+  }
+
+  private func makeCellView(at index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
+    let cellView = dataSource?.midiTimeTableView(self, viewForCellAt: index) ?? MIDITimeTableCellView()
     cellView.delegate = self
     addSubview(cellView)
     return cellView
   }
 
-  /// Frees a realized cell view no longer needed this layout pass: clears its selection, removes
-  /// it from the hierarchy, and — only if the cell it represented still exists in `rowData` and
-  /// that row opted into `configureCellView` — returns it to that row's reuse pool for a future
-  /// dequeue. Otherwise the view is simply discarded.
+  /// Frees a realized cell view no longer needed this layout pass.
   private func recycleCellView(_ view: MIDITimeTableCellView, id: MIDITimeTableCellID) {
     view.isSelected = false
     view.removeFromSuperview()
-    guard let owningRowIndex = rowData.index(ofCellID: id)?.row, rowData[owningRowIndex].configureCellView != nil else { return }
-    cellViewReusePools[owningRowIndex, default: []].append(view)
+    guard rowData.index(ofCellID: id) != nil, let identifier = view.reuseIdentifier else { return }
+    cellViewReusePools[identifier, default: []].append(view)
+  }
+
+  private func recycleHeaderCellView(_ view: MIDITimeTableHeaderCellView) {
+    view.removeFromSuperview()
+    guard let identifier = view.reuseIdentifier else { return }
+    headerCellViewReusePools[identifier, default: []].append(view)
   }
 
   /// Unselects all cells if tapped an empty area of the time table.
@@ -916,7 +988,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     case .ended, .cancelled, .failed:
       endAutoScrolling()
       isMoving = false
-      didEditCells(editingCellIndices)
+      didChangeCells(editingCellIndices)
     default:
       break
     }
@@ -952,7 +1024,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     case .ended, .cancelled, .failed:
       endAutoScrolling()
       isResizing = false
-      didEditCells(editingCellIndices)
+      didChangeCells(editingCellIndices)
     default:
       break
     }
@@ -1026,7 +1098,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     return CGPoint(x: dw, y: 0)
   }
 
-  private func didEditCells(_ cells: [MIDITimeTableCellIndex]) {
+  private func didChangeCells(_ cells: [MIDITimeTableCellIndex]) {
     var editedCells = [MIDITimeTableViewEditedCellData]()
 
     for cell in cells {
@@ -1044,14 +1116,14 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       let newCellDuration = Double(cellView.frame.size.width / beatWidth)
       let newCellRow = Int(((cellView.frame.minY - measureHeight) / rowHeight).rounded())
 
-      editedCells.append((id, cell, newCellRow, newCellPosition, newCellDuration))
+      editedCells.append(MIDITimeTableViewEditedCellData(id: id, index: cell, newRowIndex: newCellRow, newPosition: newCellPosition, newDuration: newCellDuration))
     }
 
     editingCellIndices = []
 
     // The resolver only computes what happens to the OTHER cells the edit now overlaps; fold
     // the edited cells' own new geometry in so `result` is a complete, self-sufficient set that
-    // both `applyEditResult` below and a host's `rowData.apply(result)` can act on alone.
+    // both `applyEditResult` below and a host's edit application code can act on alone.
     let editedOverlapResult = MIDITimeTableCellOverlapResolver.resolveOverlapsAmongEditedCells(editedCells)
     var result = MIDITimeTableCellOverlapResolver.resolve(
       editedCells: editedOverlapResult.updates,
@@ -1060,11 +1132,44 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     result.updates = editedOverlapResult.updates + result.updates
     result.removals = editedOverlapResult.removals + result.removals
 
-    // Keep the time table's own state correct incrementally before telling anyone about it, so
-    // a delegate inspecting the time table during these callbacks already sees the new state.
-    applyEditResult(result)
+    publishChange(result)
+  }
 
-    timeTableDelegate?.midiTimeTableView(self, didEdit: result)
+  private func publishChange(_ result: MIDITimeTableCellEditResult) {
+    let effectiveResult = effectiveChangeResult(from: result)
+    guard !effectiveResult.updates.isEmpty || !effectiveResult.removals.isEmpty || !effectiveResult.insertions.isEmpty else { return }
+    timeTableDelegate?.midiTimeTableView(self, didChange: effectiveResult)
+    applyEditResult(effectiveResult)
+    timeTableDelegate?.midiTimeTableViewShouldPushHistory(self)
+  }
+
+  internal func effectiveChangeResult(from result: MIDITimeTableCellEditResult) -> MIDITimeTableCellEditResult {
+    let epsilon = 0.000000001
+
+    let updates = result.updates.filter { update in
+      guard let currentIndex = rowData.index(ofCellID: update.id),
+        update.newRowIndex >= 0,
+        update.newRowIndex < rowData.count
+        else { return false }
+
+      let cell = rowData[currentIndex]
+      return currentIndex.row != update.newRowIndex
+        || abs(cell.position - update.newPosition) > epsilon
+        || abs(cell.duration - update.newDuration) > epsilon
+    }
+
+    let removals = result.removals.filter { id in
+      return rowData.index(ofCellID: id) != nil
+    }
+
+    let insertions = result.insertions.filter { insertion in
+      return insertion.row >= 0
+        && insertion.row < rowData.count
+        && rowData.index(ofCellID: insertion.id) == nil
+        && insertion.duration > 0
+    }
+
+    return MIDITimeTableCellEditResult(updates: updates, removals: removals, insertions: insertions)
   }
 
   public func midiTimeTableCellViewDidTap(_ midiTimeTableCellView: MIDITimeTableCellView) {
@@ -1079,7 +1184,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let deletingCellIndices = visibleCells
       .filter({ $0.isSelected })
       .compactMap({ cellIndex(of: $0) })
-    timeTableDelegate?.midiTimeTableView(self, didDelete: deletingCellIndices)
+    removeCells(at: deletingCellIndices)
   }
 
   // MARK: MIDITimeTablePlayheadViewDelegate
@@ -1110,12 +1215,4 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     }
   }
 
-  // MARK: MIDITimeTableHistoryDelegate
-
-  public func midiTimeTableHistory(_ history: MIDITimeTableHistory, didHistoryChange item: MIDITimeTableHistoryItem) {
-    if holdsHistory {
-      reloadData(historyItem: item)
-      timeTableDelegate?.midiTimeTableView(self, historyDidChange: history)
-    }
-  }
 }

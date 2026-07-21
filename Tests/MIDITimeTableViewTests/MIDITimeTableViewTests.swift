@@ -6,6 +6,17 @@
 import XCTest
 @testable import MIDITimeTableView
 
+private final class LongPressSelectionDelegate: MIDITimeTableCellViewDelegate {
+    var tappedCell: MIDITimeTableCellView?
+
+    func midiTimeTableCellViewDidMove(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer) {}
+    func midiTimeTableCellViewDidResize(_ midiTimeTableCellView: MIDITimeTableCellView, pan: UIPanGestureRecognizer) {}
+    func midiTimeTableCellViewDidTap(_ midiTimeTableCellView: MIDITimeTableCellView) {
+        tappedCell = midiTimeTableCellView
+    }
+    func midiTimeTableCellViewDidDelete(_ midiTimeTableCellView: MIDITimeTableCellView) {}
+}
+
 final class MIDITimeTableViewTests: XCTestCase {
 
     func testTimeSignatureBeatsPerMeasure() {
@@ -14,18 +25,20 @@ final class MIDITimeTableViewTests: XCTestCase {
         XCTAssertEqual(signature.noteValue, .quarter)
     }
 
-    func testCellDataStoresPositionAndDuration() {
-        let cell = MIDITimeTableCellData(data: "C7", position: 0, duration: 4)
-        XCTAssertEqual(cell.position, 0)
-        XCTAssertEqual(cell.duration, 4)
+    func testCellIndexStoresRowAndIndex() {
+        let index = MIDITimeTableCellIndex(row: 2, index: 4)
+        XCTAssertEqual(index.row, 2)
+        XCTAssertEqual(index.index, 4)
     }
 
-    func testRowDataHoldsCells() {
-        let row = MIDITimeTableRowData(
-            cells: [MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4)],
-            headerCellView: MIDITimeTableHeaderCellView(),
-            cellView: { _ in MIDITimeTableCellView() })
-        XCTAssertEqual(row.cells.count, 1)
-        XCTAssertEqual(row.cells.first?.position, 4)
+    func testLongPressSelectsCellThroughDelegate() {
+        let cell = MIDITimeTableCellView(frame: CGRect(x: 0, y: 0, width: 50, height: 40))
+        let delegate = LongPressSelectionDelegate()
+        cell.delegate = delegate
+
+        cell.prepareForMenuPresentation()
+
+        XCTAssertTrue(delegate.tappedCell === cell)
+        XCTAssertTrue(cell.isSelected)
     }
 }

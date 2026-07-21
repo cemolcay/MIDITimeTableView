@@ -70,17 +70,25 @@ open class MIDITimeTableCellView: UIView {
   open var customMenuItems = [MIDITimeTableCellViewCustomMenuItem]()
   /// When cell's position or duration editing, is selected.
   open var isSelected: Bool = false
-  /// Stable identity of the `MIDITimeTableCellData` this view represents. Set by
+  /// Stable identity of the cell this view represents. Set by
   /// `MIDITimeTableView` on `reloadData()`; used to report edits by the cell's stable id rather
   /// than its (possibly stale) array position. `nil` for a cell view that hasn't been placed in a
   /// time table yet.
   open var cellID: MIDITimeTableCellID?
+  /// Reuse identifier used by `MIDITimeTableView` when pooling cell views.
+  public private(set) var reuseIdentifier: String?
 
   open override var canBecomeFirstResponder: Bool {
     return true
   }
 
   // MARK: Init
+
+  public init(reuseIdentifier: String? = nil) {
+    self.reuseIdentifier = reuseIdentifier
+    super.init(frame: .zero)
+    commonInit()
+  }
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -112,6 +120,12 @@ open class MIDITimeTableCellView: UIView {
       object: nil)
   }
 
+  /// Called before a cell view is returned from the reuse pool.
+  open func prepareForReuse() {
+    isSelected = false
+    cellID = nil
+  }
+
   // MARK: Layout
 
   open override func layoutSubviews() {
@@ -136,12 +150,17 @@ open class MIDITimeTableCellView: UIView {
     delegate?.midiTimeTableCellViewDidResize(self, pan: pan)
   }
 
+  func prepareForMenuPresentation() {
+    becomeFirstResponder()
+    delegate?.midiTimeTableCellViewDidTap(self)
+    isSelected = true
+  }
+
   // Note: `UIMenuController` is deprecated in favor of `UIEditMenuInteraction` (iOS 16+).
   // Kept as-is to preserve the iOS 13 floor without introducing an `#available` fork here.
   @objc public func didLongPress(longPress: UILongPressGestureRecognizer) {
     guard let superview = superview else { return }
-    becomeFirstResponder()
-    isSelected = true
+    prepareForMenuPresentation()
 
     let menu = UIMenuController.shared
     menu.menuItems = [

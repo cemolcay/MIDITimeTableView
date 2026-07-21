@@ -10,291 +10,341 @@ import UIKit
 import MIDITimeTableView
 
 class HeaderCellView: MIDITimeTableHeaderCellView {
-  var titleLabel = UILabel()
-
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-    commonInit()
-  }
-
-  required init?(coder aDecoder: NSCoder) {
-    super.init(coder: aDecoder)
-    commonInit()
-  }
-
-  convenience init(title: String) {
-    self.init(frame: .zero)
-    commonInit()
-    titleLabel.text = title
-  }
-
-  func commonInit() {
-    addSubview(titleLabel)
-    backgroundColor = UIColor(red: 36.0/255.0, green: 40.0/255.0, blue: 41.0/255.0, alpha: 1)
-    titleLabel.textColor = UIColor(red: 216.0/255.0, green: 214.0/255.0, blue: 217.0/255.0, alpha: 1)
-    titleLabel.textAlignment = .center
-    titleLabel.font = UIFont.boldSystemFont(ofSize: 15)
-  }
-
-  override func layoutSubviews() {
-    super.layoutSubviews()
-    titleLabel.frame = CGRect(origin: .zero, size: frame.size)
-  }
+    var titleLabel = UILabel()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonInit()
+    }
+    
+    override init(reuseIdentifier: String? = nil) {
+        super.init(reuseIdentifier: reuseIdentifier)
+        commonInit()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        commonInit()
+    }
+    
+    convenience init(title: String) {
+        self.init(reuseIdentifier: "Header")
+        titleLabel.text = title
+    }
+    
+    func commonInit() {
+        addSubview(titleLabel)
+        backgroundColor = UIColor(red: 36.0/255.0, green: 40.0/255.0, blue: 41.0/255.0, alpha: 1)
+        titleLabel.textColor = UIColor(red: 216.0/255.0, green: 214.0/255.0, blue: 217.0/255.0, alpha: 1)
+        titleLabel.textAlignment = .center
+        titleLabel.font = UIFont.boldSystemFont(ofSize: 15)
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        titleLabel.frame = CGRect(origin: .zero, size: frame.size)
+    }
 }
 
 class CellView: MIDITimeTableCellView {
-  var titleLabel = UILabel()
-  var selectedBorderColor: UIColor = .yellow
-  var defaultBorderColor: UIColor = .black
-
-  override var isSelected: Bool {
-    didSet {
-      titleLabel.layer.borderColor = (isSelected ? selectedBorderColor : defaultBorderColor).cgColor
+    var titleLabel = UILabel()
+    var selectedBorderColor: UIColor = .yellow
+    var defaultBorderColor: UIColor = .black
+    
+    override var isSelected: Bool {
+        didSet {
+            titleLabel.layer.borderColor = (isSelected ? selectedBorderColor : defaultBorderColor).cgColor
+        }
     }
-  }
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
+        commonInit()
+    }
+    
+    override init(reuseIdentifier: String? = nil) {
+        super.init(reuseIdentifier: reuseIdentifier)
+        commonInit()
+    }
+    
+    required init?(coder aDecoder: NSCoder) {
+        super.init(coder: aDecoder)
+        commonInit()
+    }
+    
+    convenience init(title: String) {
+        self.init(reuseIdentifier: "Cell")
+        titleLabel.text = title
+    }
+    
+    func commonInit() {
+        backgroundColor = .clear
+        addSubview(titleLabel)
+        titleLabel.backgroundColor = UIColor(red: 16.0/255.0, green: 92.0/255.0, blue: 28.0/255.0, alpha: 1)
+        titleLabel.translatesAutoresizingMaskIntoConstraints = false
+        titleLabel.textAlignment = .center
+        titleLabel.textColor = .white
+        titleLabel.layer.masksToBounds = true
+        titleLabel.layer.borderColor = UIColor.black.cgColor
+        titleLabel.layer.borderWidth = 1
+        titleLabel.layer.cornerRadius = 5
+        customMenuItems = [
+            MIDITimeTableCellViewCustomMenuItem(
+                title: "Custom Menu Item",
+                action: #selector(didPressCustomMenuItem))
+        ]
+    }
+    
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        titleLabel.frame = CGRect(origin: .zero, size: frame.size)
+    }
+    
+    /// Applies a cell's data to this view, whether it's freshly created or being dequeued.
+    func configure(with cellData: CellData) {
+        titleLabel.text = cellData.title
+    }
+    
+    @objc func didPressCustomMenuItem() {
+        print("custom menu item pressed")
+    }
+}
 
-  override init(frame: CGRect) {
-    super.init(frame: frame)
-    commonInit()
-  }
+struct CellData: MIDITimeTableCellRepresentable {
+    var id: MIDITimeTableCellID
+    var title: String
+    var position: Double
+    var duration: Double
+    
+    init(id: MIDITimeTableCellID = MIDITimeTableCellID(), title: String, position: Double, duration: Double) {
+        self.id = id
+        self.title = title
+        self.position = position
+        self.duration = duration
+    }
+}
 
-  required init?(coder aDecoder: NSCoder) {
-    super.init(coder: aDecoder)
-    commonInit()
-  }
+struct RowData: MIDITimeTableRowRepresentable {
+    var title: String
+    var cells: [CellData]
+}
 
-  convenience init(title: String) {
-    self.init(frame: .zero)
-    commonInit()
-    titleLabel.text = title
-  }
-
-  func commonInit() {
-    backgroundColor = .clear
-    addSubview(titleLabel)
-    titleLabel.backgroundColor = UIColor(red: 16.0/255.0, green: 92.0/255.0, blue: 28.0/255.0, alpha: 1)
-    titleLabel.translatesAutoresizingMaskIntoConstraints = false
-    titleLabel.textAlignment = .center
-    titleLabel.textColor = .white
-    titleLabel.layer.masksToBounds = true
-    titleLabel.layer.borderColor = UIColor.black.cgColor
-    titleLabel.layer.borderWidth = 1
-    titleLabel.layer.cornerRadius = 5
-    customMenuItems = [
-      MIDITimeTableCellViewCustomMenuItem(
-        title: "Custom Menu Item",
-        action: #selector(didPressCustomMenuItem))
-    ]
-  }
-
-  override func layoutSubviews() {
-    super.layoutSubviews()
-    titleLabel.frame = CGRect(origin: .zero, size: frame.size)
-  }
-
-  /// Applies a cell's data to this view, whether it's freshly created or being reconfigured
-  /// after being dequeued from `MIDITimeTableView`'s reuse pool for a different cell in the same
-  /// row (see `MIDITimeTableRowData.configureCellView`).
-  func configure(with cellData: MIDITimeTableCellData) {
-    titleLabel.text = cellData.data as? String ?? ""
-  }
-
-  @objc func didPressCustomMenuItem() {
-    print("custom menu item pressed")
-  }
+struct History: MIDITimeTableHistoryRepresentable {
+    var history = MIDITimeTableHistoryStack<[RowData]>()
 }
 
 class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTableViewDelegate {
-  @IBOutlet weak var timeTableView: MIDITimeTableView?
-  @IBOutlet weak var undoButton: UIBarButtonItem?
-  @IBOutlet weak var redoButton: UIBarButtonItem?
-
-  var rowData: [MIDITimeTableRowData] = [
-    MIDITimeTableRowData(
-      cells: [
-        MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
-        MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
-        MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
-        MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
-        ],
-      headerCellView: HeaderCellView(title: "Chords"),
-      cellView: { cellData in
-        let title = cellData.data as? String ?? ""
-        return CellView(title: title)
-    },
-      // Reconfigures a `CellView` dequeued from the time table's reuse pool for a different
-      // cell in this row (e.g. after scrolling), instead of a fresh instance being created via
-      // `cellView` above every time one's needed.
-      configureCellView: { view, cellData in
-        (view as? CellView)?.configure(with: cellData)
-    }),
-
-    MIDITimeTableRowData(
-      cells: [
-        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
-        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
-        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
-        ],
-      headerCellView: HeaderCellView(title: "Bass"),
-      cellView: { cellData in
-        let title = cellData.data as? String ?? ""
-        return CellView(title: title)
-    },
-      // Reconfigures a `CellView` dequeued from the time table's reuse pool for a different
-      // cell in this row (e.g. after scrolling), instead of a fresh instance being created via
-      // `cellView` above every time one's needed.
-      configureCellView: { view, cellData in
-        (view as? CellView)?.configure(with: cellData)
-    }),
-
-    MIDITimeTableRowData(
-      cells: [
-        MIDITimeTableCellData(data: "C", position: 0, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 1, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 2, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 3, duration: 1),
-
-        MIDITimeTableCellData(data: "D", position: 4, duration: 1),
-        MIDITimeTableCellData(data: "D", position: 5, duration: 1),
-        MIDITimeTableCellData(data: "D", position: 6, duration: 1),
-        MIDITimeTableCellData(data: "D", position: 7, duration: 1),
-
-        MIDITimeTableCellData(data: "G", position: 8, duration: 1),
-        MIDITimeTableCellData(data: "G", position: 9, duration: 1),
-        MIDITimeTableCellData(data: "G", position: 10, duration: 1),
-        MIDITimeTableCellData(data: "G", position: 11, duration: 1),
-
-        MIDITimeTableCellData(data: "C", position: 12, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 13, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 14, duration: 1),
-        MIDITimeTableCellData(data: "C", position: 15, duration: 1),
-        ],
-      headerCellView: HeaderCellView(title: "Melody"),
-      cellView: { cellData in
-        let title = cellData.data as? String ?? ""
-        return CellView(title: title)
-    },
-      // Reconfigures a `CellView` dequeued from the time table's reuse pool for a different
-      // cell in this row (e.g. after scrolling), instead of a fresh instance being created via
-      // `cellView` above every time one's needed.
-      configureCellView: { view, cellData in
-        (view as? CellView)?.configure(with: cellData)
-    }),
-
-    MIDITimeTableRowData(
-      cells: [
-        MIDITimeTableCellData(data: "C", position: 0, duration: 0.5),
-        MIDITimeTableCellData(data: "C", position: 2, duration: 0.5),
-
-        MIDITimeTableCellData(data: "D", position: 4, duration: 0.5),
-        MIDITimeTableCellData(data: "D", position: 6, duration: 0.5),
-
-        MIDITimeTableCellData(data: "G", position: 8, duration: 0.5),
-        MIDITimeTableCellData(data: "G", position: 10, duration: 0.5),
-
-        MIDITimeTableCellData(data: "C", position: 12, duration: 0.5),
-        MIDITimeTableCellData(data: "C", position: 14, duration: 0.5),
-        ],
-      headerCellView: HeaderCellView(title: "Synths"),
-      cellView: { cellData in
-        let title = cellData.data as? String ?? ""
-        return CellView(title: title)
-    },
-      configureCellView: { view, cellData in
-        (view as? CellView)?.configure(with: cellData)
-    })
-  ]
-
-  override func viewDidLoad() {
-    super.viewDidLoad()
+    @IBOutlet weak var timeTableView: MIDITimeTableView?
+    @IBOutlet weak var undoButton: UIBarButtonItem?
+    @IBOutlet weak var redoButton: UIBarButtonItem?
     
-    timeTableView?.dataSource = self
-    timeTableView?.timeTableDelegate = self
-    timeTableView?.gridLayer.showsSubbeatLines = false
-    timeTableView?.reloadData()
-    updateHistoryButtons()
+    var rows: [RowData] = [
+        RowData(
+            title: "Chords",
+            cells: [
+                CellData(title: "C7", position: 0, duration: 4),
+                CellData(title: "Dm7", position: 4, duration: 4),
+                CellData(title: "G7b5", position: 8, duration: 4),
+                CellData(title: "C7", position: 12, duration: 4),
+            ]),
+        
+        RowData(
+            title: "Bass",
+            cells: [
+                CellData(title: "C", position: 0, duration: 1),
+                CellData(title: "D", position: 4, duration: 1),
+                CellData(title: "G", position: 8, duration: 1),
+                CellData(title: "C", position: 12, duration: 1),
+            ]),
+        
+        RowData(
+            title: "Melody",
+            cells: [
+                CellData(title: "C", position: 0, duration: 1),
+                CellData(title: "C", position: 1, duration: 1),
+                CellData(title: "C", position: 2, duration: 1),
+                CellData(title: "C", position: 3, duration: 1),
+                
+                CellData(title: "D", position: 4, duration: 1),
+                CellData(title: "D", position: 5, duration: 1),
+                CellData(title: "D", position: 6, duration: 1),
+                CellData(title: "D", position: 7, duration: 1),
+                
+                CellData(title: "G", position: 8, duration: 1),
+                CellData(title: "G", position: 9, duration: 1),
+                CellData(title: "G", position: 10, duration: 1),
+                CellData(title: "G", position: 11, duration: 1),
+                
+                CellData(title: "C", position: 12, duration: 1),
+                CellData(title: "C", position: 13, duration: 1),
+                CellData(title: "C", position: 14, duration: 1),
+                CellData(title: "C", position: 15, duration: 1),
+            ]),
+        
+        RowData(
+            title: "Synths",
+            cells: [
+                CellData(title: "C", position: 0, duration: 0.5),
+                CellData(title: "C", position: 2, duration: 0.5),
+                
+                CellData(title: "D", position: 4, duration: 0.5),
+                CellData(title: "D", position: 6, duration: 0.5),
+                
+                CellData(title: "G", position: 8, duration: 0.5),
+                CellData(title: "G", position: 10, duration: 0.5),
+                
+                CellData(title: "C", position: 12, duration: 0.5),
+                CellData(title: "C", position: 14, duration: 0.5),
+            ])
+    ]
+    var history = History()
     
-    view.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
-    timeTableView?.measureView.backgroundColor = UIColor(red: 26.0/255.0, green: 28.0/255.0, blue: 27.0/255.0, alpha: 1)
-    timeTableView?.measureView.tintColor = UIColor(red: 119.0/255.0, green: 121.0/255.0, blue: 120.0/255.0, alpha: 1)
-    timeTableView?.gridLayer.rowLineColor = .black
-    timeTableView?.gridLayer.barLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
-    timeTableView?.gridLayer.beatLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
-    timeTableView?.playheadView.tintColor = UIColor.gray.withAlphaComponent(0.5)
-    timeTableView?.rangeheadView.tintColor = UIColor.gray.withAlphaComponent(0.3)
-  }
-
-  @IBAction func redoDidPress(sender: UIButton) {
-    timeTableView?.history.redo()
-    updateHistoryButtons()
-  }
-
-  @IBAction func undoDidPress(sender: UIButton) {
-    timeTableView?.history.undo()
-    updateHistoryButtons()
-  }
-
-  private func updateHistoryButtons() {
-    undoButton?.isEnabled = timeTableView?.history.hasPreviousItem ?? false
-    redoButton?.isEnabled = timeTableView?.history.hasNextItem ?? false
-  }
-
-  // MARK: MIDITimeTableViewDataSource
-
-  func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int {
-    return rowData.count
-  }
-
-  func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature {
-    return MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
-  }
-
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData {
-    let row = rowData[index]
-    return row
-  }
-
-  // MARK: MIDITimeTableViewDelegate
-
-  func midiTimeTableViewHeightForRows(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
-    return 60
-  }
-
-  func midiTimeTableViewHeightForMeasureView(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
-    return 20
-  }
-
-  func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
-    return 100
-  }
-
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
-    rowData.removeCells(at: cells)
-    // Incremental: only the deleted cells' views are torn down, everything else keeps its
-    // existing view instance. `MIDITimeTableView` also records this as a new history entry
-    // internally, so no `reloadData()` is needed here.
-    timeTableView?.removeCells(at: cells)
-    updateHistoryButtons()
-  }
-
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {
-    // Keep our own mirror of the data in sync. `MIDITimeTableView` has already applied this same
-    // result to its own state incrementally (see `applyEditResult(_:)`) and recorded history, so
-    // there's no `reloadData()` to do here — the table is already showing the new state.
-    rowData.apply(result)
-    updateHistoryButtons()
-  }
-
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double) {
-    return
-  }
-
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdateRangeHead position: Double) {
-    return
-  }
-
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, historyDidChange history: MIDITimeTableHistory) {
-    rowData = history.currentItem
-  }
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        timeTableView?.dataSource = self
+        timeTableView?.timeTableDelegate = self
+        timeTableView?.gridLayer.showsSubbeatLines = false
+        timeTableView?.reloadData()
+        history.append(rows)
+        updateHistoryButtons()
+        
+        view.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
+        timeTableView?.measureView.backgroundColor = UIColor(red: 26.0/255.0, green: 28.0/255.0, blue: 27.0/255.0, alpha: 1)
+        timeTableView?.measureView.tintColor = UIColor(red: 119.0/255.0, green: 121.0/255.0, blue: 120.0/255.0, alpha: 1)
+        timeTableView?.gridLayer.rowLineColor = .black
+        timeTableView?.gridLayer.barLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
+        timeTableView?.gridLayer.beatLineColor = UIColor(red: 42.0/255.0, green: 42.0/255.0, blue: 42.0/255.0, alpha: 1)
+        timeTableView?.playheadView.tintColor = UIColor.gray.withAlphaComponent(0.5)
+        timeTableView?.rangeheadView.tintColor = UIColor.gray.withAlphaComponent(0.3)
+    }
+    
+    @IBAction func redoDidPress(sender: UIButton) {
+        if let item = history.redo() {
+            applyHistoryItem(item)
+        }
+        updateHistoryButtons()
+    }
+    
+    @IBAction func undoDidPress(sender: UIButton) {
+        if let item = history.undo() {
+            applyHistoryItem(item)
+        }
+        updateHistoryButtons()
+    }
+    
+    private func updateHistoryButtons() {
+        undoButton?.isEnabled = history.hasPreviousHistoryItem
+        redoButton?.isEnabled = history.hasNextHistoryItem
+    }
+    
+    private func applyHistoryItem(_ item: [RowData]) {
+        rows = item
+        timeTableView?.reloadData()
+    }
+    
+    private func index(ofCellID id: MIDITimeTableCellID) -> MIDITimeTableCellIndex? {
+        return rows.index(ofCellID: id)
+    }
+    
+    private func apply(_ result: MIDITimeTableCellEditResult) {
+        for update in result.updates {
+            guard let currentIndex = index(ofCellID: update.id) else { continue }
+            var cell = rows[currentIndex.row].cells[currentIndex.index]
+            cell.position = update.newPosition
+            cell.duration = update.newDuration
+            if currentIndex.row == update.newRowIndex {
+                rows[currentIndex.row].cells[currentIndex.index] = cell
+            } else if update.newRowIndex >= 0 && update.newRowIndex < rows.count {
+                rows[currentIndex.row].cells.remove(at: currentIndex.index)
+                rows[update.newRowIndex].cells.append(cell)
+            }
+        }
+        
+        for id in result.removals {
+            guard let currentIndex = index(ofCellID: id) else { continue }
+            rows[currentIndex.row].cells.remove(at: currentIndex.index)
+        }
+        
+        for insertion in result.insertions {
+            guard insertion.row >= 0 && insertion.row < rows.count,
+                  let sourceIndex = index(ofCellID: insertion.sourceID)
+            else { continue }
+            var cell = rows[sourceIndex.row].cells[sourceIndex.index]
+            cell.id = insertion.id
+            cell.position = insertion.position
+            cell.duration = insertion.duration
+            rows[insertion.row].cells.append(cell)
+        }
+    }
+    
+    // MARK: MIDITimeTableViewDataSource
+    
+    func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int {
+        return rows.rowCount
+    }
+    
+    func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature {
+        return MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, numberOfCellsInRow row: Int) -> Int {
+        return rows.cellCount(inRow: row)
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, idForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellID {
+        return rows.cellID(at: index)
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, positionForCellAt index: MIDITimeTableCellIndex) -> Double {
+        return rows.cellPosition(at: index)
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, durationForCellAt index: MIDITimeTableCellIndex) -> Double {
+        return rows.cellDuration(at: index)
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
+        let header = midiTimeTableView.dequeueReusableHeaderCellView(withIdentifier: "Header") as? HeaderCellView ?? HeaderCellView(title: "")
+        header.titleLabel.text = rows[row].title
+        return header
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
+        let cell = midiTimeTableView.dequeueReusableCellView(withIdentifier: "Cell") as? CellView ?? CellView(title: "")
+        cell.configure(with: rows.cell(at: index))
+        return cell
+    }
+    
+    // MARK: MIDITimeTableViewDelegate
+    
+    func midiTimeTableViewHeightForRows(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
+        return 60
+    }
+    
+    func midiTimeTableViewHeightForMeasureView(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
+        return 20
+    }
+    
+    func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat {
+        return 100
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didChange result: MIDITimeTableCellEditResult) {
+        apply(result)
+        updateHistoryButtons()
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double) {
+        return
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdateRangeHead position: Double) {
+        return
+    }
+    
+    func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView) {
+        history.append(rows)
+        updateHistoryButtons()
+    }
 }
