@@ -122,30 +122,15 @@ struct CellData: MIDITimeTableCellRepresentable {
         self.position = position
         self.duration = duration
     }
-    
-    var midiTimeTableCellID: MIDITimeTableCellID { id }
-    var midiTimeTablePosition: Double {
-        get { position }
-        set { position = newValue }
-    }
-    var midiTimeTableDuration: Double {
-        get { duration }
-        set { duration = newValue }
-    }
 }
 
 struct RowData: MIDITimeTableRowRepresentable {
     var title: String
     var cells: [CellData]
-    
-    var midiTimeTableCells: [CellData] {
-        get { cells }
-        set { cells = newValue }
-    }
 }
 
 struct History: MIDITimeTableHistoryRepresentable {
-    var history = MIDITimeTableHistoryStack<[[CellData]]>()
+    var history = MIDITimeTableHistoryStack<[RowData]>()
 }
 
 class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTableViewDelegate {
@@ -221,7 +206,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         timeTableView?.timeTableDelegate = self
         timeTableView?.gridLayer.showsSubbeatLines = false
         timeTableView?.reloadData()
-        history.append(rows.map({ $0.midiTimeTableCells }))
+        history.append(rows)
         updateHistoryButtons()
         
         view.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
@@ -253,9 +238,9 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         redoButton?.isEnabled = history.hasNextHistoryItem
     }
     
-    private func applyHistoryItem(_ item: [[CellData]]) {
+    private func applyHistoryItem(_ item: [RowData]) {
         for rowIndex in rows.indices where rowIndex < item.count {
-            rows[rowIndex].cells = item[rowIndex]
+            rows = item
         }
         timeTableView?.reloadData()
     }
@@ -317,19 +302,19 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, numberOfCellsInRow row: Int) -> Int {
-        return rows[row].midiTimeTableCells.count
+        return rows[row].cells.count
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, idForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellID {
-        return rows[index.row].midiTimeTableCells[index.index].midiTimeTableCellID
+        return rows[index.row].cells[index.index].id
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, positionForCellAt index: MIDITimeTableCellIndex) -> Double {
-        return rows[index.row].midiTimeTableCells[index.index].midiTimeTablePosition
+        return rows[index.row].cells[index.index].position
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, durationForCellAt index: MIDITimeTableCellIndex) -> Double {
-        return rows[index.row].midiTimeTableCells[index.index].midiTimeTableDuration
+        return rows[index.row].cells[index.index].duration
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
@@ -378,7 +363,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     }
     
     func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView) {
-        history.append(rows.map({ $0.midiTimeTableCells }))
+        history.append(rows)
         updateHistoryButtons()
     }
 }

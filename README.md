@@ -65,26 +65,11 @@ struct SongCell: MIDITimeTableCellRepresentable {
   var title: String
   var position: Double
   var duration: Double
-
-  var midiTimeTableCellID: MIDITimeTableCellID { id }
-  var midiTimeTablePosition: Double {
-    get { position }
-    set { position = newValue }
-  }
-  var midiTimeTableDuration: Double {
-    get { duration }
-    set { duration = newValue }
-  }
 }
 
 struct SongRow: MIDITimeTableRowRepresentable {
   var title: String
   var cells: [SongCell]
-
-  var midiTimeTableCells: [SongCell] {
-    get { cells }
-    set { cells = newValue }
-  }
 }
 
 var rowData: [SongRow] = [
@@ -109,19 +94,19 @@ func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTime
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, numberOfCellsInRow row: Int) -> Int {
-  return rowData[row].midiTimeTableCells.count
+  return rowData[row].cells.count
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, idForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellID {
-  return rowData[index.row].midiTimeTableCells[index.index].midiTimeTableCellID
+  return rowData[index.row].cells[index.index].id
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, positionForCellAt index: MIDITimeTableCellIndex) -> Double {
-  return rowData[index.row].midiTimeTableCells[index.index].midiTimeTablePosition
+  return rowData[index.row].cells[index.index].position
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, durationForCellAt index: MIDITimeTableCellIndex) -> Double {
-  return rowData[index.row].midiTimeTableCells[index.index].midiTimeTableDuration
+  return rowData[index.row].cells[index.index].duration
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
@@ -165,7 +150,7 @@ app-owned undo/redo stack with default append/undo/redo behavior:
 
 ``` swift
 struct SongHistory: MIDITimeTableHistoryRepresentable {
-  var midiTimeTableHistoryStorage = MIDITimeTableHistoryStack<[SongRow]>()
+  var history = MIDITimeTableHistoryStack<[SongRow]>()
 }
 ```
   

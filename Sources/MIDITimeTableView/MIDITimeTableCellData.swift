@@ -69,11 +69,11 @@ public typealias MIDITimeTableCellID = UUID
 /// code more structured without forcing your data to inherit from framework-owned model classes.
 public protocol MIDITimeTableCellRepresentable {
   /// Stable identity for the cell.
-  var midiTimeTableCellID: MIDITimeTableCellID { get }
+  var id: MIDITimeTableCellID { get }
   /// Position of the cell in beats.
-  var midiTimeTablePosition: Double { get set }
+  var position: Double { get set }
   /// Duration of the cell in beats.
-  var midiTimeTableDuration: Double { get set }
+  var duration: Double { get set }
 }
 
 /// Optional protocol for app-owned row models that group time table cells.
@@ -84,7 +84,7 @@ public protocol MIDITimeTableRowRepresentable {
   associatedtype Cell: MIDITimeTableCellRepresentable
 
   /// Cells displayed in this row.
-  var midiTimeTableCells: [Cell] { get set }
+  var cells: [Cell] { get set }
 }
 
 /// Optional protocol for app-owned history stacks used with
