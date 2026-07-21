@@ -240,7 +240,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var dragStartPosition: CGPoint = .zero
   private var dragCurrentPosition: CGPoint?
   private var dragView: UIView?
-  private var initialDragViewSize: CGFloat = 90
+  private var minimumDragViewDisplaySize: CGFloat = 12
   private var dragViewAutoScrollingThreshold: CGFloat = 100
   private var autoScrollingTimer: Timer?
   private var autoScrollingTimerInterval: TimeInterval = 0.3
@@ -266,6 +266,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   }
 
   private func commonInit() {
+    backgroundColor = .clear
     // Measure
     addSubview(measureView)
     // History
@@ -407,9 +408,13 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       width: CGFloat(measureView.barCount) * measureWidth,
       height: measureHeight)
 
+    // Keep the entire visible timetable surface inside the scroll view's content area, even
+    // when there are no rows or only a few rows. Otherwise gestures that begin below the last row
+    // can fall outside the scrollable content and never start marquee selection.
+    let rowsContentHeight = measureView.frame.height + (rowHeight * CGFloat(rowHeaderCellViews.count))
     contentSize = CGSize(
       width: headerCellWidth + measureView.frame.width,
-      height: measureView.frame.height + (rowHeight * CGFloat(rowHeaderCellViews.count)))
+      height: max(rowsContentHeight, bounds.height))
 
     // Playhead
     playheadView.rowHeaderWidth = headerCellWidth
@@ -650,68 +655,38 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private func createDragView() {
     isScrollEnabled = false
 
-    // Drag start position.
-    dragStartPosition.x -= initialDragViewSize/2
-    dragStartPosition.y -= initialDragViewSize/2
+    unselectAllCells()
 
-    // Create drag view.
-    dragView = UIView(frame: CGRect(origin: dragStartPosition, size: .zero))
+    dragView = UIView(frame: displayFrame(forDragSelectionRect: CGRect(origin: dragStartPosition, size: .zero), touchLocation: dragStartPosition))
     dragView?.layer.backgroundColor = UIColor.white.withAlphaComponent(0.3).cgColor
     dragView?.layer.borderColor = UIColor.white.cgColor
     dragView?.layer.borderWidth = 1
     addSubview(dragView!)
-    UIView.animate(
-      withDuration: 0.3,
-      delay: 0,
-      usingSpringWithDamping: 1,
-      initialSpringVelocity: 1,
-      options: [],
-      animations: {
-        self.dragView?.frame = CGRect(
-          x: self.dragStartPosition.x,
-          y: self.dragStartPosition.y,
-          width: self.initialDragViewSize,
-          height: self.initialDragViewSize)
-      },
-      completion: nil)
   }
 
   private func updateDragView(touchLocation: CGPoint) {
     guard let dragView = dragView else { return }
 
-    // Set drag view frame
-    let origin = dragStartPosition
-    if touchLocation.y < origin.y && touchLocation.x < origin.x {
-      dragView.frame = CGRect(
-        x: touchLocation.x,
-        y: touchLocation.y,
-        width: origin.x - touchLocation.x,
-        height: origin.y - touchLocation.y)
-    } else if touchLocation.y < origin.y && touchLocation.x > origin.x {
-      dragView.frame = CGRect(
-        x: origin.x,
-        y: touchLocation.y,
-        width: touchLocation.x - origin.x,
-        height: origin.y - touchLocation.y)
-    } else if touchLocation.y > origin.y && touchLocation.x > origin.x {
-      dragView.frame = CGRect(
-        x: origin.x,
-        y: origin.y,
-        width: touchLocation.x - origin.x,
-        height: touchLocation.y - origin.y)
-    } else if touchLocation.y > origin.y && touchLocation.x < origin.x {
-      dragView.frame = CGRect(
-        x: touchLocation.x,
-        y: origin.y,
-        width: origin.x - touchLocation.x,
-        height: touchLocation.y - origin.y)
-    }
+    let selectionRect = CGRect(
+      x: min(dragStartPosition.x, touchLocation.x),
+      y: min(dragStartPosition.y, touchLocation.y),
+      width: abs(touchLocation.x - dragStartPosition.x),
+      height: abs(touchLocation.y - dragStartPosition.y))
+    dragView.frame = displayFrame(forDragSelectionRect: selectionRect, touchLocation: touchLocation)
 
     // Make cells selected. Only cells currently realized can possibly intersect a marquee that's
     // itself bounded to the (auto-)scrollable viewport, so `visibleCells` — not the full data
     // source — is exactly the right set to check.
     visibleCells
-      .forEach({ $0.isSelected = dragView.frame.intersects($0.frame) })
+      .forEach({ $0.isSelected = selectionRect.intersects($0.frame) })
+  }
+
+  private func displayFrame(forDragSelectionRect selectionRect: CGRect, touchLocation: CGPoint) -> CGRect {
+    let width = max(selectionRect.width, minimumDragViewDisplaySize)
+    let height = max(selectionRect.height, minimumDragViewDisplaySize)
+    let x = touchLocation.x < dragStartPosition.x ? dragStartPosition.x - width : dragStartPosition.x
+    let y = touchLocation.y < dragStartPosition.y ? dragStartPosition.y - height : dragStartPosition.y
+    return CGRect(x: x, y: y, width: width, height: height)
   }
 
   private func startAutoScrollTimer(with direction: MIDITimeTableViewAutoScrollDirection) {
@@ -810,6 +785,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     bringSubviewToFront(midiTimeTableCellView)
 
     if case .began = pan.state {
+      if !midiTimeTableCellView.isSelected {
+        unselectAllCells()
+      }
       midiTimeTableCellView.isSelected = true
       editingCellIndices = visibleCells
         .filter({ $0.isSelected })
@@ -869,6 +847,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     if case .began = pan.state {
       isResizing = true
+      if !midiTimeTableCellView.isSelected {
+        unselectAllCells()
+      }
       midiTimeTableCellView.isSelected = true
       editingCellIndices = visibleCells
         .filter({ $0.isSelected })
@@ -932,8 +913,13 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // The resolver only computes what happens to the OTHER cells the edit now overlaps; fold
     // the edited cells' own new geometry in so `result` is a complete, self-sufficient set that
     // both `applyEditResult` below and a host's `rowData.apply(result)` can act on alone.
-    var result = MIDITimeTableCellOverlapResolver.resolve(editedCells: editedCells, in: rowData)
-    result.updates = editedCells + result.updates
+    let editedOverlapResult = MIDITimeTableCellOverlapResolver.resolveOverlapsAmongEditedCells(editedCells)
+    var result = MIDITimeTableCellOverlapResolver.resolve(
+      editedCells: editedOverlapResult.updates,
+      in: rowData,
+      skippingCellIDs: Set(editedCells.map({ $0.id })))
+    result.updates = editedOverlapResult.updates + result.updates
+    result.removals = editedOverlapResult.removals + result.removals
 
     // Keep the time table's own state correct incrementally before telling anyone about it, so
     // a delegate inspecting the time table during these callbacks already sees the new state.

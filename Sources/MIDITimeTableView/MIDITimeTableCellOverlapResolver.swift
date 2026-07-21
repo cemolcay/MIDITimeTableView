@@ -22,8 +22,8 @@ public enum MIDITimeTableCellOverlapResolver {
   ///   - editedCells: The cells that were just moved or resized, with their new geometry.
   ///   - rowData: Snapshot of all rows as they were immediately before the edit.
   /// - Returns: The resolved updates, removals and insertions for the affected OTHER cells.
-  public static func resolve(editedCells: [MIDITimeTableViewEditedCellData], in rowData: [MIDITimeTableRowData]) -> MIDITimeTableCellEditResult {
-    let editedIDSet = Set(editedCells.map({ $0.id }))
+  public static func resolve(editedCells: [MIDITimeTableViewEditedCellData], in rowData: [MIDITimeTableRowData], skippingCellIDs: Set<MIDITimeTableCellID>? = nil) -> MIDITimeTableCellEditResult {
+    let editedIDSet = skippingCellIDs ?? Set(editedCells.map({ $0.id }))
     // Cells fully covered by an edit, tracked both by id (the output) and by their position in
     // the immutable `rowData` snapshot (so the scan below can skip them without needing to look
     // them up again).
@@ -88,5 +88,51 @@ public enum MIDITimeTableCellOverlapResolver {
       (cell.id, index, index.row, cell.position, cell.duration)
     }
     return MIDITimeTableCellEditResult(updates: updates, removals: removals, insertions: insertions)
+  }
+
+  /// Resolves overlaps within the edited selection itself. The normal resolver skips every
+  /// edited id so selected cells win against non-selected cells, but a multi-cell resize can make
+  /// selected neighbors overlap each other. This pass gives earlier cells in each row priority
+  /// and trims/removes later selected cells against them.
+  public static func resolveOverlapsAmongEditedCells(_ editedCells: [MIDITimeTableViewEditedCellData]) -> MIDITimeTableCellEditResult {
+    var removals = [MIDITimeTableCellID]()
+    var working = editedCells
+
+    let rowGroups = Dictionary(grouping: working.indices, by: { working[$0].newRowIndex })
+    for indices in rowGroups.values {
+      let orderedIndices = indices.sorted {
+        if working[$0].newPosition == working[$1].newPosition {
+          return working[$0].newDuration > working[$1].newDuration
+        }
+        return working[$0].newPosition < working[$1].newPosition
+      }
+
+      for blockerOffset in orderedIndices.indices {
+        let blockerIndex = orderedIndices[blockerOffset]
+        if removals.contains(working[blockerIndex].id) { continue }
+
+        let blockerStart = working[blockerIndex].newPosition
+        let blockerEnd = working[blockerIndex].newPosition + working[blockerIndex].newDuration
+
+        for targetIndex in orderedIndices.dropFirst(blockerOffset + 1) {
+          if removals.contains(working[targetIndex].id) { continue }
+
+          let targetStart = working[targetIndex].newPosition
+          let targetEnd = working[targetIndex].newPosition + working[targetIndex].newDuration
+          guard blockerStart < targetEnd && blockerEnd > targetStart else { continue }
+
+          if blockerEnd >= targetEnd {
+            removals.append(working[targetIndex].id)
+          } else {
+            working[targetIndex].newPosition = blockerEnd
+            working[targetIndex].newDuration = targetEnd - blockerEnd
+          }
+        }
+      }
+    }
+
+    let removedIDs = Set(removals)
+    let updates = working.filter({ !removedIDs.contains($0.id) })
+    return MIDITimeTableCellEditResult(updates: updates, removals: removals)
   }
 }

@@ -117,4 +117,35 @@ final class MIDITimeTableCellOverlapResolverTests: XCTestCase {
     XCTAssertTrue(result.removals.isEmpty)
     XCTAssertTrue(result.insertions.isEmpty)
   }
+
+  func testEditedCellOverlapTrimsLaterSelectedCell() {
+    let firstID = MIDITimeTableCellID()
+    let secondID = MIDITimeTableCellID()
+    let edited: [MIDITimeTableViewEditedCellData] = [
+      (id: firstID, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 0, newDuration: 6),
+      (id: secondID, index: MIDITimeTableCellIndex(row: 0, index: 1), newRowIndex: 0, newPosition: 4, newDuration: 6)
+    ]
+
+    let result = MIDITimeTableCellOverlapResolver.resolveOverlapsAmongEditedCells(edited)
+
+    XCTAssertTrue(result.removals.isEmpty)
+    XCTAssertEqual(result.updates.count, 2)
+    let trimmed = result.updates.first(where: { $0.id == secondID })
+    XCTAssertEqual(trimmed?.newPosition, 6, accuracy: 0.0001)
+    XCTAssertEqual(trimmed?.newDuration, 4, accuracy: 0.0001)
+  }
+
+  func testEditedCellOverlapRemovesFullyCoveredSelectedCell() {
+    let firstID = MIDITimeTableCellID()
+    let secondID = MIDITimeTableCellID()
+    let edited: [MIDITimeTableViewEditedCellData] = [
+      (id: firstID, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 0, newDuration: 8),
+      (id: secondID, index: MIDITimeTableCellIndex(row: 0, index: 1), newRowIndex: 0, newPosition: 2, newDuration: 2)
+    ]
+
+    let result = MIDITimeTableCellOverlapResolver.resolveOverlapsAmongEditedCells(edited)
+
+    XCTAssertEqual(result.removals, [secondID])
+    XCTAssertFalse(result.updates.contains(where: { $0.id == secondID }))
+  }
 }

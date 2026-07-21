@@ -215,7 +215,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     timeTableView?.reloadData()
     updateHistoryButtons()
     
-    timeTableView?.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
+    view.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
     timeTableView?.measureView.backgroundColor = UIColor(red: 26.0/255.0, green: 28.0/255.0, blue: 27.0/255.0, alpha: 1)
     timeTableView?.measureView.tintColor = UIColor(red: 119.0/255.0, green: 121.0/255.0, blue: 120.0/255.0, alpha: 1)
     timeTableView?.gridLayer.rowLineColor = .black
