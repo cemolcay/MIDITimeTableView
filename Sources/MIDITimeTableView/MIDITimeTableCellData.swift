@@ -87,6 +87,75 @@ public protocol MIDITimeTableRowRepresentable {
   var cells: [Cell] { get set }
 }
 
+public extension MIDITimeTableRowRepresentable {
+  /// Number of cells in the row.
+  var cellCount: Int {
+    return cells.count
+  }
+
+  /// Cell at the row-local array index.
+  func cell(at index: Int) -> Cell {
+    return cells[index]
+  }
+
+  /// Stable id for the cell at the row-local array index.
+  func cellID(at index: Int) -> MIDITimeTableCellID {
+    return cell(at: index).id
+  }
+
+  /// Position, in beats, for the cell at the row-local array index.
+  func cellPosition(at index: Int) -> Double {
+    return cell(at: index).position
+  }
+
+  /// Duration, in beats, for the cell at the row-local array index.
+  func cellDuration(at index: Int) -> Double {
+    return cell(at: index).duration
+  }
+}
+
+public extension Array where Element: MIDITimeTableRowRepresentable {
+  /// Number of rows in the table data.
+  var rowCount: Int {
+    return count
+  }
+
+  /// Number of cells in the given row.
+  func cellCount(inRow row: Int) -> Int {
+    return self[row].cellCount
+  }
+
+  /// Cell at a table index.
+  func cell(at index: MIDITimeTableCellIndex) -> Element.Cell {
+    return self[index.row].cell(at: index.index)
+  }
+
+  /// Stable id for the cell at a table index.
+  func cellID(at index: MIDITimeTableCellIndex) -> MIDITimeTableCellID {
+    return cell(at: index).id
+  }
+
+  /// Position, in beats, for the cell at a table index.
+  func cellPosition(at index: MIDITimeTableCellIndex) -> Double {
+    return cell(at: index).position
+  }
+
+  /// Duration, in beats, for the cell at a table index.
+  func cellDuration(at index: MIDITimeTableCellIndex) -> Double {
+    return cell(at: index).duration
+  }
+
+  /// Finds the current row/index pair for a stable cell id.
+  func index(ofCellID id: MIDITimeTableCellID) -> MIDITimeTableCellIndex? {
+    for (rowIndex, row) in enumerated() {
+      if let cellIndex = row.cells.firstIndex(where: { $0.id == id }) {
+        return MIDITimeTableCellIndex(row: rowIndex, index: cellIndex)
+      }
+    }
+    return nil
+  }
+}
+
 /// Optional protocol for app-owned history stacks used with
 /// `MIDITimeTableViewDelegate.midiTimeTableViewShouldPushHistory(_:)`.
 ///

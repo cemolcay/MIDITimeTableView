@@ -10,6 +10,16 @@ private struct TestHistory: MIDITimeTableHistoryRepresentable {
   var history = MIDITimeTableHistoryStack<[Int]>(limit: 3)
 }
 
+private struct TestRepresentableCell: MIDITimeTableCellRepresentable {
+  let id: MIDITimeTableCellID
+  var position: Double
+  var duration: Double
+}
+
+private struct TestRepresentableRow: MIDITimeTableRowRepresentable {
+  var cells: [TestRepresentableCell]
+}
+
 final class MIDITimeTableHistoryStackTests: XCTestCase {
 
   func testAppendTracksCurrentItemAndUndoRedoAvailability() {
@@ -80,5 +90,40 @@ final class MIDITimeTableHistoryStackTests: XCTestCase {
     XCTAssertEqual(history.undo(), [1])
     XCTAssertFalse(history.hasPreviousHistoryItem)
     XCTAssertTrue(history.hasNextHistoryItem)
+  }
+
+  func testRepresentableRowHelpersExposeCellData() {
+    let id = MIDITimeTableCellID()
+    let row = TestRepresentableRow(cells: [
+      TestRepresentableCell(id: id, position: 2, duration: 4)
+    ])
+
+    XCTAssertEqual(row.cellCount, 1)
+    XCTAssertEqual(row.cell(at: 0).id, id)
+    XCTAssertEqual(row.cellID(at: 0), id)
+    XCTAssertEqual(row.cellPosition(at: 0), 2)
+    XCTAssertEqual(row.cellDuration(at: 0), 4)
+  }
+
+  func testRepresentableRowArrayHelpersExposeDataSourceValues() {
+    let firstID = MIDITimeTableCellID()
+    let secondID = MIDITimeTableCellID()
+    let rows = [
+      TestRepresentableRow(cells: [
+        TestRepresentableCell(id: firstID, position: 0, duration: 1)
+      ]),
+      TestRepresentableRow(cells: [
+        TestRepresentableCell(id: secondID, position: 4, duration: 2)
+      ])
+    ]
+    let secondIndex = MIDITimeTableCellIndex(row: 1, index: 0)
+
+    XCTAssertEqual(rows.rowCount, 2)
+    XCTAssertEqual(rows.cellCount(inRow: 0), 1)
+    XCTAssertEqual(rows.cellID(at: secondIndex), secondID)
+    XCTAssertEqual(rows.cellPosition(at: secondIndex), 4)
+    XCTAssertEqual(rows.cellDuration(at: secondIndex), 2)
+    XCTAssertEqual(rows.index(ofCellID: secondID), secondIndex)
+    XCTAssertNil(rows.index(ofCellID: MIDITimeTableCellID()))
   }
 }

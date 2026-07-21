@@ -244,12 +244,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     }
     
     private func index(ofCellID id: MIDITimeTableCellID) -> MIDITimeTableCellIndex? {
-        for (row, rows) in rows.enumerated() {
-            if let i = rows.cells.firstIndex(where: { $0.id == id }) {
-                return MIDITimeTableCellIndex(row: row, index: i)
-            }
-        }
-        return nil
+        return rows.index(ofCellID: id)
     }
     
     private func apply(_ result: MIDITimeTableCellEditResult) {
@@ -292,7 +287,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     // MARK: MIDITimeTableViewDataSource
     
     func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int {
-        return rows.count
+        return rows.rowCount
     }
     
     func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature {
@@ -300,19 +295,19 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, numberOfCellsInRow row: Int) -> Int {
-        return rows[row].cells.count
+        return rows.cellCount(inRow: row)
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, idForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellID {
-        return rows[index.row].cells[index.index].id
+        return rows.cellID(at: index)
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, positionForCellAt index: MIDITimeTableCellIndex) -> Double {
-        return rows[index.row].cells[index.index].position
+        return rows.cellPosition(at: index)
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, durationForCellAt index: MIDITimeTableCellIndex) -> Double {
-        return rows[index.row].cells[index.index].duration
+        return rows.cellDuration(at: index)
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
@@ -323,7 +318,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
         let cell = midiTimeTableView.dequeueReusableCellView(withIdentifier: "Cell") as? CellView ?? CellView(title: "")
-        cell.configure(with: rows[index.row].cells[index.index])
+        cell.configure(with: rows.cell(at: index))
         return cell
     }
     

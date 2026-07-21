@@ -86,7 +86,7 @@ var rowData: [SongRow] = [
 
 ``` swift
 func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int {
-  return rowData.count
+  return rowData.rowCount
 }
 
 func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature {
@@ -94,19 +94,19 @@ func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTime
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, numberOfCellsInRow row: Int) -> Int {
-  return rowData[row].cells.count
+  return rowData.cellCount(inRow: row)
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, idForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellID {
-  return rowData[index.row].cells[index.index].id
+  return rowData.cellID(at: index)
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, positionForCellAt index: MIDITimeTableCellIndex) -> Double {
-  return rowData[index.row].cells[index.index].position
+  return rowData.cellPosition(at: index)
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, durationForCellAt index: MIDITimeTableCellIndex) -> Double {
-  return rowData[index.row].cells[index.index].duration
+  return rowData.cellDuration(at: index)
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
@@ -117,10 +117,14 @@ func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRo
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
   let cell = midiTimeTableView.dequeueReusableCellView(withIdentifier: "Cell") as? CellView ?? CellView(title: "")
-  cell.configure(with: rowData[index.row].cells[index.index])
+  cell.configure(with: rowData.cell(at: index))
   return cell
 }
 ```
+
+Those helpers come from the optional `MIDITimeTableRowRepresentable` /
+`MIDITimeTableCellRepresentable` protocols. They only read your model; view creation and
+configuration stay explicit in the data source.
 
 Keep your model in sync by applying the edit and delete callbacks from `MIDITimeTableViewDelegate`.
 Your app's model remains the source of truth. Apply edit results synchronously in `didEdit`; the
@@ -158,12 +162,7 @@ For example:
 
 ``` swift
 private func index(ofCellID id: MIDITimeTableCellID) -> MIDITimeTableCellIndex? {
-  for (rowIndex, row) in rowData.enumerated() {
-    if let cellIndex = row.cells.firstIndex(where: { $0.id == id }) {
-      return MIDITimeTableCellIndex(row: rowIndex, index: cellIndex)
-    }
-  }
-  return nil
+  return rowData.index(ofCellID: id)
 }
 
 private func apply(_ result: MIDITimeTableCellEditResult) {
@@ -262,7 +261,7 @@ views with a reuse identifier and dequeue them in the data source:
 ``` swift
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
   let cell = midiTimeTableView.dequeueReusableCellView(withIdentifier: "Cell") as? CellView ?? CellView(title: "")
-  cell.configure(with: rowData[index.row].cells[index.index])
+  cell.configure(with: rowData.cell(at: index))
   return cell
 }
 ```
