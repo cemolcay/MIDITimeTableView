@@ -32,15 +32,20 @@ Features
 
 * Easy to implement, Delegate/DataSource API similar to `UITableView` and `UICollectionView`.
 * Unlimited rows and cells.
-* Cells and Row Headers are fully customisable. You can show any UIView inside them.
+* Cells and Row Headers are fully customisable. You can show any `UIView` inside them.
 * Shows bar measure (optional).
 * Shows editable playhead that shows current time (optional).
-* Pinch to zoom in/out. (optional).
-* Edit single cell or multiple cells.
-* Drag them around to change row or position.
-* Drag them from right edge to change duration.
-* Long press any cell to show customisable menu.
-* Holds history with a customisable limit and make undo/redo (optional).
+* Shows an editable range head, with optional automatic extension to the last cell.
+* Pinch to zoom in/out (optional).
+* Edit a single cell or multiple selected cells.
+* Drag selected cells around to change row or position.
+* Drag selected cells from the right edge to change duration.
+* Long-press the time table surface to draw a marquee selection rectangle.
+* Auto-scrolls near grid edges while drawing a marquee, moving cells, or resizing cells.
+* Snaps cell moves/resizes, playhead drags, and range-head drags to a configurable beat subdivision.
+* Resolves overlaps after edits, including trims, removals, splits, and overlaps inside a multi-cell resize.
+* Long-press any cell to show a customisable menu.
+* Holds history with a customisable limit and supports undo/redo (optional).
 * Customise grid and show bar, beat and subbeat lines with any style (optional).
 * Viewport virtualization: cell views, grid lines and measure bars are only realized near what's
   actually on screen, so documents with hundreds or thousands of cells scroll smoothly instead of
@@ -71,7 +76,7 @@ var rowData: [MIDITimeTableRowData] = [
 ]
 ```
 
-`MIDITimeTableViewDataSource` is very likely to `UITableViewDataSource` or `UICollectionViewDataSource` API. Just feed the row data, number of rows, time signature and you are ready to go.
+`MIDITimeTableViewDataSource` is similar to `UITableViewDataSource` or `UICollectionViewDataSource` API. Just feed the row data, number of rows, time signature and you are ready to go.
 
 ``` swift
 func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int {
@@ -87,12 +92,53 @@ func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int)
   return row
 }
 ```
+
+Keep your model in sync by applying the edit and delete callbacks from `MIDITimeTableViewDelegate`.
+The time table view applies edits internally before calling `didEdit`; your app should apply the
+same result to its own `rowData`.
+
+``` swift
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {
+  rowData.apply(result)
+}
+
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
+  rowData.removeCells(at: cells)
+  midiTimeTableView.removeCells(at: cells)
+}
+
+func midiTimeTableViewSnapResolution(_ midiTimeTableView: MIDITimeTableView) -> Int {
+  return 4
+}
+```
   
 You can customise the measure bar, the grid, each header and data cell. Check out the example project.
 
-`MIDITimeTableCellView`'s are editable, you can move around them on the grid, resize their duration or long press to open a delete menu. Also, you need to subclass yourself to present your own data on it.
+`MIDITimeTableCellView`'s are editable, you can move them around the grid, resize their duration,
+or long press to open a delete menu. Subclass `MIDITimeTableCellView` to present your own data.
   
 You can set the `minMeasureWidth` and `maxMeasureWidth` to set zoom levels of the time table.
+
+### Editing behavior
+
+Tap a cell to select it. Dragging or resizing an unselected cell clears the previous selection and
+edits only that cell. Dragging or resizing an already-selected cell edits the selected group
+together.
+
+Long-press anywhere on the time table surface, including empty space below the last row, to start
+marquee selection. A small rectangle appears under the long-press location immediately; as you drag,
+that point and the current touch location act as opposite corners, so selection works in every
+direction like a desktop marquee tool.
+
+When the touch reaches the grid edge, the time table auto-scrolls. Marquee selection can auto-scroll
+horizontally and vertically. Moving cells can auto-scroll horizontally and vertically while the
+selected cells can still move in that direction. Resizing cells can auto-scroll horizontally while
+the selected cells can still grow or shrink. Auto-scroll stops at the grid and row bounds.
+
+Moves and resizes snap to the delegate's `midiTimeTableViewSnapResolution(_:)`, which defaults to
+`4` subdivisions per beat. After every move or resize, overlaps are resolved and reported as a
+`MIDITimeTableCellEditResult` containing updates, removals, and insertions. Call
+`rowData.apply(result)` in `midiTimeTableView(_:didEdit:)` to keep your data source in sync.
 
 ### Viewport virtualization & cell reuse
 
@@ -101,7 +147,7 @@ viewport (plus a small overscan margin, tunable via `virtualizationOverscanMulti
 are currently selected. This is what `visibleCells` (`public private(set) var`) reflects — it's
 **not** every cell in your data, only the ones currently realized as views. A cell that isn't in
 `visibleCells` still exists in your data source; it just isn't on screen right now. Look a
-specific cell's view up by its stable id with `midiTimeTableView.cellView(for: cellData.id)`,
+specific cell's view up by its stable `MIDITimeTableCellID` with `midiTimeTableView.cellView(for: cellData.id)`,
 which returns `nil` for a cell that isn't currently realized.
 
 To get `UITableView`-style cell reuse instead of a fresh view per cell every time one scrolls into
@@ -128,11 +174,11 @@ instance.
 Documentation
 ----
 
-[Full documentation are here.](http://cemolcay.github.io/MIDITimeTableView)
+[Full documentation is here.](http://cemolcay.github.io/MIDITimeTableView)
 
 AppStore
 ----
 
-This library used in my app [ChordBud](https://itunes.apple.com/us/app/chordbud-chord-progressions/id1313017378?mt=8), check it out!
+This library is used in my app [ChordBud](https://itunes.apple.com/us/app/chordbud-chord-progressions/id1313017378?mt=8), check it out!
   
 [![alt tag](https://linkmaker.itunes.apple.com/assets/shared/badges/en-us/appstore-lrg.svg)](https://itunes.apple.com/us/app/chordbud-chord-progressions/id1313017378?mt=8)
