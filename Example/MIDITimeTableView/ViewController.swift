@@ -101,8 +101,8 @@ class CellView: MIDITimeTableCellView {
     }
     
     /// Applies a cell's data to this view, whether it's freshly created or being dequeued.
-    func configure(with cellData: MIDITimeTableCellData) {
-        titleLabel.text = cellData.data as? String ?? ""
+    func configure(with cellData: SongCell) {
+        titleLabel.text = cellData.title
     }
     
     @objc func didPressCustomMenuItem() {
@@ -110,16 +110,53 @@ class CellView: MIDITimeTableCellView {
     }
 }
 
-final class SongRowData: MIDITimeTableRowData {
-    let title: String
+struct SongCell {
+    var id: MIDITimeTableCellID
+    var title: String
+    var position: Double
+    var duration: Double
     
-    init(title: String, cells: [MIDITimeTableCellData]) {
+    init(id: MIDITimeTableCellID = MIDITimeTableCellID(), title: String, position: Double, duration: Double) {
+        self.id = id
         self.title = title
-        super.init(cells: cells)
+        self.position = position
+        self.duration = duration
+    }
+}
+
+struct SongRow {
+    var title: String
+    var cells: [SongCell]
+}
+
+struct SongHistory {
+    var items = [[[SongCell]]]()
+    var currentIndex = -1
+    
+    var hasPreviousItem: Bool { currentIndex > 0 }
+    var hasNextItem: Bool { currentIndex < items.count - 1 }
+    var currentItem: [[SongCell]] {
+        guard currentIndex >= 0, currentIndex < items.count else { return [] }
+        return items[currentIndex]
     }
     
-    override func copy() -> MIDITimeTableRowData {
-        return SongRowData(title: title, cells: cells)
+    mutating func append(_ rows: [SongRow]) {
+        var nextItems = items.enumerated().filter({ $0.offset <= currentIndex }).map({ $0.element })
+        nextItems.append(rows.map({ $0.cells }))
+        items = nextItems
+        currentIndex = items.count - 1
+    }
+    
+    mutating func undo() -> [[SongCell]]? {
+        guard hasPreviousItem else { return nil }
+        currentIndex -= 1
+        return currentItem
+    }
+    
+    mutating func redo() -> [[SongCell]]? {
+        guard hasNextItem else { return nil }
+        currentIndex += 1
+        return currentItem
     }
 }
 
@@ -128,65 +165,66 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     @IBOutlet weak var undoButton: UIBarButtonItem?
     @IBOutlet weak var redoButton: UIBarButtonItem?
     
-    var rowData: [MIDITimeTableRowData] = [
-        SongRowData(
+    var rowData: [SongRow] = [
+        SongRow(
             title: "Chords",
             cells: [
-                MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
-                MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
-                MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
-                MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
+                SongCell(title: "C7", position: 0, duration: 4),
+                SongCell(title: "Dm7", position: 4, duration: 4),
+                SongCell(title: "G7b5", position: 8, duration: 4),
+                SongCell(title: "C7", position: 12, duration: 4),
             ]),
         
-        SongRowData(
+        SongRow(
             title: "Bass",
             cells: [
-                MIDITimeTableCellData(data: "C", position: 0, duration: 1),
-                MIDITimeTableCellData(data: "D", position: 4, duration: 1),
-                MIDITimeTableCellData(data: "G", position: 8, duration: 1),
-                MIDITimeTableCellData(data: "C", position: 12, duration: 1),
+                SongCell(title: "C", position: 0, duration: 1),
+                SongCell(title: "D", position: 4, duration: 1),
+                SongCell(title: "G", position: 8, duration: 1),
+                SongCell(title: "C", position: 12, duration: 1),
             ]),
         
-        SongRowData(
+        SongRow(
             title: "Melody",
             cells: [
-                MIDITimeTableCellData(data: "C", position: 0, duration: 1),
-                MIDITimeTableCellData(data: "C", position: 1, duration: 1),
-                MIDITimeTableCellData(data: "C", position: 2, duration: 1),
-                MIDITimeTableCellData(data: "C", position: 3, duration: 1),
+                SongCell(title: "C", position: 0, duration: 1),
+                SongCell(title: "C", position: 1, duration: 1),
+                SongCell(title: "C", position: 2, duration: 1),
+                SongCell(title: "C", position: 3, duration: 1),
                 
-                MIDITimeTableCellData(data: "D", position: 4, duration: 1),
-                MIDITimeTableCellData(data: "D", position: 5, duration: 1),
-                MIDITimeTableCellData(data: "D", position: 6, duration: 1),
-                MIDITimeTableCellData(data: "D", position: 7, duration: 1),
+                SongCell(title: "D", position: 4, duration: 1),
+                SongCell(title: "D", position: 5, duration: 1),
+                SongCell(title: "D", position: 6, duration: 1),
+                SongCell(title: "D", position: 7, duration: 1),
                 
-                MIDITimeTableCellData(data: "G", position: 8, duration: 1),
-                MIDITimeTableCellData(data: "G", position: 9, duration: 1),
-                MIDITimeTableCellData(data: "G", position: 10, duration: 1),
-                MIDITimeTableCellData(data: "G", position: 11, duration: 1),
+                SongCell(title: "G", position: 8, duration: 1),
+                SongCell(title: "G", position: 9, duration: 1),
+                SongCell(title: "G", position: 10, duration: 1),
+                SongCell(title: "G", position: 11, duration: 1),
                 
-                MIDITimeTableCellData(data: "C", position: 12, duration: 1),
-                MIDITimeTableCellData(data: "C", position: 13, duration: 1),
-                MIDITimeTableCellData(data: "C", position: 14, duration: 1),
-                MIDITimeTableCellData(data: "C", position: 15, duration: 1),
+                SongCell(title: "C", position: 12, duration: 1),
+                SongCell(title: "C", position: 13, duration: 1),
+                SongCell(title: "C", position: 14, duration: 1),
+                SongCell(title: "C", position: 15, duration: 1),
             ]),
         
-        SongRowData(
+        SongRow(
             title: "Synths",
             cells: [
-                MIDITimeTableCellData(data: "C", position: 0, duration: 0.5),
-                MIDITimeTableCellData(data: "C", position: 2, duration: 0.5),
+                SongCell(title: "C", position: 0, duration: 0.5),
+                SongCell(title: "C", position: 2, duration: 0.5),
                 
-                MIDITimeTableCellData(data: "D", position: 4, duration: 0.5),
-                MIDITimeTableCellData(data: "D", position: 6, duration: 0.5),
+                SongCell(title: "D", position: 4, duration: 0.5),
+                SongCell(title: "D", position: 6, duration: 0.5),
                 
-                MIDITimeTableCellData(data: "G", position: 8, duration: 0.5),
-                MIDITimeTableCellData(data: "G", position: 10, duration: 0.5),
+                SongCell(title: "G", position: 8, duration: 0.5),
+                SongCell(title: "G", position: 10, duration: 0.5),
                 
-                MIDITimeTableCellData(data: "C", position: 12, duration: 0.5),
-                MIDITimeTableCellData(data: "C", position: 14, duration: 0.5),
+                SongCell(title: "C", position: 12, duration: 0.5),
+                SongCell(title: "C", position: 14, duration: 0.5),
             ])
     ]
+    var history = SongHistory()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -195,6 +233,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         timeTableView?.timeTableDelegate = self
         timeTableView?.gridLayer.showsSubbeatLines = false
         timeTableView?.reloadData()
+        history.append(rowData)
         updateHistoryButtons()
         
         view.backgroundColor = UIColor(red: 18.0/255.0, green: 20.0/255.0, blue: 19.0/255.0, alpha: 1)
@@ -208,18 +247,75 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     }
     
     @IBAction func redoDidPress(sender: UIButton) {
-        timeTableView?.history.redo()
+        if let item = history.redo() {
+            applyHistoryItem(item)
+        }
         updateHistoryButtons()
     }
     
     @IBAction func undoDidPress(sender: UIButton) {
-        timeTableView?.history.undo()
+        if let item = history.undo() {
+            applyHistoryItem(item)
+        }
         updateHistoryButtons()
     }
     
     private func updateHistoryButtons() {
-        undoButton?.isEnabled = timeTableView?.history.hasPreviousItem ?? false
-        redoButton?.isEnabled = timeTableView?.history.hasNextItem ?? false
+        undoButton?.isEnabled = history.hasPreviousItem
+        redoButton?.isEnabled = history.hasNextItem
+    }
+    
+    private func applyHistoryItem(_ item: [[SongCell]]) {
+        for rowIndex in rowData.indices where rowIndex < item.count {
+            rowData[rowIndex].cells = item[rowIndex]
+        }
+        timeTableView?.reloadData()
+    }
+    
+    private func index(ofCellID id: MIDITimeTableCellID) -> MIDITimeTableCellIndex? {
+        for (row, rowData) in rowData.enumerated() {
+            if let i = rowData.cells.firstIndex(where: { $0.id == id }) {
+                return MIDITimeTableCellIndex(row: row, index: i)
+            }
+        }
+        return nil
+    }
+    
+    private func apply(_ result: MIDITimeTableCellEditResult) {
+        for update in result.updates {
+            guard let currentIndex = index(ofCellID: update.id) else { continue }
+            var cell = rowData[currentIndex.row].cells[currentIndex.index]
+            cell.position = update.newPosition
+            cell.duration = update.newDuration
+            if currentIndex.row == update.newRowIndex {
+                rowData[currentIndex.row].cells[currentIndex.index] = cell
+            } else if update.newRowIndex >= 0 && update.newRowIndex < rowData.count {
+                rowData[currentIndex.row].cells.remove(at: currentIndex.index)
+                rowData[update.newRowIndex].cells.append(cell)
+            }
+        }
+        
+        for id in result.removals {
+            guard let currentIndex = index(ofCellID: id) else { continue }
+            rowData[currentIndex.row].cells.remove(at: currentIndex.index)
+        }
+        
+        for insertion in result.insertions {
+            guard insertion.row >= 0 && insertion.row < rowData.count,
+                  let sourceIndex = index(ofCellID: insertion.sourceID)
+            else { continue }
+            var cell = rowData[sourceIndex.row].cells[sourceIndex.index]
+            cell.id = insertion.id
+            cell.position = insertion.position
+            cell.duration = insertion.duration
+            rowData[insertion.row].cells.append(cell)
+        }
+    }
+    
+    private func removeCells(at indices: [MIDITimeTableCellIndex]) {
+        for (row, index) in indices.ordered {
+            rowData[row].cells = rowData[row].cells.enumerated().filter({ !index.contains($0.offset) }).map({ $0.element })
+        }
     }
     
     // MARK: MIDITimeTableViewDataSource
@@ -232,13 +328,25 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         return MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
     }
     
-    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowDataForRow row: Int) -> MIDITimeTableRowData {
-        return rowData[row]
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, numberOfCellsInRow row: Int) -> Int {
+        return rowData[row].cells.count
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, idForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellID {
+        return rowData[index.row].cells[index.index].id
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, positionForCellAt index: MIDITimeTableCellIndex) -> Double {
+        return rowData[index.row].cells[index.index].position
+    }
+    
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, durationForCellAt index: MIDITimeTableCellIndex) -> Double {
+        return rowData[index.row].cells[index.index].duration
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
         let header = midiTimeTableView.dequeueReusableHeaderCellView(withIdentifier: "Header") as? HeaderCellView ?? HeaderCellView(title: "")
-        header.titleLabel.text = (rowData[row] as? SongRowData)?.title ?? ""
+        header.titleLabel.text = rowData[row].title
         return header
     }
     
@@ -263,19 +371,13 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
-        rowData.removeCells(at: cells)
-        // Incremental: only the deleted cells' views are torn down, everything else keeps its
-        // existing view instance. `MIDITimeTableView` also records this as a new history entry
-        // internally, so no `reloadData()` is needed here.
+        removeCells(at: cells)
         timeTableView?.removeCells(at: cells)
         updateHistoryButtons()
     }
     
     func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {
-        // Keep our own mirror of the data in sync. `MIDITimeTableView` has already applied this same
-        // result to its own state incrementally (see `applyEditResult(_:)`) and recorded history, so
-        // there's no `reloadData()` to do here — the table is already showing the new state.
-        rowData.apply(result)
+        apply(result)
         updateHistoryButtons()
     }
     
@@ -287,7 +389,8 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         return
     }
     
-    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, historyDidChange history: MIDITimeTableHistory) {
-        rowData = history.currentItem
+    func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView) {
+        history.append(rowData)
+        updateHistoryButtons()
     }
 }

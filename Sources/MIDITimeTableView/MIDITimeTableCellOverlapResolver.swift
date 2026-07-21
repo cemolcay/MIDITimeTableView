@@ -22,7 +22,7 @@ public enum MIDITimeTableCellOverlapResolver {
   ///   - editedCells: The cells that were just moved or resized, with their new geometry.
   ///   - rowData: Snapshot of all rows as they were immediately before the edit.
   /// - Returns: The resolved updates, removals and insertions for the affected OTHER cells.
-  public static func resolve(editedCells: [MIDITimeTableViewEditedCellData], in rowData: [MIDITimeTableRowData], skippingCellIDs: Set<MIDITimeTableCellID>? = nil) -> MIDITimeTableCellEditResult {
+  internal static func resolve(editedCells: [MIDITimeTableViewEditedCellData], in rowData: [MIDITimeTableRowLayoutData], skippingCellIDs: Set<MIDITimeTableCellID>? = nil) -> MIDITimeTableCellEditResult {
     let editedIDSet = skippingCellIDs ?? Set(editedCells.map({ $0.id }))
     // Cells fully covered by an edit, tracked both by id (the output) and by their position in
     // the immutable `rowData` snapshot (so the scan below can skip them without needing to look
@@ -34,9 +34,9 @@ public enum MIDITimeTableCellOverlapResolver {
     // `rowData` snapshot, so that multiple edited cells landing on the same underlying cell
     // resolve against each other in sequence rather than clobbering one another's changes. `id`
     // is preserved on every value here since we only ever mutate `position`/`duration` in place.
-    var working = [MIDITimeTableCellIndex: MIDITimeTableCellData]()
+    var working = [MIDITimeTableCellIndex: MIDITimeTableCellLayoutData]()
 
-    func currentCell(at index: MIDITimeTableCellIndex) -> MIDITimeTableCellData? {
+    func currentCell(at index: MIDITimeTableCellIndex) -> MIDITimeTableCellLayoutData? {
       if let cell = working[index] { return cell }
       guard index.row >= 0, index.row < rowData.count,
         index.index >= 0, index.index < rowData[index.row].cells.count
@@ -45,7 +45,7 @@ public enum MIDITimeTableCellOverlapResolver {
     }
 
     for edited in editedCells {
-      let editedData = MIDITimeTableCellData(data: 0, position: edited.newPosition, duration: edited.newDuration)
+      let editedData = MIDITimeTableCellLayoutData(id: edited.id, position: edited.newPosition, duration: edited.newDuration)
       let targetRow = edited.newRowIndex
       guard targetRow >= 0, targetRow < rowData.count else { continue }
 
@@ -64,13 +64,13 @@ public enum MIDITimeTableCellOverlapResolver {
         } else if editedData.position > otherCell.position && editedData.endPosition < otherCell.endPosition {
           // Edit lands strictly inside -> trim the left piece in place (keeps its original id),
           // insert the right remainder as a brand new cell with a fresh id.
-          let rightPiece = MIDITimeTableCellData(
-            data: otherCell.data,
+          let rightPiece = MIDITimeTableCellLayoutData(
+            id: MIDITimeTableCellID(),
             position: editedData.endPosition,
             duration: otherCell.endPosition - editedData.endPosition)
           otherCell.duration = editedData.position - otherCell.position
           working[otherCellIndex] = otherCell
-          insertions.append((targetRow, rightPiece))
+          insertions.append((targetRow, otherCell.id, rightPiece.id, rightPiece.position, rightPiece.duration))
         } else if editedData.position <= otherCell.position {
           // Overlaps the other cell's start -> trim it from the left.
           otherCell.duration = otherCell.endPosition - editedData.endPosition

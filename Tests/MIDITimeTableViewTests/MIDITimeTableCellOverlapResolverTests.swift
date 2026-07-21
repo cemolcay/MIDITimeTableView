@@ -9,9 +9,9 @@ import XCTest
 final class MIDITimeTableCellOverlapResolverTests: XCTestCase {
 
   /// Builds a single row with cells at the given (position, duration) pairs.
-  private func makeRow(_ cells: [(position: Double, duration: Double)]) -> MIDITimeTableRowData {
-    return MIDITimeTableRowData(
-      cells: cells.map({ MIDITimeTableCellData(data: 0, position: $0.position, duration: $0.duration) }))
+  private func makeRow(_ cells: [(position: Double, duration: Double)]) -> MIDITimeTableRowLayoutData {
+    return MIDITimeTableRowLayoutData(
+      cells: cells.map({ MIDITimeTableCellLayoutData(id: MIDITimeTableCellID(), position: $0.position, duration: $0.duration) }))
   }
 
   func testPartialLeftTrim() {
@@ -96,9 +96,10 @@ final class MIDITimeTableCellOverlapResolverTests: XCTestCase {
     let rightPiece = result.insertions[0]
     XCTAssertEqual(rightPiece.row, 0)
     // The right piece is a brand new cell: a fresh id, distinct from the original.
-    XCTAssertNotEqual(rightPiece.cell.id, otherCellID)
-    XCTAssertEqual(rightPiece.cell.position, 5, accuracy: 0.0001)
-    XCTAssertEqual(rightPiece.cell.duration, 5, accuracy: 0.0001)
+    XCTAssertNotEqual(rightPiece.id, otherCellID)
+    XCTAssertEqual(rightPiece.sourceID, otherCellID)
+    XCTAssertEqual(rightPiece.position, 5, accuracy: 0.0001)
+    XCTAssertEqual(rightPiece.duration, 5, accuracy: 0.0001)
   }
 
   func testNoOverlapProducesNoChanges() {

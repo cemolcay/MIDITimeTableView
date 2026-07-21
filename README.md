@@ -45,7 +45,6 @@ Features
 * Snaps cell moves/resizes, playhead drags, and range-head drags to a configurable beat subdivision.
 * Resolves overlaps after edits, including trims, removals, splits, and overlaps inside a multi-cell resize.
 * Long-press any cell to show a customisable menu.
-* Holds history with a customisable limit and supports undo/redo (optional).
 * Customise grid and show bar, beat and subbeat lines with any style (optional).
 * Viewport virtualization: cell views, grid lines and measure bars are only realized near what's
   actually on screen, so documents with hundreds or thousands of cells scroll smoothly instead of
@@ -57,31 +56,28 @@ Usage
 
 Create a `MIDITimeTableView` either programmatically or from storyboard and implement its `MIDITimeTableViewDataSource` and `MIDITimeTableViewDelegate` methods.
   
-You need a data object to store each row and its cells data. Subclass `MIDITimeTableRowData`
-when a row needs typed metadata.
+Keep your own row and cell models. The time table asks your data source only for stable IDs,
+positions and durations.
 
 ``` swift
-final class SongRowData: MIDITimeTableRowData {
-  let title: String
-
-  init(title: String, cells: [MIDITimeTableCellData]) {
-    self.title = title
-    super.init(cells: cells)
-  }
-
-  override func copy() -> MIDITimeTableRowData {
-    SongRowData(title: title, cells: cells)
-  }
+struct SongCell {
+  var id = MIDITimeTableCellID()
+  var title: String
+  var position: Double
+  var duration: Double
 }
 
-var rowData: [MIDITimeTableRowData] = [
-  SongRowData(
+struct SongRow {
+  var title: String
+  var cells: [SongCell]
+}
+
+var rowData: [SongRow] = [
+  SongRow(
     title: "Chords",
     cells: [
-      MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
-      MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
-      MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
-      MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
+      SongCell(title: "C7", position: 0, duration: 4),
+      SongCell(title: "Dm7", position: 4, duration: 4),
     ]),
 ]
 ```
@@ -97,13 +93,25 @@ func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTime
   return MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
 }
 
-func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowDataForRow row: Int) -> MIDITimeTableRowData {
-  return rowData[row]
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, numberOfCellsInRow row: Int) -> Int {
+  return rowData[row].cells.count
+}
+
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, idForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellID {
+  return rowData[index.row].cells[index.index].id
+}
+
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, positionForCellAt index: MIDITimeTableCellIndex) -> Double {
+  return rowData[index.row].cells[index.index].position
+}
+
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, durationForCellAt index: MIDITimeTableCellIndex) -> Double {
+  return rowData[index.row].cells[index.index].duration
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
   let header = midiTimeTableView.dequeueReusableHeaderCellView(withIdentifier: "Header") as? HeaderCellView ?? HeaderCellView(title: "")
-  header.titleLabel.text = (rowData[row] as? SongRowData)?.title ?? ""
+  header.titleLabel.text = rowData[row].title
   return header
 }
 
@@ -115,17 +123,21 @@ func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt ind
 ```
 
 Keep your model in sync by applying the edit and delete callbacks from `MIDITimeTableViewDelegate`.
-The time table view applies edits internally before calling `didEdit`; your app should apply the
-same result to its own `rowData`.
+The time table view applies edits to its internal layout snapshot before calling `didEdit`; your app
+should apply the same result to its own model.
 
 ``` swift
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {
-  rowData.apply(result)
+  apply(result)
 }
 
 func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
-  rowData.removeCells(at: cells)
+  removeCells(at: cells)
   midiTimeTableView.removeCells(at: cells)
+}
+
+func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView) {
+  history.append(rowData)
 }
 
 func midiTimeTableViewSnapResolution(_ midiTimeTableView: MIDITimeTableView) -> Int {
@@ -158,8 +170,8 @@ the selected cells can still grow or shrink. Auto-scroll stops at the grid and r
 
 Moves and resizes snap to the delegate's `midiTimeTableViewSnapResolution(_:)`, which defaults to
 `4` subdivisions per beat. After every move or resize, overlaps are resolved and reported as a
-`MIDITimeTableCellEditResult` containing updates, removals, and insertions. Call
-`rowData.apply(result)` in `midiTimeTableView(_:didEdit:)` to keep your data source in sync.
+`MIDITimeTableCellEditResult` containing updates, removals, and insertions. Apply that result in
+`midiTimeTableView(_:didEdit:)` to keep your data source in sync.
 
 ### Viewport virtualization & cell reuse
 
@@ -168,7 +180,7 @@ viewport (plus a small overscan margin, tunable via `virtualizationOverscanMulti
 are currently selected. This is what `visibleCells` (`public private(set) var`) reflects — it's
 **not** every cell in your data, only the ones currently realized as views. A cell that isn't in
 `visibleCells` still exists in your data source; it just isn't on screen right now. Look a
-specific cell's view up by its stable `MIDITimeTableCellID` with `midiTimeTableView.cellView(for: cellData.id)`,
+specific cell's view up by its stable `MIDITimeTableCellID` with `midiTimeTableView.cellView(for: songCell.id)`,
 which returns `nil` for a cell that isn't currently realized.
 
 To get `UITableView`-style reuse instead of a fresh view every time one scrolls into view, create

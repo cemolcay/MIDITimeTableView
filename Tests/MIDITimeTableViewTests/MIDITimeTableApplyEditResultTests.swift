@@ -6,12 +6,22 @@
 import XCTest
 @testable import MIDITimeTableView
 
-/// Minimal data source/delegate double so `MIDITimeTableView.reloadData()` can populate real
-/// cell views to exercise `applyEditResult`/`removeCells` against.
-private final class StubDataSource: MIDITimeTableViewDataSource, MIDITimeTableViewDelegate {
-  var rows: [MIDITimeTableRowData]
+private struct TestCell {
+  let id: MIDITimeTableCellID
+  var position: Double
+  var duration: Double
 
-  init(rows: [MIDITimeTableRowData]) {
+  init(id: MIDITimeTableCellID = MIDITimeTableCellID(), position: Double, duration: Double) {
+    self.id = id
+    self.position = position
+    self.duration = duration
+  }
+}
+
+private final class StubDataSource: MIDITimeTableViewDataSource, MIDITimeTableViewDelegate {
+  var rows: [[TestCell]]
+
+  init(rows: [[TestCell]]) {
     self.rows = rows
   }
 
@@ -19,8 +29,17 @@ private final class StubDataSource: MIDITimeTableViewDataSource, MIDITimeTableVi
   func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature {
     MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
   }
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowDataForRow row: Int) -> MIDITimeTableRowData {
-    rows[row]
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, numberOfCellsInRow row: Int) -> Int {
+    rows[row].count
+  }
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, idForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellID {
+    rows[index.row][index.index].id
+  }
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, positionForCellAt index: MIDITimeTableCellIndex) -> Double {
+    rows[index.row][index.index].position
+  }
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, durationForCellAt index: MIDITimeTableCellIndex) -> Double {
+    rows[index.row][index.index].duration
   }
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
     MIDITimeTableHeaderCellView()
@@ -35,21 +54,15 @@ private final class StubDataSource: MIDITimeTableViewDataSource, MIDITimeTableVi
   func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat { 100 }
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double) {}
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdateRangeHead position: Double) {}
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, historyDidChange history: MIDITimeTableHistory) {}
 }
 
 final class MIDITimeTableApplyEditResultTests: XCTestCase {
 
-  private func makeRow(_ cells: [(position: Double, duration: Double)]) -> MIDITimeTableRowData {
-    return MIDITimeTableRowData(
-      cells: cells.map({ MIDITimeTableCellData(data: 0, position: $0.position, duration: $0.duration) }))
+  private func makeRow(_ cells: [(position: Double, duration: Double)]) -> [TestCell] {
+    return cells.map({ TestCell(position: $0.position, duration: $0.duration) })
   }
 
-  /// Builds a time table with the given rows already loaded, plus the stub keeping it alive
-  /// (dataSource/delegate are weak). All the cells used across this file sit well within the
-  /// small test frame, so they're realized (see `MIDITimeTableView.visibleCells`) right after
-  /// `reloadData()` and stay that way — none of these tests are about virtualization itself.
-  private func makeLoadedTimeTable(_ rows: [MIDITimeTableRowData]) -> (MIDITimeTableView, StubDataSource) {
+  private func makeLoadedTimeTable(_ rows: [[TestCell]]) -> (MIDITimeTableView, StubDataSource) {
     let stub = StubDataSource(rows: rows)
     let view = MIDITimeTableView(frame: CGRect(x: 0, y: 0, width: 400, height: 400))
     view.dataSource = stub
@@ -61,17 +74,16 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
   func testApplyEditResultReusesExistingViewInstanceForUnrelatedCell() {
     let row = makeRow([(position: 0, duration: 4), (position: 10, duration: 2)])
     let (timeTable, stub) = makeLoadedTimeTable([row])
-    _ = stub // keep alive
-    let untouchedID = row.cells[1].id
+    _ = stub
+    let untouchedID = row[1].id
     let untouchedView = timeTable.cellView(for: untouchedID)
     XCTAssertNotNil(untouchedView)
-    let movedID = row.cells[0].id
+    let movedID = row[0].id
 
     let result = MIDITimeTableCellEditResult(
       updates: [(id: movedID, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 2, newDuration: 4)])
     timeTable.applyEditResult(result)
 
-    // The untouched cell keeps its exact same view instance — no teardown/recreate.
     XCTAssertTrue(timeTable.cellView(for: untouchedID) === untouchedView)
   }
 
@@ -79,7 +91,7 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
     let row = makeRow([(position: 0, duration: 4)])
     let (timeTable, stub) = makeLoadedTimeTable([row, makeRow([])])
     _ = stub
-    let id = row.cells[0].id
+    let id = row[0].id
     guard let cellView = timeTable.cellView(for: id) else {
       return XCTFail("expected the cell to be realized right after reloadData()")
     }
@@ -88,7 +100,6 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
       updates: [(id: id, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 1, newPosition: 6, newDuration: 4)])
     timeTable.applyEditResult(result)
 
-    // Same view instance moved to the new row, not a freshly created one.
     XCTAssertTrue(timeTable.cellView(for: id) === cellView)
     XCTAssertEqual(timeTable.cellIndex(of: cellView)?.row, 1)
   }
@@ -97,7 +108,7 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
     let row = makeRow([(position: 0, duration: 4), (position: 4, duration: 2)])
     let (timeTable, stub) = makeLoadedTimeTable([row])
     _ = stub
-    let removedID = row.cells[1].id
+    let removedID = row[1].id
     let removedView = timeTable.cellView(for: removedID)
     XCTAssertNotNil(removedView)
 
@@ -112,17 +123,19 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
     let (timeTable, stub) = makeLoadedTimeTable([row])
     _ = stub
 
-    let newCell = MIDITimeTableCellData(data: 0, position: 8, duration: 2)
-    timeTable.applyEditResult(MIDITimeTableCellEditResult(insertions: [(row: 0, cell: newCell)]))
+    let newCellID = MIDITimeTableCellID()
+    timeTable.applyEditResult(
+      MIDITimeTableCellEditResult(
+        insertions: [(row: 0, sourceID: row[0].id, id: newCellID, position: 8, duration: 2)]))
 
-    XCTAssertNotNil(timeTable.cellView(for: newCell.id))
+    XCTAssertNotNil(timeTable.cellView(for: newCellID))
   }
 
   func testRemoveCellsAtIndicesRemovesIncrementally() {
     let row = makeRow([(position: 0, duration: 4), (position: 4, duration: 2)])
     let (timeTable, stub) = makeLoadedTimeTable([row])
     _ = stub
-    let keptID = row.cells[0].id
+    let keptID = row[0].id
     let keptView = timeTable.cellView(for: keptID)
     XCTAssertNotNil(keptView)
 
