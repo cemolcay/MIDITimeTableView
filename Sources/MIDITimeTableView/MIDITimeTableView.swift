@@ -63,18 +63,17 @@ public protocol MIDITimeTableViewDataSource: AnyObject {
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData
 }
 
-/// Edited cell data. Holds the edited cell's index before editing, and new row index, position and duration data after editing.
-public typealias MIDITimeTableViewEditedCellData = (index: MIDITimeTableCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
+/// Edited cell data. Holds the edited cell's stable id and its index before editing, and new row
+/// index, position and duration data after editing.
+///
+/// Prefer `id` to locate the cell in your own data going forward — it stays valid regardless of
+/// how many other cells were added, removed or reordered since. `index` is a snapshot of the
+/// cell's (row, array-position) at the moment the edit was reported and can go stale the instant
+/// another edit in the same batch shifts it.
+public typealias MIDITimeTableViewEditedCellData = (id: MIDITimeTableCellID, index: MIDITimeTableCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
 
 /// Delegate functions to inform about editing cells and sizing of the time table.
 public protocol MIDITimeTableViewDelegate: AnyObject {
-  /// Informs about the cell is either moved to another position, changed duration or changed position in a current or a new row.
-  ///
-  /// - Parameters:
-  ///   - midiTimeTableView: Time table that performed changes on.
-  ///   - cells: Edited cells data with changes before and after.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData])
-
   /// Informs about the cell edit's resolved overlaps: cells trimmed, removed or split because
   /// the moved/resized cell now covers them. Call `rowData.apply(result)` in your implementation
   /// to keep your data in sync in a single step. Has a default no-op implementation below, so
@@ -110,6 +109,19 @@ public protocol MIDITimeTableViewDelegate: AnyObject {
   /// - Returns: Width of header cell in each row.
   func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat
 
+  /// Number of grid subdivisions per beat, used for snapping cell moves/resizes and
+  /// playhead/range head drags, and for drawing the finest ("subbeat") grid lines. For example,
+  /// 4 snaps to sixteenth notes within a quarter-note beat.
+  ///
+  /// Has a default implementation returning 4, so existing conformers don't need to adopt it. If
+  /// you want snapping to follow your time signature's note value, return
+  /// `timeSignature(of:).noteValue.rawValue` (or any other subdivision count you prefer — the two
+  /// are independent: note value describes the meter, this describes the editing grid).
+  ///
+  /// - Parameter midiTimeTableView: Time table to set its snap resolution.
+  /// - Returns: Number of subdivisions per beat. Values below 1 are treated as 1.
+  func midiTimeTableViewSnapResolution(_ midiTimeTableView: MIDITimeTableView) -> Int
+
   /// Informs about user updated playhead position.
   ///
   /// - Parameter midiTimeTableView: Time table that updated.
@@ -132,6 +144,10 @@ extension MIDITimeTableViewDelegate {
   /// Default no-op implementation, so existing conformers of `MIDITimeTableViewDelegate` don't
   /// break when this method was added. Adopt it to receive resolved overlap information.
   public func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {}
+
+  /// Default implementation returning 4 (sixteenth notes in a quarter-note beat), matching the
+  /// time table's long-standing built-in behavior. Override to customise snapping.
+  public func midiTimeTableViewSnapResolution(_ midiTimeTableView: MIDITimeTableView) -> Int { 4 }
 }
 
 /// Draws time table with multiple rows and editable cells. Heavily customisable.
@@ -199,6 +215,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   private var rowHeight: CGFloat = 60
   private var measureHeight: CGFloat = 30
   private var headerCellWidth: CGFloat = 120
+  /// Number of grid subdivisions per beat. See `MIDITimeTableViewDelegate.midiTimeTableViewSnapResolution(_:)`.
+  private var snapResolution: Int = 4
   private var editingCellIndices = [MIDITimeTableCellIndex]()
 
   private var dragSelectMinimumPressDuration: TimeInterval = 0.5
@@ -215,7 +233,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   }
 
   private var subbeatWidth: CGFloat {
-    return beatWidth / 4
+    return beatWidth / CGFloat(snapResolution)
   }
 
   // MARK: Init
@@ -355,8 +373,12 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     gridLayer.measureWidth = measureWidth
     gridLayer.measureHeight = measureHeight
     gridLayer.beatCount = measureView.beatCount
+    gridLayer.snapResolution = snapResolution
     gridLayer.isHidden = !showsGrid
     gridLayer.frame = CGRect(x: 0, y: 0, width: contentSize.width, height: contentSize.height)
+
+    // Measure view's per-bar snap ticks.
+    measureView.snapResolution = snapResolution
   }
 
 
@@ -388,6 +410,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       for (index, cell) in row.cells.enumerated() {
         let cellView = row.cellView(cell)
         cellView.tag = index
+        cellView.cellID = cell.id
         cellView.delegate = self
         cells.append(cellView)
         addSubview(cellView)
@@ -399,6 +422,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     rowHeight = timeTableDelegate?.midiTimeTableViewHeightForRows(self) ?? rowHeight
     measureHeight = showsMeasure ? (timeTableDelegate?.midiTimeTableViewHeightForMeasureView(self) ?? measureHeight) : 0
     headerCellWidth = showsHeaders ? timeTableDelegate?.midiTimeTableViewWidthForRowHeaderCells(self) ?? headerCellWidth : 0
+    snapResolution = max(1, timeTableDelegate?.midiTimeTableViewSnapResolution(self) ?? snapResolution)
 
     // Update grid
     gridLayer.setNeedsLayout()
@@ -409,12 +433,85 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     }
   }
 
+  /// Applies an edit result to the time table's own row data and cell views incrementally:
+  /// only cells actually touched by `result` (updated, removed, or newly inserted) get their
+  /// view moved, removed, or created. Every other cell keeps its existing view instance and
+  /// stays in the hierarchy exactly as it was, instead of the whole table being torn down and
+  /// rebuilt the way `reloadData()` would.
+  ///
+  /// `didEditCells` already calls this for you after every move/resize, so the time table stays
+  /// visually correct on its own. It's exposed publicly in case you want to fold in an edit
+  /// result you produced yourself (e.g. replaying one from persistence).
+  ///
+  /// - Parameter result: The edit result to apply.
+  public func applyEditResult(_ result: MIDITimeTableCellEditResult) {
+    // Look up every currently-displayed cell view by its stable id before mutating anything, so
+    // cells untouched by this edit — the common case, usually all but one — get their exact same
+    // view instance reused rather than torn down and recreated.
+    var existingViewsByID = [MIDITimeTableCellID: MIDITimeTableCellView]()
+    for views in cellViews {
+      for view in views {
+        if let id = view.cellID { existingViewsByID[id] = view }
+      }
+    }
+
+    rowData.apply(result)
+
+    var newCellViews = [[MIDITimeTableCellView]]()
+    newCellViews.reserveCapacity(rowData.count)
+    for row in rowData.indices {
+      var rowViews = [MIDITimeTableCellView]()
+      rowViews.reserveCapacity(rowData[row].cells.count)
+      for (index, cell) in rowData[row].cells.enumerated() {
+        let cellView: MIDITimeTableCellView
+        if let existing = existingViewsByID.removeValue(forKey: cell.id) {
+          cellView = existing
+        } else {
+          // No prior view shares this id: a brand new cell (e.g. a split-off remainder).
+          cellView = rowData[row].cellView(cell)
+          cellView.cellID = cell.id
+          cellView.delegate = self
+          addSubview(cellView)
+        }
+        cellView.tag = index
+        rowViews.append(cellView)
+      }
+      newCellViews.append(rowViews)
+    }
+
+    // Anything left unclaimed no longer has a corresponding cell — removed, or fully covered by
+    // the edit — so its view is no longer needed.
+    existingViewsByID.values.forEach({ $0.removeFromSuperview() })
+
+    cellViews = newCellViews
+    setNeedsLayout()
+
+    if holdsHistory {
+      history.append(item: rowData)
+    }
+  }
+
+  /// Removes the given cells from the time table's own row data and cell views incrementally,
+  /// without rebuilding any cell unaffected by the deletion. Call this from
+  /// `midiTimeTableView(_:didDelete:)` in place of `reloadData()`.
+  ///
+  /// - Parameter indices: Row/index pairs of the cells to remove, as reported by `didDelete`.
+  public func removeCells(at indices: [MIDITimeTableCellIndex]) {
+    let ids = indices.compactMap { index -> MIDITimeTableCellID? in
+      guard index.row >= 0, index.row < rowData.count,
+        index.index >= 0, index.index < rowData[index.row].cells.count
+        else { return nil }
+      return rowData[index.row].cells[index.index].id
+    }
+    applyEditResult(MIDITimeTableCellEditResult(removals: ids))
+  }
+
   /// Gets the row and column index of the cell view in the data source.
   ///
   /// - Parameter cell: The cell you want to get row and column info.
   /// - Returns: Returns a row and column index Int pair in a tuple.
   public func cellIndex(of cell: MIDITimeTableCellView) -> MIDITimeTableCellIndex? {
-    let row = Int((cell.frame.minY - measureHeight) / rowHeight)
+    let row = Int(((cell.frame.minY - measureHeight) / rowHeight).rounded())
     guard row >= 0, row < cellViews.count, let index = cellViews[row].firstIndex(of: cell) else { return nil }
     return MIDITimeTableCellIndex(row: row, index: index)
   }
@@ -439,9 +536,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
       // Make scroll view scroll if drag view hits the limit
       var autoScrollDirection = MIDITimeTableViewAutoScrollDirection()
-      var visibleRect = CGRect(origin: contentOffset, size: bounds.size)
+      let visibleRect = CGRect(origin: contentOffset, size: bounds.size)
       if touchLocation.y < visibleRect.minY + dragViewAutoScrollingThreshold, contentOffset.y > 0 { // move up
-        visibleRect.origin.y -= dragViewAutoScrollingThreshold
         autoScrollDirection.insert(.up)
       } else if touchLocation.y > visibleRect.maxY - dragViewAutoScrollingThreshold, contentOffset.y + frame.size.height < contentSize.height { // move down
         autoScrollDirection.insert(.down)
@@ -532,19 +628,15 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   }
 
   private func startAutoScrollTimer(with direction: MIDITimeTableViewAutoScrollDirection) {
-    autoScrollingTimer = Timer.scheduledTimer(
-      timeInterval: autoScrollingTimerInterval,
-      target: self,
-      selector: #selector(autoScrollTimerTick(timer:)),
-      userInfo: ["direction": direction],
-      repeats: true)
+    // Block-based, with the direction captured directly — no `userInfo` dictionary/`Any`
+    // round-trip to unpack on every tick.
+    autoScrollingTimer = Timer.scheduledTimer(withTimeInterval: autoScrollingTimerInterval, repeats: true) { [weak self] _ in
+      self?.autoScrollTimerTick(direction: direction)
+    }
   }
 
-  @objc private func autoScrollTimerTick(timer: Timer) {
-    guard let userInfo = timer.userInfo as? [String: Any],
-      let dragCurrentPosition = dragCurrentPosition,
-      let direction = userInfo["direction"] as? MIDITimeTableViewAutoScrollDirection
-      else { return }
+  private func autoScrollTimerTick(direction: MIDITimeTableViewAutoScrollDirection) {
+    guard let dragCurrentPosition = dragCurrentPosition else { return }
 
     var scrollDirection = CGPoint.zero
     if direction.contains(.left) {
@@ -733,9 +825,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       let cellView = cellViews[cell.row][cell.index]
       let newCellPosition = Double(cellView.frame.minX - headerCellWidth) / Double(beatWidth)
       let newCellDuration = Double(cellView.frame.size.width / beatWidth)
-      let newCellRow = Int((cellView.frame.minY - measureHeight) / rowHeight)
+      let newCellRow = Int(((cellView.frame.minY - measureHeight) / rowHeight).rounded())
 
       editedCells.append((
+        cellView.cellID ?? MIDITimeTableCellID(),
         cell,
         newCellRow,
         newCellPosition,
@@ -743,13 +836,17 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     }
 
     editingCellIndices = []
-    timeTableDelegate?.midiTimeTableView(self, didEdit: editedCells)
 
     // The resolver only computes what happens to the OTHER cells the edit now overlaps; fold
-    // the edited cells' own new geometry in so `result.updates` is a complete, self-sufficient
-    // set that `rowData.apply(result)` alone can act on.
+    // the edited cells' own new geometry in so `result` is a complete, self-sufficient set that
+    // both `applyEditResult` below and a host's `rowData.apply(result)` can act on alone.
     var result = MIDITimeTableCellOverlapResolver.resolve(editedCells: editedCells, in: rowData)
     result.updates = editedCells + result.updates
+
+    // Keep the time table's own state correct incrementally before telling anyone about it, so
+    // a delegate inspecting the time table during these callbacks already sees the new state.
+    applyEditResult(result)
+
     timeTableDelegate?.midiTimeTableView(self, didEdit: result)
   }
 
@@ -781,7 +878,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       maxBackwardSteps: Int(((playheadView.frame.minX - headerCellWidth) / subbeatWidth).rounded(.down)))
 
     if steps != 0 {
-      playheadView.position = max(0, playheadView.position + (Double(steps) * 0.25))
+      playheadView.position = max(0, playheadView.position + (Double(steps) / Double(snapResolution)))
       panGestureRecognizer.setTranslation(CGPoint(x: translation.x - (CGFloat(steps) * subbeatWidth), y: translation.y), in: self)
     }
 

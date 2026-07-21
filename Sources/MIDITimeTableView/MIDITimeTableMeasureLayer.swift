@@ -18,10 +18,16 @@ open class MIDITimeTableMeasureLayer: CALayer {
   public var showsBarNumber = true
   /// Number of beats in the measure.
   public var beatCount = 4
+  /// Number of grid subdivisions per beat, used for drawing the small snap ticks. Defaults 4.
+  public var snapResolution = 4
   /// Number of bar to show in text layer.
   public var barNumber = 0
   /// Text and bar colors.
   public var tintColor: UIColor = .black
+  /// Rendering scale used for the bar-number text layer's crispness. A plain `CALayer` has no
+  /// `traitCollection` of its own, so this is propagated down from the owning
+  /// `MIDITimeTableMeasureView`'s `traitCollection.displayScale` rather than read here directly.
+  public var displayScale: CGFloat = UITraitCollection.current.displayScale
 
   /// Initilizes layer.
   public override init() {
@@ -50,18 +56,20 @@ open class MIDITimeTableMeasureLayer: CALayer {
     textLayer.frame = CGRect(x: 2, y: 0, width: frame.width, height: frame.height/2)
     textLayer.fontSize = frame.height/2
     textLayer.foregroundColor = tintColor.cgColor
-    textLayer.contentsScale = UIScreen.main.scale
+    textLayer.contentsScale = displayScale
     textLayer.alignmentMode = .left
     textLayer.string = showsBarNumber ? "\(barNumber)" : ""
     // Shape layer
     shapeLayer.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
     let path = UIBezierPath()
-    let width = frame.width / CGFloat(beatCount * 4)
+    let subdivisions = max(1, snapResolution)
+    let ticks = max(1, beatCount) * subdivisions
+    let width = frame.width / CGFloat(ticks)
     var currentX: CGFloat = width
-    for i in 1...beatCount*4 {
-      if i == beatCount * 4 {
+    for i in 1...ticks {
+      if i == ticks {
         path.move(to: CGPoint(x: currentX, y: 0))
-      } else if i%4 == 0 {
+      } else if i%subdivisions == 0 {
         path.move(to: CGPoint(x: currentX, y: shapeLayer.frame.height/2))
       } else {
         path.move(to: CGPoint(x: currentX, y: shapeLayer.frame.height/4*3))

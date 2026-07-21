@@ -17,8 +17,9 @@ final class MIDITimeTableRowDataApplyTests: XCTestCase {
 
   func testApplyUpdatesCellInPlaceWithinSameRow() {
     var rows = [makeRow([(position: 0, duration: 4), (position: 10, duration: 2)])]
+    let cellID = rows[0, 0].id
     let result = MIDITimeTableCellEditResult(
-      updates: [(index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 2, newDuration: 4)])
+      updates: [(id: cellID, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 2, newDuration: 4)])
 
     rows.apply(result)
 
@@ -31,8 +32,9 @@ final class MIDITimeTableRowDataApplyTests: XCTestCase {
 
   func testApplyMovesCellToAnotherRow() {
     var rows = [makeRow([(position: 0, duration: 4)]), makeRow([])]
+    let cellID = rows[0, 0].id
     let result = MIDITimeTableCellEditResult(
-      updates: [(index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 1, newPosition: 6, newDuration: 4)])
+      updates: [(id: cellID, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 1, newPosition: 6, newDuration: 4)])
 
     rows.apply(result)
 
@@ -40,11 +42,14 @@ final class MIDITimeTableRowDataApplyTests: XCTestCase {
     XCTAssertEqual(rows[1].cells.count, 1)
     XCTAssertEqual(rows[1].cells[0].position, 6)
     XCTAssertEqual(rows[1].cells[0].duration, 4)
+    // Identity survives the cross-row move.
+    XCTAssertEqual(rows[1].cells[0].id, cellID)
   }
 
   func testApplyRemovesFullyCoveredCells() {
     var rows = [makeRow([(position: 0, duration: 4), (position: 4, duration: 2)])]
-    let result = MIDITimeTableCellEditResult(removals: [MIDITimeTableCellIndex(row: 0, index: 1)])
+    let removedID = rows[0, 1].id
+    let result = MIDITimeTableCellEditResult(removals: [removedID])
 
     rows.apply(result)
 
@@ -62,13 +67,27 @@ final class MIDITimeTableRowDataApplyTests: XCTestCase {
     XCTAssertTrue(rows[0].cells.contains(where: { $0.position == 8 && $0.duration == 2 }))
   }
 
+  func testApplyIgnoresUpdateForUnknownID() {
+    // An update whose id no longer exists in the array (e.g. already removed by another change
+    // in the same batch) should be skipped rather than crashing or inserting anything.
+    var rows = [makeRow([(position: 0, duration: 4)])]
+    let result = MIDITimeTableCellEditResult(
+      updates: [(id: MIDITimeTableCellID(), index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 2, newDuration: 4)])
+
+    rows.apply(result)
+
+    XCTAssertEqual(rows[0].cells.count, 1)
+    XCTAssertEqual(rows[0].cells[0].position, 0)
+  }
+
   func testResolveThenApplyEndToEndTrimsOverlappedCell() {
     // Two adjacent cells: A occupies [0, 4), B occupies [4, 8).
     var rows = [makeRow([(position: 0, duration: 4), (position: 4, duration: 4)])]
+    let cellAID = rows[0, 0].id
 
     // Move A onto B's territory: A's new geometry is [2, 6).
     let edited: [MIDITimeTableViewEditedCellData] = [
-      (index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 2, newDuration: 4)
+      (id: cellAID, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 2, newDuration: 4)
     ]
 
     // This mirrors MIDITimeTableView.didEditCells: fold the edited cells' own new geometry into

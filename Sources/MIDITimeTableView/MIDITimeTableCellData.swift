@@ -56,8 +56,17 @@ extension Sequence where Element == MIDITimeTableCellIndex {
   }
 }
 
+/// Stable identity for a `MIDITimeTableCellData`. Unlike `MIDITimeTableCellIndex` — which is only
+/// a snapshot of a cell's current (row, array-position) and goes stale the moment any cell in the
+/// same row is added, removed, or reordered — a cell's `id` never changes across edits, so it's
+/// the reliable way to track "the same cell" through a sequence of moves, resizes, or splits.
+public typealias MIDITimeTableCellID = UUID
+
 /// Data of each cell in the rows of `MIDITimeTableView`.
-public struct MIDITimeTableCellData {
+public struct MIDITimeTableCellData: Identifiable {
+  /// Stable identity of the cell. See `MIDITimeTableCellID`.
+  public let id: MIDITimeTableCellID
+
   /// Actual data to show on views.
   public var data: Any
 
@@ -72,10 +81,13 @@ public struct MIDITimeTableCellData {
   /// Initilizes the cell data.
   ///
   /// - Parameters:
+  ///   - id: Stable identity for the cell. Defaults to a new random id; pass an existing one when
+  ///     re-hydrating a cell (e.g. from your own persistence) so its identity survives a reload.
   ///   - data: Data to show in cell view.
   ///   - position: Position of cell in row in form of beats.
   ///   - duration: Duration of cell in row in form of beats.
-  public init(data: Any, position: Double, duration: Double) {
+  public init(id: MIDITimeTableCellID = MIDITimeTableCellID(), data: Any, position: Double, duration: Double) {
+    self.id = id
     self.data = data
     self.position = position
     self.duration = duration

@@ -18,12 +18,12 @@ public struct MIDITimeTableCellEditResult {
   /// Every cell whose position/duration changed: the cells that were directly moved or resized,
   /// plus any other cells trimmed because one of those edits now overlaps them.
   public var updates: [MIDITimeTableViewEditedCellData]
-  /// Cells fully covered by an edited cell; these should be removed entirely.
-  public var removals: [MIDITimeTableCellIndex]
+  /// Stable ids of cells fully covered by an edited cell; these should be removed entirely.
+  public var removals: [MIDITimeTableCellID]
   /// New cells created by splitting a cell that had an edited cell land inside it.
   public var insertions: [MIDITimeTableCellInsertion]
 
-  public init(updates: [MIDITimeTableViewEditedCellData] = [], removals: [MIDITimeTableCellIndex] = [], insertions: [MIDITimeTableCellInsertion] = []) {
+  public init(updates: [MIDITimeTableViewEditedCellData] = [], removals: [MIDITimeTableCellID] = [], insertions: [MIDITimeTableCellInsertion] = []) {
     self.updates = updates
     self.removals = removals
     self.insertions = insertions
@@ -51,6 +51,23 @@ extension Array where Element == MIDITimeTableRowData {
     } set {
       self[index.row, index.index] = newValue
     }
+  }
+
+  /// Finds a cell's current `(row, array-position)` by its stable id.
+  ///
+  /// Unlike a `MIDITimeTableCellIndex` captured earlier, this is always accurate no matter how
+  /// many edits have mutated the array since — it searches fresh every call instead of trusting a
+  /// snapshot that could have gone stale.
+  ///
+  /// - Parameter id: Stable id of the cell to find.
+  /// - Returns: The cell's current index, or `nil` if no cell with that id exists.
+  public func index(ofCellID id: MIDITimeTableCellID) -> MIDITimeTableCellIndex? {
+    for (row, rowData) in enumerated() {
+      if let i = rowData.cells.firstIndex(where: { $0.id == id }) {
+        return MIDITimeTableCellIndex(row: row, index: i)
+      }
+    }
+    return nil
   }
 
   /// Adds a cell data in a row.
@@ -85,56 +102,35 @@ extension Array where Element == MIDITimeTableRowData {
   /// single call a host needs in `midiTimeTableView(_:didEdit:)` to keep its data in sync;
   /// see `Example/MIDITimeTableView/ViewController.swift` for the reference usage.
   ///
+  /// Every update and removal is located by the cell's stable `id`, looked up fresh right before
+  /// it's used (via `index(ofCellID:)`). That makes this correct regardless of the order the
+  /// changes are applied in — unlike addressing by `(row, index)`, an id lookup can never go
+  /// stale partway through, even when several of these changes land in the same row.
+  ///
   /// - Parameter result: The edit result reported by the time table view.
   public mutating func apply(_ result: MIDITimeTableCellEditResult) {
     guard !isEmpty else { return }
 
-    // Resolve every update against its ORIGINAL index first (before any structural change),
-    // splitting into "stays in the same row" (safe to update in place) and "moves to another
-    // row" (needs a remove + append). Keying by the original index keeps this correct even when
-    // multiple cells in the same row are edited at once — nothing shifts until `removeCells`
-    // below, which removes a whole row's indices in one pass.
-    var sameRowUpdates = [MIDITimeTableCellIndex: MIDITimeTableCellData]()
-    var movedAway = [MIDITimeTableCellIndex: (row: Int, cell: MIDITimeTableCellData)]()
-
     for update in result.updates {
-      let index = update.index
-      guard index.row >= 0, index.row < count,
-        index.index >= 0, index.index < self[index.row].cells.count
-        else { continue }
-      var cell = self[index]
+      guard let currentIndex = index(ofCellID: update.id) else { continue }
+      var cell = self[currentIndex]
       cell.position = update.newPosition
       cell.duration = update.newDuration
-      if index.row == update.newRowIndex {
-        sameRowUpdates[index] = cell
-      } else {
-        movedAway[index] = (update.newRowIndex, cell)
+      if currentIndex.row == update.newRowIndex {
+        self[currentIndex] = cell
+      } else if update.newRowIndex >= 0 && update.newRowIndex < count {
+        removeCell(at: currentIndex)
+        appendCell(cell, row: update.newRowIndex)
       }
     }
 
-    var appendedByRow = [Int: [MIDITimeTableCellData]]()
-    for (_, moved) in movedAway {
-      appendedByRow[moved.row, default: []].append(moved.cell)
-    }
-    for insertion in result.insertions {
-      appendedByRow[insertion.row, default: []].append(insertion.cell)
+    for id in result.removals {
+      guard let currentIndex = index(ofCellID: id) else { continue }
+      removeCell(at: currentIndex)
     }
 
-    // In-place updates don't change row length/order, so they're safe to apply before removal.
-    for (index, cell) in sameRowUpdates {
-      self[index] = cell
-    }
-
-    // Remove fully covered cells and cells that moved to another row in one grouped pass per row.
-    var removalIndices = result.removals
-    removalIndices.append(contentsOf: movedAway.keys)
-    removeCells(at: removalIndices)
-
-    // Append moved and split-off cells to their destination rows.
-    for (row, cells) in appendedByRow where row >= 0 && row < count {
-      for cell in cells {
-        appendCell(cell, row: row)
-      }
+    for insertion in result.insertions where insertion.row >= 0 && insertion.row < count {
+      appendCell(insertion.cell, row: insertion.row)
     }
   }
 }

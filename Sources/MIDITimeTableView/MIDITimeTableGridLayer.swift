@@ -52,6 +52,8 @@ public class MIDITimeTableGridLayer: CALayer {
   public var barCount: Int = 0
   /// Number of beats in a measure.
   public var beatCount: Int = 0
+  /// Number of grid subdivisions per beat, used for drawing subbeat lines. Defaults 4.
+  public var snapResolution: Int = 4
   /// Height of each row in the time table.
   public var rowHeight: CGFloat = 0
   /// Width of the header cell in each row of the time table.
@@ -131,10 +133,11 @@ public class MIDITimeTableGridLayer: CALayer {
 
     // Subbeat lines
     let subbeatPath = UIBezierPath()
-    for i in 0..<barCount*beatCount*4 {
-      if i%4 == 0 { continue }
-      subbeatPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / (CGFloat(beatCount) * 4)), y: measureHeight))
-      subbeatPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / (CGFloat(beatCount) * 4)), y: frame.height))
+    let subdivisions = max(1, snapResolution)
+    for i in 0..<barCount*beatCount*subdivisions {
+      if i%subdivisions == 0 { continue }
+      subbeatPath.move(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / (CGFloat(beatCount) * CGFloat(subdivisions))), y: measureHeight))
+      subbeatPath.addLine(to: CGPoint(x: rowHeaderWidth + (CGFloat(i) * measureWidth / (CGFloat(beatCount) * CGFloat(subdivisions))), y: frame.height))
       subbeatPath.close()
     }
     subbeatLineLayer.path = subbeatPath.cgPath

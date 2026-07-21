@@ -23,12 +23,17 @@ public enum MIDITimeTableCellOverlapResolver {
   ///   - rowData: Snapshot of all rows as they were immediately before the edit.
   /// - Returns: The resolved updates, removals and insertions for the affected OTHER cells.
   public static func resolve(editedCells: [MIDITimeTableViewEditedCellData], in rowData: [MIDITimeTableRowData]) -> MIDITimeTableCellEditResult {
-    let editedIndexSet = Set(editedCells.map({ $0.index }))
-    var removals = Set<MIDITimeTableCellIndex>()
+    let editedIDSet = Set(editedCells.map({ $0.id }))
+    // Cells fully covered by an edit, tracked both by id (the output) and by their position in
+    // the immutable `rowData` snapshot (so the scan below can skip them without needing to look
+    // them up again).
+    var removedIndices = Set<MIDITimeTableCellIndex>()
+    var removals = [MIDITimeTableCellID]()
     var insertions = [MIDITimeTableCellInsertion]()
-    // Working state of non-edited cells touched so far, keyed by their ORIGINAL index, so that
-    // multiple edited cells landing on the same underlying cell resolve against each other in
-    // sequence rather than clobbering one another's changes.
+    // Working state of non-edited cells touched so far, keyed by their position in the immutable
+    // `rowData` snapshot, so that multiple edited cells landing on the same underlying cell
+    // resolve against each other in sequence rather than clobbering one another's changes. `id`
+    // is preserved on every value here since we only ever mutate `position`/`duration` in place.
     var working = [MIDITimeTableCellIndex: MIDITimeTableCellData]()
 
     func currentCell(at index: MIDITimeTableCellIndex) -> MIDITimeTableCellData? {
@@ -46,22 +51,25 @@ public enum MIDITimeTableCellOverlapResolver {
 
       for otherIndexInRow in rowData[targetRow].cells.indices {
         let otherCellIndex = MIDITimeTableCellIndex(row: targetRow, index: otherIndexInRow)
-        if editedIndexSet.contains(otherCellIndex) || removals.contains(otherCellIndex) { continue }
-        guard var otherCell = currentCell(at: otherCellIndex), editedData.overlaps(otherCell) else { continue }
+        if removedIndices.contains(otherCellIndex) { continue }
+        guard var otherCell = currentCell(at: otherCellIndex) else { continue }
+        if editedIDSet.contains(otherCell.id) { continue }
+        guard editedData.overlaps(otherCell) else { continue }
 
         if editedData.position <= otherCell.position && editedData.endPosition >= otherCell.endPosition {
           // Fully covered by the edit -> remove.
-          removals.insert(otherCellIndex)
+          removedIndices.insert(otherCellIndex)
+          removals.append(otherCell.id)
           working.removeValue(forKey: otherCellIndex)
         } else if editedData.position > otherCell.position && editedData.endPosition < otherCell.endPosition {
-          // Edit lands strictly inside -> trim the left piece in place, insert the right remainder.
-          let rightPosition = editedData.endPosition
-          let rightDuration = otherCell.endPosition - editedData.endPosition
+          // Edit lands strictly inside -> trim the left piece in place (keeps its original id),
+          // insert the right remainder as a brand new cell with a fresh id.
+          let rightPiece = MIDITimeTableCellData(
+            data: otherCell.data,
+            position: editedData.endPosition,
+            duration: otherCell.endPosition - editedData.endPosition)
           otherCell.duration = editedData.position - otherCell.position
           working[otherCellIndex] = otherCell
-          var rightPiece = otherCell
-          rightPiece.position = rightPosition
-          rightPiece.duration = rightDuration
           insertions.append((targetRow, rightPiece))
         } else if editedData.position <= otherCell.position {
           // Overlaps the other cell's start -> trim it from the left.
@@ -77,8 +85,8 @@ public enum MIDITimeTableCellOverlapResolver {
     }
 
     let updates: [MIDITimeTableViewEditedCellData] = working.map { index, cell in
-      (index, index.row, cell.position, cell.duration)
+      (cell.id, index, index.row, cell.position, cell.duration)
     }
-    return MIDITimeTableCellEditResult(updates: updates, removals: Array(removals), insertions: insertions)
+    return MIDITimeTableCellEditResult(updates: updates, removals: removals, insertions: insertions)
   }
 }

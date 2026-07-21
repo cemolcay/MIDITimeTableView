@@ -243,19 +243,18 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
     rowData.removeCells(at: cells)
-    timeTableView?.reloadData()
+    // Incremental: only the deleted cells' views are torn down, everything else keeps its
+    // existing view instance. `MIDITimeTableView` also records this as a new history entry
+    // internally, so no `reloadData()` is needed here.
+    timeTableView?.removeCells(at: cells)
     updateHistoryButtons()
   }
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit cells: [MIDITimeTableViewEditedCellData]) {
-    // Overlap resolution is handled in `didEdit result:` below via `rowData.apply(result)`,
-    // which supersedes this method's data. Left as a no-op since it's still a required
-    // delegate method for source compatibility with existing conformers.
-  }
-
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {
+    // Keep our own mirror of the data in sync. `MIDITimeTableView` has already applied this same
+    // result to its own state incrementally (see `applyEditResult(_:)`) and recorded history, so
+    // there's no `reloadData()` to do here — the table is already showing the new state.
     rowData.apply(result)
-    timeTableView?.reloadData()
     updateHistoryButtons()
   }
 

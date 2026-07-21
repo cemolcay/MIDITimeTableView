@@ -70,6 +70,11 @@ open class MIDITimeTableCellView: UIView {
   open var customMenuItems = [MIDITimeTableCellViewCustomMenuItem]()
   /// When cell's position or duration editing, is selected.
   open var isSelected: Bool = false
+  /// Stable identity of the `MIDITimeTableCellData` this view represents. Set by
+  /// `MIDITimeTableView` on `reloadData()`; used to report edits by the cell's stable id rather
+  /// than its (possibly stale) array position. `nil` for a cell view that hasn't been placed in a
+  /// time table yet.
+  open var cellID: MIDITimeTableCellID?
 
   open override var canBecomeFirstResponder: Bool {
     return true

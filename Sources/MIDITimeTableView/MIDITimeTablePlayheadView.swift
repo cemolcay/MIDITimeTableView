@@ -48,7 +48,7 @@ public class MIDITimeTablePlayheadView: UIView {
   /// Playhead's guide line height that draws on timetable. It's best to match timetable's content height.
   public var lineHeight: CGFloat = 0 { didSet{ setNeedsLayout() }}
   /// Playhead's guide line width that draws on timetable.
-  public var lineWidth: CGFloat = 1 / UIScreen.main.scale { didSet{ setNeedsLayout() }}
+  public var lineWidth: CGFloat = 1 / UITraitCollection.current.displayScale { didSet{ setNeedsLayout() }}
   /// Line layer that draws playhead's position guide on timetable.
   private var lineLayer = CALayer()
   /// Optional image view that initilizes if an image assings.
