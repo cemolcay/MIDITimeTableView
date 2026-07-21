@@ -7,6 +7,7 @@
 //
 
 import UIKit
+import MIDITimeTableView
 
 class HeaderCellView: MIDITimeTableHeaderCellView {
   var titleLabel = UILabel()

@@ -6,20 +6,26 @@ Customisable and editable time table grid for showing midi or audio related data
 Demo
 ----
 
-![alt tag](https://github.com/cemolcay/MIDITimeTableView/raw/master/demo.gif)
+![alt tag](https://github.com/cemolcay/MIDITimeTableView/raw/master/Example/demo.gif)
 
 Requirements
 ----
 
-- Swift 5.0+
-- iOS 9.0+
+- Swift 5.9+
+- iOS 13.0+
 
 Install
 ----
 
+### Swift Package Manager
+
 ```
-pod 'MIDITimeTableView'
+.package(url: "https://github.com/cemolcay/MIDITimeTableView", from: "1.0.3")
 ```
+
+Or add it via Xcode: File > Add Package Dependencies... and paste the repo URL.
+
+A runnable demo project is available in [`Example/`](Example).
 
 Features
 ----
