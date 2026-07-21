@@ -9,7 +9,26 @@
 import Foundation
 
 /// A new cell layout created by splitting an existing cell that had an edited cell land inside it.
-public typealias MIDITimeTableCellInsertion = (row: Int, sourceID: MIDITimeTableCellID, id: MIDITimeTableCellID, position: Double, duration: Double)
+public struct MIDITimeTableCellInsertion: Equatable {
+  /// Row the new fragment belongs to.
+  public var row: Int
+  /// Stable id of the existing cell this fragment was split from. Clone that model when inserting.
+  public var sourceID: MIDITimeTableCellID
+  /// Stable id assigned to the new fragment.
+  public var id: MIDITimeTableCellID
+  /// Position, in beats, of the new fragment.
+  public var position: Double
+  /// Duration, in beats, of the new fragment.
+  public var duration: Double
+
+  public init(row: Int, sourceID: MIDITimeTableCellID, id: MIDITimeTableCellID, position: Double, duration: Double) {
+    self.row = row
+    self.sourceID = sourceID
+    self.id = id
+    self.position = position
+    self.duration = duration
+  }
+}
 
 /// Result of an edit (move or resize), including its effect on the cells it now overlaps.
 public struct MIDITimeTableCellEditResult {

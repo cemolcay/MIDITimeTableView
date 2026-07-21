@@ -218,6 +218,11 @@ You can customise the measure bar, the grid, each header and data cell. Check ou
 
 `MIDITimeTableCellView`'s are editable, you can move them around the grid, resize their duration,
 or long press to open a delete menu. Subclass `MIDITimeTableCellView` to present your own data.
+
+> **Note:** the long-press cell menu is built on `UIMenuController`, which Apple deprecated in
+> iOS 16 in favor of `UIEditMenuInteraction`. It's kept as-is to preserve the iOS 13 deployment
+> floor; a `UIEditMenuInteraction` path (behind an `#available` check) is planned for a future
+> release.
   
 You can set the `minMeasureWidth` and `maxMeasureWidth` to set zoom levels of the time table.
 

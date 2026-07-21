@@ -29,7 +29,12 @@ public enum MIDITimeTableCellOverlapResolver {
     // them up again).
     var removedIndices = Set<MIDITimeTableCellIndex>()
     var removals = [MIDITimeTableCellID]()
-    var insertions = [MIDITimeTableCellInsertion]()
+    // Live inserted fragments (right-hand remainders of "landed strictly inside" splits), tracked
+    // as working state so that a *later* edited cell in the same batch that overlaps a fragment
+    // resolves against it too, instead of the fragment being emitted untouched and leaving a
+    // residual overlap. `sourceID` is propagated across nested splits so the fragment always
+    // references the original host cell to clone from.
+    var insertionWorking = [(row: Int, sourceID: MIDITimeTableCellID, data: MIDITimeTableCellLayoutData)]()
     // Working state of non-edited cells touched so far, keyed by their position in the immutable
     // `rowData` snapshot, so that multiple edited cells landing on the same underlying cell
     // resolve against each other in sequence rather than clobbering one another's changes. `id`
@@ -70,7 +75,7 @@ public enum MIDITimeTableCellOverlapResolver {
             duration: otherCell.endPosition - editedData.endPosition)
           otherCell.duration = editedData.position - otherCell.position
           working[otherCellIndex] = otherCell
-          insertions.append((targetRow, otherCell.id, rightPiece.id, rightPiece.position, rightPiece.duration))
+          insertionWorking.append((targetRow, otherCell.id, rightPiece))
         } else if editedData.position <= otherCell.position {
           // Overlaps the other cell's start -> trim it from the left.
           otherCell.duration = otherCell.endPosition - editedData.endPosition
@@ -82,10 +87,50 @@ public enum MIDITimeTableCellOverlapResolver {
           working[otherCellIndex] = otherCell
         }
       }
+
+      // Re-resolve the edit against fragments already split off earlier in this same batch. Same
+      // four cases as above; a fragment split again just appends another fragment to the list,
+      // which any still-later edited cell will in turn see.
+      var fragmentIndex = 0
+      while fragmentIndex < insertionWorking.count {
+        var fragment = insertionWorking[fragmentIndex]
+        guard fragment.row == targetRow, editedData.overlaps(fragment.data) else {
+          fragmentIndex += 1
+          continue
+        }
+
+        if editedData.position <= fragment.data.position && editedData.endPosition >= fragment.data.endPosition {
+          insertionWorking.remove(at: fragmentIndex)
+          continue
+        } else if editedData.position > fragment.data.position && editedData.endPosition < fragment.data.endPosition {
+          let rightPiece = MIDITimeTableCellLayoutData(
+            id: MIDITimeTableCellID(),
+            position: editedData.endPosition,
+            duration: fragment.data.endPosition - editedData.endPosition)
+          fragment.data.duration = editedData.position - fragment.data.position
+          insertionWorking[fragmentIndex] = fragment
+          insertionWorking.append((targetRow, fragment.sourceID, rightPiece))
+        } else if editedData.position <= fragment.data.position {
+          fragment.data.duration = fragment.data.endPosition - editedData.endPosition
+          fragment.data.position = editedData.endPosition
+          insertionWorking[fragmentIndex] = fragment
+        } else {
+          fragment.data.duration = editedData.position - fragment.data.position
+          insertionWorking[fragmentIndex] = fragment
+        }
+        fragmentIndex += 1
+      }
     }
 
-    let updates: [MIDITimeTableViewEditedCellData] = working.map { index, cell in
-      (cell.id, index, index.row, cell.position, cell.duration)
+    // Sort so the batched result is deterministic for hosts that diff arrays, rather than reflecting
+    // the (unordered) dictionary's iteration order.
+    let updates: [MIDITimeTableViewEditedCellData] = working
+      .map { index, cell in
+        MIDITimeTableViewEditedCellData(id: cell.id, index: index, newRowIndex: index.row, newPosition: cell.position, newDuration: cell.duration)
+      }
+      .sorted { ($0.index.row, $0.index.index) < ($1.index.row, $1.index.index) }
+    let insertions = insertionWorking.map { entry in
+      MIDITimeTableCellInsertion(row: entry.row, sourceID: entry.sourceID, id: entry.data.id, position: entry.data.position, duration: entry.data.duration)
     }
     return MIDITimeTableCellEditResult(updates: updates, removals: removals, insertions: insertions)
   }
@@ -94,7 +139,7 @@ public enum MIDITimeTableCellOverlapResolver {
   /// edited id so selected cells win against non-selected cells, but a multi-cell resize can make
   /// selected neighbors overlap each other. This pass gives earlier cells in each row priority
   /// and trims/removes later selected cells against them.
-  public static func resolveOverlapsAmongEditedCells(_ editedCells: [MIDITimeTableViewEditedCellData]) -> MIDITimeTableCellEditResult {
+  internal static func resolveOverlapsAmongEditedCells(_ editedCells: [MIDITimeTableViewEditedCellData]) -> MIDITimeTableCellEditResult {
     var removals = [MIDITimeTableCellID]()
     var working = editedCells
 

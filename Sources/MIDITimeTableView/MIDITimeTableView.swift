@@ -95,7 +95,27 @@ public protocol MIDITimeTableViewDataSource: AnyObject {
 /// how many other cells were added, removed or reordered since. `index` is a snapshot of the
 /// cell's (row, array-position) at the moment the edit was reported and can go stale the instant
 /// another edit in the same batch shifts it.
-public typealias MIDITimeTableViewEditedCellData = (id: MIDITimeTableCellID, index: MIDITimeTableCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
+public struct MIDITimeTableViewEditedCellData: Equatable {
+  /// Stable identity of the edited cell.
+  public var id: MIDITimeTableCellID
+  /// The cell's (row, array-position) snapshot at the moment the edit was reported. Can go stale;
+  /// prefer `id` to locate the cell going forward.
+  public var index: MIDITimeTableCellIndex
+  /// Row index the cell now belongs to.
+  public var newRowIndex: Int
+  /// Position, in beats, the cell now starts at.
+  public var newPosition: Double
+  /// Duration, in beats, the cell now spans.
+  public var newDuration: Double
+
+  public init(id: MIDITimeTableCellID, index: MIDITimeTableCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double) {
+    self.id = id
+    self.index = index
+    self.newRowIndex = newRowIndex
+    self.newPosition = newPosition
+    self.newDuration = newDuration
+  }
+}
 
 /// Delegate functions to inform about changed cells and sizing of the time table.
 public protocol MIDITimeTableViewDelegate: AnyObject {
@@ -492,7 +512,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     assert(dataSourceRowCount >= 0, "MIDITimeTableViewDataSource returned a negative row count.")
     let numberOfRows = max(0, dataSourceRowCount)
     let timeSignature = dataSource?.timeSignature(of: self) ?? MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
-    measureView.beatCount = timeSignature.beats
+    assert(timeSignature.beats >= 1, "MIDITimeTableViewDataSource returned a time signature with \(timeSignature.beats) beats. Beats must be greater than zero.")
+    // Clamp to at least one beat so `beatWidth` (measureWidth / beatCount) can never divide by zero
+    // and poison every cell frame with NaN/inf in release builds where the assert above is stripped.
+    measureView.beatCount = max(1, timeSignature.beats)
 
     // Update rowData
     rowData.removeAll()
@@ -1093,7 +1116,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       let newCellDuration = Double(cellView.frame.size.width / beatWidth)
       let newCellRow = Int(((cellView.frame.minY - measureHeight) / rowHeight).rounded())
 
-      editedCells.append((id, cell, newCellRow, newCellPosition, newCellDuration))
+      editedCells.append(MIDITimeTableViewEditedCellData(id: id, index: cell, newRowIndex: newCellRow, newPosition: newCellPosition, newDuration: newCellDuration))
     }
 
     editingCellIndices = []

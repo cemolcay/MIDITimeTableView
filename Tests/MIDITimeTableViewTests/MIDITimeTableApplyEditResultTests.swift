@@ -84,7 +84,7 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
     let movedID = row[0].id
 
     let result = MIDITimeTableCellEditResult(
-      updates: [(id: movedID, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 2, newDuration: 4)])
+      updates: [MIDITimeTableViewEditedCellData(id: movedID, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 0, newPosition: 2, newDuration: 4)])
     timeTable.applyEditResult(result)
 
     XCTAssertTrue(timeTable.cellView(for: untouchedID) === untouchedView)
@@ -100,7 +100,7 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
     }
 
     let result = MIDITimeTableCellEditResult(
-      updates: [(id: id, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 1, newPosition: 6, newDuration: 4)])
+      updates: [MIDITimeTableViewEditedCellData(id: id, index: MIDITimeTableCellIndex(row: 0, index: 0), newRowIndex: 1, newPosition: 6, newDuration: 4)])
     timeTable.applyEditResult(result)
 
     XCTAssertTrue(timeTable.cellView(for: id) === cellView)
@@ -129,7 +129,7 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
     let newCellID = MIDITimeTableCellID()
     timeTable.applyEditResult(
       MIDITimeTableCellEditResult(
-        insertions: [(row: 0, sourceID: row[0].id, id: newCellID, position: 8, duration: 2)]))
+        insertions: [MIDITimeTableCellInsertion(row: 0, sourceID: row[0].id, id: newCellID, position: 8, duration: 2)]))
 
     XCTAssertNotNil(timeTable.cellView(for: newCellID))
   }
@@ -165,7 +165,7 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
     let result = timeTable.effectiveChangeResult(
       from: MIDITimeTableCellEditResult(
         updates: [
-          (
+          MIDITimeTableViewEditedCellData(
             id: row[0].id,
             index: MIDITimeTableCellIndex(row: 0, index: 0),
             newRowIndex: 0,
