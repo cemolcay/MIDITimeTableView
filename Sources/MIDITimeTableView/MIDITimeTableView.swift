@@ -108,6 +108,7 @@ public protocol MIDITimeTableViewDelegate: AnyObject {
   ///
   /// - Parameters:
   ///   - midiTimeTableView: Time table that performed changes on.
+  ///   - result: Resolved change result with updated, removed and newly split cells.
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didChange result: MIDITimeTableCellEditResult)
 
   /// Measure view height in the time table.
