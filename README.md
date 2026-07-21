@@ -126,19 +126,16 @@ Those helpers come from the optional `MIDITimeTableRowRepresentable` /
 `MIDITimeTableCellRepresentable` protocols. They only read your model; view creation and
 configuration stay explicit in the data source.
 
-Keep your model in sync by applying the edit and delete callbacks from `MIDITimeTableViewDelegate`.
-Your app's model remains the source of truth. Apply edit results synchronously in `didEdit`; the
-time table updates its internal layout immediately after the callback returns, so any newly split
-cells can be dequeued and configured from your already-updated data source.
+Keep your model in sync by applying the change callback from `MIDITimeTableViewDelegate`.
+Your app's model remains the source of truth. Moves, resizes, overlap trims, split insertions and
+deletions all arrive as one `MIDITimeTableCellEditResult` in `didChange`. Apply the result
+synchronously there; the time table updates its internal layout immediately after the callback
+returns, so any newly split cells can be dequeued and configured from your already-updated data
+source.
 
 ``` swift
-func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didChange result: MIDITimeTableCellEditResult) {
   apply(result)
-}
-
-func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
-  removeCells(at: cells)
-  midiTimeTableView.removeCells(at: cells)
 }
 
 func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView) {
@@ -213,9 +210,9 @@ struct SongHistory: MIDITimeTableHistoryRepresentable {
 ```
 
 The optional `midiTimeTableViewShouldPushHistory(_:)` delegate callback is called after the table
-has accepted a user edit or after you call `removeCells(at:)` from `didDelete`. Use it to snapshot
-your already-updated model. Programmatic edits that you apply yourself should push their own history
-entry when appropriate.
+has accepted a user change and applied the same result to its internal layout. Use it to snapshot
+your already-updated model. Programmatic changes that you apply yourself should push their own
+history entry when appropriate.
   
 You can customise the measure bar, the grid, each header and data cell. Check out the example project.
 
@@ -241,9 +238,9 @@ selected cells can still move in that direction. Resizing cells can auto-scroll 
 the selected cells can still grow or shrink. Auto-scroll stops at the grid and row bounds.
 
 Moves and resizes snap to the delegate's `midiTimeTableViewSnapResolution(_:)`, which defaults to
-`4` subdivisions per beat. After every move or resize, overlaps are resolved and reported as a
+`4` subdivisions per beat. After every user change, overlaps are resolved and reported as a
 `MIDITimeTableCellEditResult` containing updates, removals, and insertions. Apply that result in
-`midiTimeTableView(_:didEdit:)` to keep your data source in sync.
+`midiTimeTableView(_:didChange:)` to keep your data source in sync.
 
 ### Viewport virtualization & cell reuse
 

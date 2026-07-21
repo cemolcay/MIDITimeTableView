@@ -278,12 +278,6 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         }
     }
     
-    private func removeCells(at indices: [MIDITimeTableCellIndex]) {
-        for (row, index) in indices.ordered {
-            rows[row].cells = rows[row].cells.enumerated().filter({ !index.contains($0.offset) }).map({ $0.element })
-        }
-    }
-    
     // MARK: MIDITimeTableViewDataSource
     
     func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int {
@@ -336,13 +330,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         return 100
     }
     
-    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {
-        removeCells(at: cells)
-        timeTableView?.removeCells(at: cells)
-        updateHistoryButtons()
-    }
-    
-    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {
+    func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didChange result: MIDITimeTableCellEditResult) {
         apply(result)
         updateHistoryButtons()
     }

@@ -20,6 +20,7 @@ private struct TestCell {
 
 private final class StubDataSource: MIDITimeTableViewDataSource, MIDITimeTableViewDelegate {
   var rows: [[TestCell]]
+  var changeResults = [MIDITimeTableCellEditResult]()
 
   init(rows: [[TestCell]]) {
     self.rows = rows
@@ -48,7 +49,9 @@ private final class StubDataSource: MIDITimeTableViewDataSource, MIDITimeTableVi
     MIDITimeTableCellView()
   }
 
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {}
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didChange result: MIDITimeTableCellEditResult) {
+    changeResults.append(result)
+  }
   func midiTimeTableViewHeightForMeasureView(_ midiTimeTableView: MIDITimeTableView) -> CGFloat { 20 }
   func midiTimeTableViewHeightForRows(_ midiTimeTableView: MIDITimeTableView) -> CGFloat { 60 }
   func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat { 100 }
@@ -142,5 +145,36 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
     timeTable.removeCells(at: [MIDITimeTableCellIndex(row: 0, index: 1)])
 
     XCTAssertTrue(timeTable.cellView(for: keptID) === keptView)
+    XCTAssertEqual(stub.changeResults.last?.removals, [row[1].id])
+  }
+
+  func testRemoveCellsAtInvalidIndicesDoesNotPublishChange() {
+    let row = makeRow([(position: 0, duration: 4)])
+    let (timeTable, stub) = makeLoadedTimeTable([row])
+
+    timeTable.removeCells(at: [MIDITimeTableCellIndex(row: 0, index: 99)])
+
+    XCTAssertTrue(stub.changeResults.isEmpty)
+  }
+
+  func testEffectiveChangeResultDropsNoOpUpdate() {
+    let row = makeRow([(position: 2, duration: 4)])
+    let (timeTable, stub) = makeLoadedTimeTable([row])
+    _ = stub
+
+    let result = timeTable.effectiveChangeResult(
+      from: MIDITimeTableCellEditResult(
+        updates: [
+          (
+            id: row[0].id,
+            index: MIDITimeTableCellIndex(row: 0, index: 0),
+            newRowIndex: 0,
+            newPosition: 2,
+            newDuration: 4)
+        ]))
+
+    XCTAssertTrue(result.updates.isEmpty)
+    XCTAssertTrue(result.removals.isEmpty)
+    XCTAssertTrue(result.insertions.isEmpty)
   }
 }

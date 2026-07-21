@@ -150,12 +150,17 @@ open class MIDITimeTableCellView: UIView {
     delegate?.midiTimeTableCellViewDidResize(self, pan: pan)
   }
 
+  func prepareForMenuPresentation() {
+    becomeFirstResponder()
+    delegate?.midiTimeTableCellViewDidTap(self)
+    isSelected = true
+  }
+
   // Note: `UIMenuController` is deprecated in favor of `UIEditMenuInteraction` (iOS 16+).
   // Kept as-is to preserve the iOS 13 floor without introducing an `#available` fork here.
   @objc public func didLongPress(longPress: UILongPressGestureRecognizer) {
     guard let superview = superview else { return }
-    becomeFirstResponder()
-    isSelected = true
+    prepareForMenuPresentation()
 
     let menu = UIMenuController.shared
     menu.menuItems = [

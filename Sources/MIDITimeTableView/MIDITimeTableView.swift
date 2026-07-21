@@ -97,10 +97,10 @@ public protocol MIDITimeTableViewDataSource: AnyObject {
 /// another edit in the same batch shifts it.
 public typealias MIDITimeTableViewEditedCellData = (id: MIDITimeTableCellID, index: MIDITimeTableCellIndex, newRowIndex: Int, newPosition: Double, newDuration: Double)
 
-/// Delegate functions to inform about editing cells and sizing of the time table.
+/// Delegate functions to inform about changed cells and sizing of the time table.
 public protocol MIDITimeTableViewDelegate: AnyObject {
-  /// Informs about the cell edit's resolved overlaps: cells trimmed, removed or split because
-  /// the moved/resized cell now covers them.
+  /// Informs about a user-driven table change: moves, resizes, overlap trims, split insertions,
+  /// and deletions all flow through this single result.
   ///
   /// The delegate should apply `result` to its backing data source synchronously during this
   /// callback. `MIDITimeTableView` updates its internal layout immediately after this returns, so
@@ -108,15 +108,7 @@ public protocol MIDITimeTableViewDelegate: AnyObject {
   ///
   /// - Parameters:
   ///   - midiTimeTableView: Time table that performed changes on.
-  ///   - result: Resolved edit result with updated, removed and newly split cells.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult)
-
-  /// Informs about the cell is being deleted.
-  ///
-  /// - Parameters:
-  ///   - midiTimeTableView: Time table that performed changes on.
-  ///   - cells: Row and column indices of the cells will be deleting.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex])
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didChange result: MIDITimeTableCellEditResult)
 
   /// Measure view height in the time table.
   ///
@@ -159,15 +151,15 @@ public protocol MIDITimeTableViewDelegate: AnyObject {
   /// - Parameter midiTimeTableView: Time table that updated.
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdateRangeHead position: Double)
 
-  /// Called after the time table reports an edit or deletion, giving apps one optional hook for
+  /// Called after the time table reports a change, giving apps one optional hook for
   /// committing their own undo/redo snapshot.
   func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView)
 }
 
 extension MIDITimeTableViewDelegate {
   /// Default no-op implementation, so existing conformers of `MIDITimeTableViewDelegate` don't
-  /// break when this method was added. Adopt it to receive resolved overlap information.
-  public func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didEdit result: MIDITimeTableCellEditResult) {}
+  /// need to adopt it unless they want to receive resolved table changes.
+  public func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didChange result: MIDITimeTableCellEditResult) {}
 
   /// Default implementation returning 4 (sixteenth notes in a quarter-note beat), matching the
   /// time table's long-standing built-in behavior. Override to customise snapping.
@@ -534,10 +526,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// stays in the hierarchy exactly as it was, instead of the whole table being torn down and
   /// rebuilt the way `reloadData()` would.
   ///
-  /// `didEditCells` already calls this for you after every move/resize, after first giving your
-  /// delegate a chance to apply the same result to your backing data source. If you call this
-  /// directly with insertions, update your data source first so newly dequeued cell views can be
-  /// configured from the inserted models.
+  /// User-driven changes already call this for you after first giving your delegate a chance to
+  /// apply the same result to your backing data source. If you call this directly with insertions,
+  /// update your data source first so newly dequeued cell views can be configured from the
+  /// inserted models.
   ///
   /// - Parameter result: The edit result to apply.
   public func applyEditResult(_ result: MIDITimeTableCellEditResult) {
@@ -563,11 +555,11 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
   }
 
-  /// Removes the given cells from the time table's own row data and cell views incrementally,
-  /// without rebuilding any cell unaffected by the deletion. Call this from
-  /// `midiTimeTableView(_:didDelete:)` in place of `reloadData()`.
+  /// Removes the given cells by publishing a normal change result. The delegate receives
+  /// `MIDITimeTableCellEditResult(removals:)` first, then the time table removes the cells from
+  /// its internal layout snapshot.
   ///
-  /// - Parameter indices: Row/index pairs of the cells to remove, as reported by `didDelete`.
+  /// - Parameter indices: Row/index pairs of the cells to remove.
   public func removeCells(at indices: [MIDITimeTableCellIndex]) {
     let ids = indices.compactMap { index -> MIDITimeTableCellID? in
       guard index.row >= 0, index.row < rowData.count,
@@ -575,8 +567,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
         else { return nil }
       return rowData[index.row].cells[index.index].id
     }
-    applyEditResult(MIDITimeTableCellEditResult(removals: ids))
-    timeTableDelegate?.midiTimeTableViewShouldPushHistory(self)
+    publishChange(MIDITimeTableCellEditResult(removals: ids))
   }
 
   /// Returns a cell's currently realized view, if any. `nil` if the cell exists in the data but
@@ -973,7 +964,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     case .ended, .cancelled, .failed:
       endAutoScrolling()
       isMoving = false
-      didEditCells(editingCellIndices)
+      didChangeCells(editingCellIndices)
     default:
       break
     }
@@ -1009,7 +1000,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     case .ended, .cancelled, .failed:
       endAutoScrolling()
       isResizing = false
-      didEditCells(editingCellIndices)
+      didChangeCells(editingCellIndices)
     default:
       break
     }
@@ -1083,7 +1074,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     return CGPoint(x: dw, y: 0)
   }
 
-  private func didEditCells(_ cells: [MIDITimeTableCellIndex]) {
+  private func didChangeCells(_ cells: [MIDITimeTableCellIndex]) {
     var editedCells = [MIDITimeTableViewEditedCellData]()
 
     for cell in cells {
@@ -1117,9 +1108,44 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     result.updates = editedOverlapResult.updates + result.updates
     result.removals = editedOverlapResult.removals + result.removals
 
-    timeTableDelegate?.midiTimeTableView(self, didEdit: result)
-    applyEditResult(result)
+    publishChange(result)
+  }
+
+  private func publishChange(_ result: MIDITimeTableCellEditResult) {
+    let effectiveResult = effectiveChangeResult(from: result)
+    guard !effectiveResult.updates.isEmpty || !effectiveResult.removals.isEmpty || !effectiveResult.insertions.isEmpty else { return }
+    timeTableDelegate?.midiTimeTableView(self, didChange: effectiveResult)
+    applyEditResult(effectiveResult)
     timeTableDelegate?.midiTimeTableViewShouldPushHistory(self)
+  }
+
+  internal func effectiveChangeResult(from result: MIDITimeTableCellEditResult) -> MIDITimeTableCellEditResult {
+    let epsilon = 0.000000001
+
+    let updates = result.updates.filter { update in
+      guard let currentIndex = rowData.index(ofCellID: update.id),
+        update.newRowIndex >= 0,
+        update.newRowIndex < rowData.count
+        else { return false }
+
+      let cell = rowData[currentIndex]
+      return currentIndex.row != update.newRowIndex
+        || abs(cell.position - update.newPosition) > epsilon
+        || abs(cell.duration - update.newDuration) > epsilon
+    }
+
+    let removals = result.removals.filter { id in
+      return rowData.index(ofCellID: id) != nil
+    }
+
+    let insertions = result.insertions.filter { insertion in
+      return insertion.row >= 0
+        && insertion.row < rowData.count
+        && rowData.index(ofCellID: insertion.id) == nil
+        && insertion.duration > 0
+    }
+
+    return MIDITimeTableCellEditResult(updates: updates, removals: removals, insertions: insertions)
   }
 
   public func midiTimeTableCellViewDidTap(_ midiTimeTableCellView: MIDITimeTableCellView) {
@@ -1134,7 +1160,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     let deletingCellIndices = visibleCells
       .filter({ $0.isSelected })
       .compactMap({ cellIndex(of: $0) })
-    timeTableDelegate?.midiTimeTableView(self, didDelete: deletingCellIndices)
+    removeCells(at: deletingCellIndices)
   }
 
   // MARK: MIDITimeTablePlayheadViewDelegate
