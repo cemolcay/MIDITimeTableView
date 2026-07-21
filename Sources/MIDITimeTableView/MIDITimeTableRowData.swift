@@ -136,31 +136,15 @@ extension Array where Element == MIDITimeTableRowData {
 }
 
 /// Data for each row of `MIDITimeTableView`.
-public struct MIDITimeTableRowData {
+///
+/// `MIDITimeTableRowData` is intentionally model-only: it stores timing/cell data and nothing
+/// about row header or cell rendering. Subclass it to attach typed domain state for a row.
+open class MIDITimeTableRowData {
   /// Cell data that row shows.
   public var cells: [MIDITimeTableCellData]
-  /// Header cell reference that optionally shown as the `MIDITimeTableView`'s row header.
-  public var headerCellView: MIDITimeTableHeaderCellView
-  /// View of each cell in the row.
-  public var cellView: (MIDITimeTableCellData) -> MIDITimeTableCellView
-  /// Reconfigures a cell view that's being recycled from the time table's internal reuse pool for
-  /// a different cell in this row (e.g. after scrolling), instead of creating a new instance via
-  /// `cellView`. Optional — a `UITableView`-style `cellForRowAt` hook for the pooled-instance case.
-  ///
-  /// Pools are kept per-row, so the view passed in is always the exact subclass this row's
-  /// `cellView` factory produces. Leave `nil` to opt out of instance reuse: the time table falls
-  /// back to creating a fresh view via `cellView` every time one is needed (still viewport-bounded,
-  /// just without reusing instances).
-  ///
-  /// - Parameters:
-  ///   - view: The recycled view instance to reconfigure.
-  ///   - cell: The cell it should now represent.
-  public var configureCellView: ((MIDITimeTableCellView, MIDITimeTableCellData) -> Void)?
-  /// Other data for your custom objects. It is useful when moving history related custom data back and forth.
-  public var customData: Any?
 
   /// Calculates the duration of cells in the row.
-  public var duration: Double {
+  open var duration: Double {
     var max = 0.0
     for cell in cells {
       let position = cell.position + cell.duration
@@ -173,16 +157,15 @@ public struct MIDITimeTableRowData {
   ///
   /// - Parameters:
   ///   - cells: Data of the cells.
-  ///   - headerCellView: Row header cell view reference.
-  ///   - cellView: Each view of cell data in row.
-  ///   - configureCellView: Reconfigures a pooled view recycled for a different cell in this row.
-  ///     Defaults `nil` (no instance reuse). See its documentation above.
-  ///   - customData: Other data for your custom objects. It is useful when moving history related custom data back and forth.
-  public init(cells: [MIDITimeTableCellData], headerCellView: MIDITimeTableHeaderCellView, cellView: @escaping (MIDITimeTableCellData) -> MIDITimeTableCellView, configureCellView: ((MIDITimeTableCellView, MIDITimeTableCellData) -> Void)? = nil, customData: Any? = nil) {
+  public init(cells: [MIDITimeTableCellData]) {
     self.cells = cells
-    self.headerCellView = headerCellView
-    self.cellView = cellView
-    self.configureCellView = configureCellView
-    self.customData = customData
+  }
+
+  /// Returns a copy suitable for history snapshots.
+  ///
+  /// Subclasses that add stored properties should override this and return the same concrete row
+  /// type so undo/redo preserves their typed row metadata.
+  open func copy() -> MIDITimeTableRowData {
+    return MIDITimeTableRowData(cells: cells)
   }
 }

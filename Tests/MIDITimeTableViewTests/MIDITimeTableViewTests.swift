@@ -22,9 +22,7 @@ final class MIDITimeTableViewTests: XCTestCase {
 
     func testRowDataHoldsCells() {
         let row = MIDITimeTableRowData(
-            cells: [MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4)],
-            headerCellView: MIDITimeTableHeaderCellView(),
-            cellView: { _ in MIDITimeTableCellView() })
+            cells: [MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4)])
         XCTAssertEqual(row.cells.count, 1)
         XCTAssertEqual(row.cells.first?.position, 4)
     }

@@ -10,9 +10,7 @@ final class MIDITimeTableRowDataApplyTests: XCTestCase {
 
   private func makeRow(_ cells: [(position: Double, duration: Double)]) -> MIDITimeTableRowData {
     return MIDITimeTableRowData(
-      cells: cells.map({ MIDITimeTableCellData(data: 0, position: $0.position, duration: $0.duration) }),
-      headerCellView: MIDITimeTableHeaderCellView(),
-      cellView: { _ in MIDITimeTableCellView() })
+      cells: cells.map({ MIDITimeTableCellData(data: 0, position: $0.position, duration: $0.duration) }))
   }
 
   func testApplyUpdatesCellInPlaceWithinSameRow() {

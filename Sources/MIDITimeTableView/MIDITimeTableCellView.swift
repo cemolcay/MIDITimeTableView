@@ -75,12 +75,20 @@ open class MIDITimeTableCellView: UIView {
   /// than its (possibly stale) array position. `nil` for a cell view that hasn't been placed in a
   /// time table yet.
   open var cellID: MIDITimeTableCellID?
+  /// Reuse identifier used by `MIDITimeTableView` when pooling cell views.
+  public private(set) var reuseIdentifier: String?
 
   open override var canBecomeFirstResponder: Bool {
     return true
   }
 
   // MARK: Init
+
+  public init(reuseIdentifier: String? = nil) {
+    self.reuseIdentifier = reuseIdentifier
+    super.init(frame: .zero)
+    commonInit()
+  }
 
   public override init(frame: CGRect) {
     super.init(frame: frame)
@@ -110,6 +118,12 @@ open class MIDITimeTableCellView: UIView {
       selector: #selector(menuControllerWillHideNotification),
       name: UIMenuController.willHideMenuNotification,
       object: nil)
+  }
+
+  /// Called before a cell view is returned from the reuse pool.
+  open func prepareForReuse() {
+    isSelected = false
+    cellID = nil
   }
 
   // MARK: Layout

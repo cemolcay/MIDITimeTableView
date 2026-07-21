@@ -11,6 +11,7 @@ import XCTest
 /// real cell views to exercise viewport windowing and reuse pooling against.
 private final class VirtualizationStubDataSource: MIDITimeTableViewDataSource, MIDITimeTableViewDelegate {
   var rows: [MIDITimeTableRowData]
+  var didConfigureCell: ((MIDITimeTableCellView, MIDITimeTableCellData) -> Void)?
 
   init(rows: [MIDITimeTableRowData]) {
     self.rows = rows
@@ -20,7 +21,18 @@ private final class VirtualizationStubDataSource: MIDITimeTableViewDataSource, M
   func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature {
     MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
   }
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData { rows[index] }
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowDataForRow row: Int) -> MIDITimeTableRowData {
+    rows[row]
+  }
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
+    MIDITimeTableHeaderCellView()
+  }
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
+    let cellData = rows[index]
+    let view = midiTimeTableView.dequeueReusableCellView(withIdentifier: "Cell") ?? MIDITimeTableCellView(reuseIdentifier: "Cell")
+    didConfigureCell?(view, cellData)
+    return view
+  }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {}
   func midiTimeTableViewHeightForMeasureView(_ midiTimeTableView: MIDITimeTableView) -> CGFloat { 20 }
@@ -48,15 +60,8 @@ final class MIDITimeTableVirtualizationTests: XCTestCase {
     return (view, stub)
   }
 
-  private func makeRow(
-    _ cells: [MIDITimeTableCellData],
-    configureCellView: ((MIDITimeTableCellView, MIDITimeTableCellData) -> Void)? = nil
-  ) -> MIDITimeTableRowData {
-    return MIDITimeTableRowData(
-      cells: cells,
-      headerCellView: MIDITimeTableHeaderCellView(),
-      cellView: { _ in MIDITimeTableCellView() },
-      configureCellView: configureCellView)
+  private func makeRow(_ cells: [MIDITimeTableCellData]) -> MIDITimeTableRowData {
+    return MIDITimeTableRowData(cells: cells)
   }
 
   /// Scrolls the time table and forces a synchronous re-layout, since XCTest doesn't pump a run
@@ -87,9 +92,9 @@ final class MIDITimeTableVirtualizationTests: XCTestCase {
     var configuredIDs = [MIDITimeTableCellID]()
     let nearCell = MIDITimeTableCellData(data: 0, position: 0, duration: 1)
     let farCell = MIDITimeTableCellData(data: 0, position: 60, duration: 1)
-    let row = makeRow([nearCell, farCell], configureCellView: { _, cell in configuredIDs.append(cell.id) })
+    let row = makeRow([nearCell, farCell])
     let (timeTable, stub) = makeLoadedTimeTable(rows: [row])
-    _ = stub
+    stub.didConfigureCell = { _, cell in configuredIDs.append(cell.id) }
 
     guard let nearView = timeTable.cellView(for: nearCell.id) else {
       return XCTFail("expected the near cell to be realized right after reloadData()")
@@ -100,7 +105,7 @@ final class MIDITimeTableVirtualizationTests: XCTestCase {
     scroll(timeTable, to: 2800)
 
     XCTAssertTrue(timeTable.cellView(for: farCell.id) === nearView, "the dequeued view should be the exact instance freed from the same row")
-    XCTAssertTrue(configuredIDs.contains(farCell.id), "configureCellView should have been invoked for the reused view's new cell")
+    XCTAssertTrue(configuredIDs.contains(farCell.id), "viewForCellAt should have configured the reused view's new cell")
   }
 
   func testSelectedOffscreenCellStaysRealizedAndFreesOnceDeselected() {

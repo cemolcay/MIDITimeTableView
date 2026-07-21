@@ -57,26 +57,36 @@ Usage
 
 Create a `MIDITimeTableView` either programmatically or from storyboard and implement its `MIDITimeTableViewDataSource` and `MIDITimeTableViewDelegate` methods.
   
-You need a data object to store each row and its cells data.
+You need a data object to store each row and its cells data. Subclass `MIDITimeTableRowData`
+when a row needs typed metadata.
 
 ``` swift
+final class SongRowData: MIDITimeTableRowData {
+  let title: String
+
+  init(title: String, cells: [MIDITimeTableCellData]) {
+    self.title = title
+    super.init(cells: cells)
+  }
+
+  override func copy() -> MIDITimeTableRowData {
+    SongRowData(title: title, cells: cells)
+  }
+}
+
 var rowData: [MIDITimeTableRowData] = [
-  MIDITimeTableRowData(
+  SongRowData(
+    title: "Chords",
     cells: [
       MIDITimeTableCellData(data: "C7", position: 0, duration: 4),
       MIDITimeTableCellData(data: "Dm7", position: 4, duration: 4),
       MIDITimeTableCellData(data: "G7b5", position: 8, duration: 4),
       MIDITimeTableCellData(data: "C7", position: 12, duration: 4),
-    ],
-    headerCellView: HeaderCellView(title: "Chords"),
-    cellView: { cellData in
-      let title = cellData.data as? String ?? ""
-      return CellView(title: title)
-    }),
+    ]),
 ]
 ```
 
-`MIDITimeTableViewDataSource` is similar to `UITableViewDataSource` or `UICollectionViewDataSource` API. Just feed the row data, number of rows, time signature and you are ready to go.
+`MIDITimeTableViewDataSource` is similar to `UITableViewDataSource` or `UICollectionViewDataSource` API. Feed the row/cell model and return configured views for headers and cells.
 
 ``` swift
 func numberOfRows(in midiTimeTableView: MIDITimeTableView) -> Int {
@@ -87,9 +97,20 @@ func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTime
   return MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
 }
 
-func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData {
-  let row = rowData[index]
-  return row
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowDataForRow row: Int) -> MIDITimeTableRowData {
+  return rowData[row]
+}
+
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
+  let header = midiTimeTableView.dequeueReusableHeaderCellView(withIdentifier: "Header") as? HeaderCellView ?? HeaderCellView(title: "")
+  header.titleLabel.text = (rowData[row] as? SongRowData)?.title ?? ""
+  return header
+}
+
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
+  let cell = midiTimeTableView.dequeueReusableCellView(withIdentifier: "Cell") as? CellView ?? CellView(title: "")
+  cell.configure(with: rowData[index.row].cells[index.index])
+  return cell
 }
 ```
 
@@ -150,24 +171,18 @@ are currently selected. This is what `visibleCells` (`public private(set) var`) 
 specific cell's view up by its stable `MIDITimeTableCellID` with `midiTimeTableView.cellView(for: cellData.id)`,
 which returns `nil` for a cell that isn't currently realized.
 
-To get `UITableView`-style cell reuse instead of a fresh view per cell every time one scrolls into
-view, provide `configureCellView` alongside `cellView` on `MIDITimeTableRowData`:
+To get `UITableView`-style reuse instead of a fresh view every time one scrolls into view, create
+views with a reuse identifier and dequeue them in the data source:
 
 ``` swift
-MIDITimeTableRowData(
-  cells: cells,
-  headerCellView: HeaderCellView(title: "Chords"),
-  cellView: { cellData in
-    let title = cellData.data as? String ?? ""
-    return CellView(title: title)
-  },
-  configureCellView: { view, cellData in
-    (view as? CellView)?.configure(with: cellData)
-  })
+func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
+  let cell = midiTimeTableView.dequeueReusableCellView(withIdentifier: "Cell") as? CellView ?? CellView(title: "")
+  cell.configure(with: rowData[index.row].cells[index.index])
+  return cell
+}
 ```
 
-Views are pooled per row, so a dequeued instance is always the exact subclass that row's
-`cellView` produces. Leave `configureCellView` `nil` to opt out — the time table still only
+Views are pooled by reuse identifier. Leave the dequeue call out to opt out — the time table still
 realizes what's near the viewport, it just creates a fresh view each time instead of reusing an
 instance.
 

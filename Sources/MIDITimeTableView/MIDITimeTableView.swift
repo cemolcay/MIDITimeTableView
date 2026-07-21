@@ -40,7 +40,7 @@ public struct MIDITimeTableViewAutoScrollDirection: OptionSet {
   public static let down = MIDITimeTableViewAutoScrollDirection(rawValue: 1 << 3)
 }
 
-/// Populates the `MIDITimeTableView` with the datas of rows and cells.
+/// Populates the `MIDITimeTableView` with row/cell data and rendered views.
 public protocol MIDITimeTableViewDataSource: AnyObject {
   /// Number of rows in the time table.
   ///
@@ -54,13 +54,29 @@ public protocol MIDITimeTableViewDataSource: AnyObject {
   /// - Returns: Time signature of the time table.
   func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature
 
-  /// Row data for each row in the time table.
+  /// Model data for a row.
   ///
   /// - Parameters:
   ///   - midiTimeTableView: Time table that populates row data.
-  ///   - index: Index of row to populate data.
-  /// - Returns: Row data of time table for an index.
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData
+  ///   - row: Index of row to populate.
+  /// - Returns: Model-only row data for the index.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowDataForRow row: Int) -> MIDITimeTableRowData
+
+  /// Header view for a row. Return a dequeued header view when possible.
+  ///
+  /// - Parameters:
+  ///   - midiTimeTableView: Time table that displays the header.
+  ///   - row: Row index of the header.
+  /// - Returns: Header view for the row.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView
+
+  /// Cell view for a row/index pair. Return a dequeued cell view when possible.
+  ///
+  /// - Parameters:
+  ///   - midiTimeTableView: Time table that displays the cell.
+  ///   - index: Row and array-position of the cell view.
+  /// - Returns: Cell view for the given index.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellView
 }
 
 /// Edited cell data. Holds the edited cell's stable id and its index before editing, and new row
@@ -211,11 +227,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// Realized cell views keyed by their cell's stable id, for O(1) lookup (`cellView(for:)`).
   /// Kept in sync with `visibleCells`.
   private var realizedCellViewsByID = [MIDITimeTableCellID: MIDITimeTableCellView]()
-  /// Freed cell views available to be dequeued and reconfigured (via a row's
-  /// `configureCellView`) for a different cell in the same row, instead of being deallocated and
-  /// recreated from scratch. Keyed by row index; a row only accumulates entries here if it
-  /// opted into `configureCellView`.
-  private var cellViewReusePools = [Int: [MIDITimeTableCellView]]()
+  /// Freed cell views available to be dequeued and reconfigured by the data source.
+  private var cellViewReusePools = [String: [MIDITimeTableCellView]]()
+  /// Freed header views available to be dequeued and reconfigured by the data source.
+  private var headerCellViewReusePools = [String: [MIDITimeTableHeaderCellView]]()
   /// Multiplier applied to the current viewport size to compute the overscan margin used to
   /// decide which cells/grid lines/measure bars to realize. Defaults `1`, i.e. content within one
   /// extra screen's worth of scrolling in every direction is realized ahead of time, so fast
@@ -377,9 +392,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     newVisibleCells.reserveCapacity(toRealize.count)
 
     for placement in toRealize {
-      let owningRow = rowData[placement.rowIndex]
-      let cell = owningRow.cells[placement.indexInRow]
-      let cellView = realizedCellViewsByID[placement.id] ?? dequeueCellView(for: cell, rowIndex: placement.rowIndex, owningRow: owningRow)
+      let cellView = realizedCellViewsByID[placement.id] ?? makeCellView(at: MIDITimeTableCellIndex(row: placement.rowIndex, index: placement.indexInRow))
       cellView.frame = placement.frame
       cellView.tag = placement.indexInRow
       cellView.cellID = placement.id
@@ -474,11 +487,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// - Parameter historyItem: Optional history item. Defaults nil.
   public func reloadData(keepHistory: Bool = true, historyItem: MIDITimeTableHistoryItem? = nil) {
     // Reset data source
-    rowHeaderCellViews.forEach({ $0.removeFromSuperview() })
+    rowHeaderCellViews.forEach({ recycleHeaderCellView($0) })
     rowHeaderCellViews = []
-    realizedCellViewsByID.values.forEach({ $0.removeFromSuperview() })
+    realizedCellViewsByID.forEach({ recycleCellView($0.value, id: $0.key) })
     realizedCellViewsByID = [:]
-    cellViewReusePools = [:]
     visibleCells = []
 
     let numberOfRows = historyItem?.count ?? dataSource?.numberOfRows(in: self) ?? 0
@@ -488,9 +500,9 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // Update rowData
     rowData.removeAll()
     for i in 0..<numberOfRows {
-      guard let row = historyItem?[i] ?? dataSource?.midiTimeTableView(self, rowAt: i) else { continue }
+      let row = historyItem?[i].copy() ?? dataSource?.midiTimeTableView(self, rowDataForRow: i).copy() ?? MIDITimeTableRowData(cells: [])
       rowData.insert(row, at: i)
-      let rowHeaderCell = row.headerCellView
+      let rowHeaderCell = dataSource?.midiTimeTableView(self, viewForHeaderInRow: i) ?? MIDITimeTableHeaderCellView()
       rowHeaderCellViews.append(rowHeaderCell)
       addSubview(rowHeaderCell)
     }
@@ -511,7 +523,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     // Keep history
     if holdsHistory, keepHistory, historyItem == nil {
-      history.append(item: rowData)
+      history.append(item: copyRowData(rowData))
     }
   }
 
@@ -542,13 +554,13 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // the next layout pass's windowing logic (see `layoutSubviews`): a cell untouched by this
     // edit keeps its existing view instance exactly as it was; a moved/resized cell's view (same
     // instance, found by id) is simply repositioned; a brand new cell (e.g. a split-off
-    // remainder) gets a view dequeued from its row's reuse pool or created fresh. Forced
+    // remainder) gets a view dequeued from the reuse pool or created fresh. Forced
     // synchronously so callers see up-to-date `visibleCells` immediately after this call returns.
     setNeedsLayout()
     layoutIfNeeded()
 
     if holdsHistory {
-      history.append(item: rowData)
+      history.append(item: copyRowData(rowData))
     }
   }
 
@@ -585,33 +597,45 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     return rowData.index(ofCellID: id)
   }
 
-  /// Returns a view for `cell` in row `rowIndex`: a view dequeued from that row's reuse pool and
-  /// reconfigured via `owningRow.configureCellView` when one's available, otherwise a freshly
-  /// created instance via `owningRow.cellView`. Pools are kept per-row, so a dequeued instance is
-  /// always the exact subclass `owningRow.cellView` would have produced.
-  private func dequeueCellView(for cell: MIDITimeTableCellData, rowIndex: Int, owningRow: MIDITimeTableRowData) -> MIDITimeTableCellView {
-    let cellView: MIDITimeTableCellView
-    if var pool = cellViewReusePools[rowIndex], let reused = pool.popLast() {
-      cellViewReusePools[rowIndex] = pool
-      owningRow.configureCellView?(reused, cell)
-      cellView = reused
-    } else {
-      cellView = owningRow.cellView(cell)
-    }
+  /// Returns a reusable cell view with `identifier`, if one is available.
+  public func dequeueReusableCellView(withIdentifier identifier: String) -> MIDITimeTableCellView? {
+    guard var pool = cellViewReusePools[identifier], let view = pool.popLast() else { return nil }
+    cellViewReusePools[identifier] = pool
+    view.prepareForReuse()
+    return view
+  }
+
+  /// Returns a reusable header view with `identifier`, if one is available.
+  public func dequeueReusableHeaderCellView(withIdentifier identifier: String) -> MIDITimeTableHeaderCellView? {
+    guard var pool = headerCellViewReusePools[identifier], let view = pool.popLast() else { return nil }
+    headerCellViewReusePools[identifier] = pool
+    view.prepareForReuse()
+    return view
+  }
+
+  private func copyRowData(_ rows: [MIDITimeTableRowData]) -> [MIDITimeTableRowData] {
+    return rows.map({ $0.copy() })
+  }
+
+  private func makeCellView(at index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
+    let cellView = dataSource?.midiTimeTableView(self, viewForCellAt: index) ?? MIDITimeTableCellView()
     cellView.delegate = self
     addSubview(cellView)
     return cellView
   }
 
-  /// Frees a realized cell view no longer needed this layout pass: clears its selection, removes
-  /// it from the hierarchy, and — only if the cell it represented still exists in `rowData` and
-  /// that row opted into `configureCellView` — returns it to that row's reuse pool for a future
-  /// dequeue. Otherwise the view is simply discarded.
+  /// Frees a realized cell view no longer needed this layout pass.
   private func recycleCellView(_ view: MIDITimeTableCellView, id: MIDITimeTableCellID) {
     view.isSelected = false
     view.removeFromSuperview()
-    guard let owningRowIndex = rowData.index(ofCellID: id)?.row, rowData[owningRowIndex].configureCellView != nil else { return }
-    cellViewReusePools[owningRowIndex, default: []].append(view)
+    guard rowData.index(ofCellID: id) != nil, let identifier = view.reuseIdentifier else { return }
+    cellViewReusePools[identifier, default: []].append(view)
+  }
+
+  private func recycleHeaderCellView(_ view: MIDITimeTableHeaderCellView) {
+    view.removeFromSuperview()
+    guard let identifier = view.reuseIdentifier else { return }
+    headerCellViewReusePools[identifier, default: []].append(view)
   }
 
   /// Unselects all cells if tapped an empty area of the time table.
@@ -1114,8 +1138,8 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
   public func midiTimeTableHistory(_ history: MIDITimeTableHistory, didHistoryChange item: MIDITimeTableHistoryItem) {
     if holdsHistory {
-      reloadData(historyItem: item)
       timeTableDelegate?.midiTimeTableView(self, historyDidChange: history)
+      reloadData(keepHistory: false, historyItem: item)
     }
   }
 }

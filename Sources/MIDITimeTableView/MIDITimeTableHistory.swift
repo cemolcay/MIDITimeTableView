@@ -87,7 +87,7 @@ public class MIDITimeTableHistory {
   /// - Parameter item: Item to add to history.
   public func append(item: MIDITimeTableHistoryItem) {
     var newHistory = items.enumerated().filter({ $0.offset <= currentIndex }).map({ $0.element })
-    newHistory.append(item)
+    newHistory.append(item.map({ $0.copy() }))
     newHistory = Array(newHistory.suffix(limit))
     currentIndex = newHistory.count - 1
     items = newHistory

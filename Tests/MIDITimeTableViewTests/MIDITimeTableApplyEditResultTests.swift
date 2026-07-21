@@ -19,7 +19,15 @@ private final class StubDataSource: MIDITimeTableViewDataSource, MIDITimeTableVi
   func timeSignature(of midiTimeTableView: MIDITimeTableView) -> MIDITimeTableTimeSignature {
     MIDITimeTableTimeSignature(beats: 4, noteValue: .quarter)
   }
-  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowAt index: Int) -> MIDITimeTableRowData { rows[index] }
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, rowDataForRow row: Int) -> MIDITimeTableRowData {
+    rows[row]
+  }
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForHeaderInRow row: Int) -> MIDITimeTableHeaderCellView {
+    MIDITimeTableHeaderCellView()
+  }
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, viewForCellAt index: MIDITimeTableCellIndex) -> MIDITimeTableCellView {
+    MIDITimeTableCellView()
+  }
 
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didDelete cells: [MIDITimeTableCellIndex]) {}
   func midiTimeTableViewHeightForMeasureView(_ midiTimeTableView: MIDITimeTableView) -> CGFloat { 20 }
@@ -34,9 +42,7 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
 
   private func makeRow(_ cells: [(position: Double, duration: Double)]) -> MIDITimeTableRowData {
     return MIDITimeTableRowData(
-      cells: cells.map({ MIDITimeTableCellData(data: 0, position: $0.position, duration: $0.duration) }),
-      headerCellView: MIDITimeTableHeaderCellView(),
-      cellView: { _ in MIDITimeTableCellView() })
+      cells: cells.map({ MIDITimeTableCellData(data: 0, position: $0.position, duration: $0.duration) }))
   }
 
   /// Builds a time table with the given rows already loaded, plus the stub keeping it alive
