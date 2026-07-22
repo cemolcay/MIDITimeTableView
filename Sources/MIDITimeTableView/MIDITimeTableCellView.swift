@@ -150,7 +150,10 @@ open class MIDITimeTableCellView: UIView {
     delegate?.midiTimeTableCellViewDidResize(self, pan: pan)
   }
 
-  func prepareForMenuPresentation() {
+  /// Selects the cell and reports the tap, as if the long-press were a regular tap, before a
+  /// subclass presents its own delete confirmation UI. Call this first from an overridden
+  /// `didLongPress(longPress:)`.
+  open func prepareForMenuPresentation() {
     becomeFirstResponder()
     delegate?.midiTimeTableCellViewDidTap(self)
     isSelected = true
@@ -158,7 +161,7 @@ open class MIDITimeTableCellView: UIView {
 
   // Note: `UIMenuController` is deprecated in favor of `UIEditMenuInteraction` (iOS 16+).
   // Kept as-is to preserve the iOS 13 floor without introducing an `#available` fork here.
-  @objc public func didLongPress(longPress: UILongPressGestureRecognizer) {
+  @objc open func didLongPress(longPress: UILongPressGestureRecognizer) {
     guard let superview = superview else { return }
     prepareForMenuPresentation()
 

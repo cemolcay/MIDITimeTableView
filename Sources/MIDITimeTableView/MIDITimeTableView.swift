@@ -175,6 +175,20 @@ public protocol MIDITimeTableViewDelegate: AnyObject {
   /// Called after the time table reports a change, giving apps one optional hook for
   /// committing their own undo/redo snapshot.
   func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView)
+
+  /// Informs that a single cell became the sole selection, either by a direct tap or as the
+  /// end result of a drag-select gesture that resolved to exactly one cell. Not called for
+  /// multi-cell selections; use `visibleCells.filter({ $0.isSelected })` if you need those.
+  ///
+  /// - Parameters:
+  ///   - midiTimeTableView: Time table that changed selection.
+  ///   - index: Row/array-position of the newly selected cell at the moment of selection.
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didSelectCellAt index: MIDITimeTableCellIndex)
+
+  /// Informs that every cell was deselected, e.g. by tapping an empty area of the time table.
+  ///
+  /// - Parameter midiTimeTableView: Time table that cleared its selection.
+  func midiTimeTableViewDidUnselectAllCells(_ midiTimeTableView: MIDITimeTableView)
 }
 
 extension MIDITimeTableViewDelegate {
@@ -188,6 +202,12 @@ extension MIDITimeTableViewDelegate {
 
   /// Default no-op implementation.
   public func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView) {}
+
+  /// Default no-op implementation.
+  public func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didSelectCellAt index: MIDITimeTableCellIndex) {}
+
+  /// Default no-op implementation.
+  public func midiTimeTableViewDidUnselectAllCells(_ midiTimeTableView: MIDITimeTableView) {}
 }
 
 /// Draws time table with multiple rows and editable cells. Heavily customisable.
@@ -935,7 +955,40 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// Makes all cells unselected. A selected cell is always realized (see `visibleCells`), so
   /// this reaches every selected cell in the whole document, not just the ones on screen.
   public func unselectAllCells() {
+    let hadSelection = visibleCells.contains(where: { $0.isSelected })
     visibleCells.forEach({ $0.isSelected = false })
+    if hadSelection {
+      timeTableDelegate?.midiTimeTableViewDidUnselectAllCells(self)
+    }
+  }
+
+  /// Selects the cell at `index` programmatically, exactly as if the user had tapped it:
+  /// deselects any other selected cell, reports it through `didSelectCellAt`, and pins its view
+  /// realized (see `visibleCells`) even if `index` isn't currently on screen.
+  ///
+  /// - Parameter index: Row/array-position of the cell to select.
+  /// - Returns: `true` if a cell exists at `index` and was selected, `false` if `index` is out of bounds.
+  @discardableResult
+  public func selectCell(at index: MIDITimeTableCellIndex) -> Bool {
+    guard index.row >= 0, index.row < rowData.count,
+          index.index >= 0, index.index < rowData[index.row].cells.count else { return false }
+
+    let id = rowData[index.row].cells[index.index].id
+    let cellView = realizedCellViewsByID[id] ?? makeCellView(at: index)
+
+    for view in visibleCells where view !== cellView {
+      view.isSelected = false
+    }
+    cellView.isSelected = true
+
+    realizedCellViewsByID[id] = cellView
+    if !visibleCells.contains(where: { $0 === cellView }) {
+      visibleCells.append(cellView)
+    }
+
+    timeTableDelegate?.midiTimeTableView(self, didSelectCellAt: index)
+    setNeedsLayout()
+    return true
   }
 
   // MARK: Zooming
@@ -1173,10 +1226,20 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   }
 
   public func midiTimeTableCellViewDidTap(_ midiTimeTableCellView: MIDITimeTableCellView) {
+    // Tapping an already-selected cell toggles it off, matching how tapping empty space
+    // unselects everything.
+    if midiTimeTableCellView.isSelected {
+      unselectAllCells()
+      return
+    }
+
     // A selected cell is always realized (see `visibleCells`), so this correctly deselects every
     // previously-selected cell, on screen or not.
     for cell in visibleCells {
       cell.isSelected = cell == midiTimeTableCellView
+    }
+    if let index = cellIndex(of: midiTimeTableCellView) {
+      timeTableDelegate?.midiTimeTableView(self, didSelectCellAt: index)
     }
   }
 

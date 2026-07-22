@@ -21,6 +21,8 @@ private struct TestCell {
 private final class StubDataSource: MIDITimeTableViewDataSource, MIDITimeTableViewDelegate {
   var rows: [[TestCell]]
   var changeResults = [MIDITimeTableCellEditResult]()
+  var selectedIndices = [MIDITimeTableCellIndex]()
+  var unselectAllCallCount = 0
 
   init(rows: [[TestCell]]) {
     self.rows = rows
@@ -57,6 +59,12 @@ private final class StubDataSource: MIDITimeTableViewDataSource, MIDITimeTableVi
   func midiTimeTableViewWidthForRowHeaderCells(_ midiTimeTableView: MIDITimeTableView) -> CGFloat { 100 }
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdatePlayhead position: Double) {}
   func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didUpdateRangeHead position: Double) {}
+  func midiTimeTableView(_ midiTimeTableView: MIDITimeTableView, didSelectCellAt index: MIDITimeTableCellIndex) {
+    selectedIndices.append(index)
+  }
+  func midiTimeTableViewDidUnselectAllCells(_ midiTimeTableView: MIDITimeTableView) {
+    unselectAllCallCount += 1
+  }
 }
 
 final class MIDITimeTableApplyEditResultTests: XCTestCase {
@@ -176,5 +184,92 @@ final class MIDITimeTableApplyEditResultTests: XCTestCase {
     XCTAssertTrue(result.updates.isEmpty)
     XCTAssertTrue(result.removals.isEmpty)
     XCTAssertTrue(result.insertions.isEmpty)
+  }
+
+  func testTappingACellReportsItsSelectionAndReplacesAnyPriorSelection() {
+    let row = makeRow([(position: 0, duration: 4), (position: 4, duration: 2)])
+    let (timeTable, stub) = makeLoadedTimeTable([row])
+    guard let firstCellView = timeTable.cellView(for: row[0].id),
+          let secondCellView = timeTable.cellView(for: row[1].id) else {
+      return XCTFail("expected both cells to be realized right after reloadData()")
+    }
+
+    timeTable.midiTimeTableCellViewDidTap(firstCellView)
+    XCTAssertEqual(stub.selectedIndices, [MIDITimeTableCellIndex(row: 0, index: 0)])
+    XCTAssertTrue(firstCellView.isSelected)
+
+    timeTable.midiTimeTableCellViewDidTap(secondCellView)
+    XCTAssertEqual(stub.selectedIndices, [MIDITimeTableCellIndex(row: 0, index: 0), MIDITimeTableCellIndex(row: 0, index: 1)])
+    XCTAssertFalse(firstCellView.isSelected, "selecting another cell should deselect the previous one")
+    XCTAssertTrue(secondCellView.isSelected)
+  }
+
+  func testTappingAnAlreadySelectedCellUnselectsIt() {
+    let row = makeRow([(position: 0, duration: 4)])
+    let (timeTable, stub) = makeLoadedTimeTable([row])
+    guard let cellView = timeTable.cellView(for: row[0].id) else {
+      return XCTFail("expected the cell to be realized right after reloadData()")
+    }
+
+    timeTable.midiTimeTableCellViewDidTap(cellView)
+    XCTAssertTrue(cellView.isSelected)
+
+    timeTable.midiTimeTableCellViewDidTap(cellView)
+    XCTAssertFalse(cellView.isSelected, "tapping an already-selected cell should toggle it off")
+    XCTAssertEqual(stub.unselectAllCallCount, 1)
+    XCTAssertEqual(stub.selectedIndices, [MIDITimeTableCellIndex(row: 0, index: 0)], "should not report a second selection for the toggle-off tap")
+  }
+
+  func testSelectCellAtIndexRealizesOffscreenCellAndReportsSelection() {
+    let farCell = TestCell(position: 2000, duration: 4)
+    let row = makeRow([(position: 0, duration: 4)]) + [farCell]
+    let (timeTable, stub) = makeLoadedTimeTable([row])
+    XCTAssertNil(timeTable.cellView(for: farCell.id), "far cell should not be realized before scrolling or selecting")
+
+    let selected = timeTable.selectCell(at: MIDITimeTableCellIndex(row: 0, index: 1))
+
+    XCTAssertTrue(selected)
+    XCTAssertEqual(stub.selectedIndices, [MIDITimeTableCellIndex(row: 0, index: 1)])
+    let realizedView = timeTable.cellView(for: farCell.id)
+    XCTAssertNotNil(realizedView, "selecting an offscreen cell should realize and pin its view")
+    XCTAssertTrue(realizedView?.isSelected == true)
+  }
+
+  func testSelectCellAtIndexDeselectsThePreviouslySelectedCell() {
+    let row = makeRow([(position: 0, duration: 4), (position: 4, duration: 2)])
+    let (timeTable, _) = makeLoadedTimeTable([row])
+    guard let firstView = timeTable.cellView(for: row[0].id) else {
+      return XCTFail("expected the cell to be realized right after reloadData()")
+    }
+
+    XCTAssertTrue(timeTable.selectCell(at: MIDITimeTableCellIndex(row: 0, index: 0)))
+    XCTAssertTrue(firstView.isSelected)
+
+    XCTAssertTrue(timeTable.selectCell(at: MIDITimeTableCellIndex(row: 0, index: 1)))
+    XCTAssertFalse(firstView.isSelected)
+  }
+
+  func testSelectCellAtOutOfBoundsIndexReturnsFalse() {
+    let row = makeRow([(position: 0, duration: 4)])
+    let (timeTable, stub) = makeLoadedTimeTable([row])
+
+    XCTAssertFalse(timeTable.selectCell(at: MIDITimeTableCellIndex(row: 0, index: 99)))
+    XCTAssertTrue(stub.selectedIndices.isEmpty)
+  }
+
+  func testUnselectAllCellsReportsOnlyWhenThereWasASelection() {
+    let row = makeRow([(position: 0, duration: 4)])
+    let (timeTable, stub) = makeLoadedTimeTable([row])
+    guard let cellView = timeTable.cellView(for: row[0].id) else {
+      return XCTFail("expected the cell to be realized right after reloadData()")
+    }
+
+    timeTable.unselectAllCells()
+    XCTAssertEqual(stub.unselectAllCallCount, 0, "nothing was selected, so no notification should fire")
+
+    timeTable.midiTimeTableCellViewDidTap(cellView)
+    timeTable.unselectAllCells()
+    XCTAssertEqual(stub.unselectAllCallCount, 1)
+    XCTAssertFalse(cellView.isSelected)
   }
 }
