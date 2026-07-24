@@ -19,6 +19,28 @@ open class MIDITimeTableMeasureView: UIView {
   public var snapResolution: Int = 4 { didSet { if oldValue != snapResolution { setNeedsLayout() } } }
   /// Property to show bar numbers. Defaults true.
   public var showsBarNumbers = true { didSet { if oldValue != showsBarNumbers { setNeedsLayout() } } }
+  /// Property to show beat tick lines. Defaults true.
+  public var showsBeatLines = true { didSet { if oldValue != showsBeatLines { setNeedsLayout() } } }
+  /// Property to show subbeat tick lines. Defaults true.
+  public var showsSubbeatLines = true { didSet { if oldValue != showsSubbeatLines { setNeedsLayout() } } }
+  /// Property to show the horizontal bottom line. Defaults true.
+  public var showsBottomLine = true { didSet { if oldValue != showsBottomLine { setNeedsLayout() } } }
+  /// Color of bar-boundary tick lines. Defaults nil, which uses `tintColor`.
+  public var barLineColor: UIColor? { didSet { setNeedsLayout() } }
+  /// Color of beat tick lines. Defaults nil, which uses `tintColor`.
+  public var beatLineColor: UIColor? { didSet { setNeedsLayout() } }
+  /// Color of subbeat tick lines. Defaults nil, which uses `tintColor`.
+  public var subbeatLineColor: UIColor? { didSet { setNeedsLayout() } }
+  /// Color of the bottom line. Defaults nil, which uses `tintColor`.
+  public var bottomLineColor: UIColor? { didSet { setNeedsLayout() } }
+  /// Width of bar-boundary tick lines. Defaults 1.
+  public var barLineWidth: CGFloat = 1 { didSet { if oldValue != barLineWidth { setNeedsLayout() } } }
+  /// Width of beat tick lines. Defaults 1.
+  public var beatLineWidth: CGFloat = 1 { didSet { if oldValue != beatLineWidth { setNeedsLayout() } } }
+  /// Width of subbeat tick lines. Defaults 1.
+  public var subbeatLineWidth: CGFloat = 1 { didSet { if oldValue != subbeatLineWidth { setNeedsLayout() } } }
+  /// Width of the bottom line. Defaults 1.
+  public var bottomLineWidth: CGFloat = 1 { didSet { if oldValue != bottomLineWidth { setNeedsLayout() } } }
   /// The x-range (in this view's own coordinate space) of bars to realize layers for. Bars
   /// outside it are freed into a reuse pool instead of laid out, so the number of live
   /// `MIDITimeTableMeasureLayer`s tracks what's on screen rather than the whole timeline. The
@@ -34,8 +56,9 @@ open class MIDITimeTableMeasureView: UIView {
   private var pooledBarLayers = [MIDITimeTableMeasureLayer]()
 
   /// Forces every bar layer to be rebuilt from scratch on the next layout pass. You shouldn't
-  /// normally need this — `barCount`/`beatCount`/`snapResolution`/`showsBarNumbers` already
-  /// trigger a refresh when they actually change — but it's kept as a manual escape hatch.
+  /// normally need this — `barCount`/`beatCount`/`snapResolution`/`showsBarNumbers`/tick visibility
+  /// properties already trigger a refresh when they actually change — but it's kept as a manual
+  /// escape hatch.
   public func update() {
     setNeedsLayout()
   }
@@ -63,6 +86,7 @@ open class MIDITimeTableMeasureView: UIView {
 
     // Recycle bars that scrolled out of view.
     for (number, barLayer) in barLayersByNumber where !visibleNumbers.contains(number) {
+      barLayer.removeFromSuperlayer()
       pooledBarLayers.append(barLayer)
       barLayersByNumber.removeValue(forKey: number)
     }
@@ -78,12 +102,27 @@ open class MIDITimeTableMeasureView: UIView {
         barLayer = reused
       } else {
         barLayer = MIDITimeTableMeasureLayer()
+      }
+      if barLayer.superlayer !== layer {
         layer.addSublayer(barLayer)
       }
       barLayersByNumber[number] = barLayer
 
+      CATransaction.begin()
+      CATransaction.setDisableActions(true)
       barLayer.tintColor = tintColor
       barLayer.showsBarNumber = showsBarNumbers
+      barLayer.showsBeatLines = showsBeatLines
+      barLayer.showsSubbeatLines = showsSubbeatLines
+      barLayer.showsBottomLine = showsBottomLine
+      barLayer.barLineColor = barLineColor
+      barLayer.beatLineColor = beatLineColor
+      barLayer.subbeatLineColor = subbeatLineColor
+      barLayer.bottomLineColor = bottomLineColor
+      barLayer.barLineWidth = barLineWidth
+      barLayer.beatLineWidth = beatLineWidth
+      barLayer.subbeatLineWidth = subbeatLineWidth
+      barLayer.bottomLineWidth = bottomLineWidth
       barLayer.beatCount = beatCount
       barLayer.snapResolution = snapResolution
       barLayer.displayScale = traitCollection.displayScale
@@ -92,6 +131,7 @@ open class MIDITimeTableMeasureView: UIView {
       // A reused layer whose frame size didn't change wouldn't otherwise redraw its content (its
       // own properties have no `didSet`), so ask explicitly.
       barLayer.setNeedsLayout()
+      CATransaction.commit()
     }
   }
 }

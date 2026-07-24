@@ -20,13 +20,13 @@ public class MIDITimeTableGridLayer: CALayer {
   private var subbeatLineLayer = CAShapeLayer()
 
   /// Property to show row lines. Defaults true.
-  public var showsRowLines = true
+  public var showsRowLines = true { didSet { if oldValue != showsRowLines { setNeedsLayout() } } }
   /// Property to show bar lines. Defaults true.
-  public var showsBarLines = true
+  public var showsBarLines = true { didSet { if oldValue != showsBarLines { setNeedsLayout() } } }
   /// Property to show beat lines. Defaults true.
-  public var showsBeatLines = true
+  public var showsBeatLines = true { didSet { if oldValue != showsBeatLines { setNeedsLayout() } } }
   /// Property to show subbeat lines. Defaults true.
-  public var showsSubbeatLines = true
+  public var showsSubbeatLines = true { didSet { if oldValue != showsSubbeatLines { setNeedsLayout() } } }
 
   /// Color of row lines. Defaults dark gray.
   public var rowLineColor: UIColor = .darkGray
@@ -147,7 +147,7 @@ public class MIDITimeTableGridLayer: CALayer {
     if beatCount > 0, beatLineMinY < clipMaxY {
       let beatWidth = measureWidth / CGFloat(beatCount)
       let beatRange = Self.visibleIndexRange(clipMinX: clipMinX, clipMaxX: clipMaxX, offset: rowHeaderWidth, unitWidth: beatWidth, count: barCount * beatCount)
-      for i in beatRange where i % beatCount != 0 {
+      for i in beatRange {
         let x = rowHeaderWidth + (CGFloat(i) * beatWidth)
         beatPath.move(to: CGPoint(x: x, y: beatLineMinY))
         beatPath.addLine(to: CGPoint(x: x, y: clipMaxY))

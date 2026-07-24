@@ -1002,6 +1002,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       deltaScale = max(deltaScale, minMeasureWidth/measureWidth)
       measureWidth *= deltaScale
       setNeedsLayout()
+      layoutIfNeeded()
       pinch.scale = 1
     default:
       return

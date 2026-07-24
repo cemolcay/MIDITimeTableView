@@ -205,6 +205,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         timeTableView?.dataSource = self
         timeTableView?.timeTableDelegate = self
         timeTableView?.gridLayer.showsSubbeatLines = false
+        timeTableView?.measureView.showsSubbeatLines = false
         timeTableView?.reloadData()
         history.append(rows)
         updateHistoryButtons()
@@ -346,5 +347,9 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
     func midiTimeTableViewShouldPushHistory(_ midiTimeTableView: MIDITimeTableView) {
         history.append(rows)
         updateHistoryButtons()
+    }
+    
+    func midiTimeTableViewSnapResolution(_ midiTimeTableView: MIDITimeTableView) -> Int {
+        return 16
     }
 }
