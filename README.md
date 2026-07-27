@@ -280,6 +280,5 @@ Documentation
 AppStore
 ----
 
-This library is used in my app [ChordBud](https://itunes.apple.com/us/app/chordbud-chord-progressions/id1313017378?mt=8), check it out!
-  
-[![alt tag](https://linkmaker.itunes.apple.com/assets/shared/badges/en-us/appstore-lrg.svg)](https://itunes.apple.com/us/app/chordbud-chord-progressions/id1313017378?mt=8)
+This library is used in my app [ChordBud](https://apps.apple.com/us/app/chordbud-2-auv3-midi-sequencer/id1526221230), check it out!
+ 
