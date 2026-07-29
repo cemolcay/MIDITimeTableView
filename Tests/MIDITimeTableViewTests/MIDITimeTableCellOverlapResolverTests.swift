@@ -202,6 +202,28 @@ final class MIDITimeTableCellOverlapResolverTests: XCTestCase {
     XCTAssertEqual(result.updates.map(\.newDuration), [1, 1])
   }
 
+  func testResolveByShiftingLaterCellsMovesCellOverlappedInMiddle() {
+    let rowData = [makeRow([(position: 0, duration: 4), (position: 5, duration: 1), (position: 6, duration: 1)])]
+    let editedID = rowData[0, 1].id
+    let edited = [
+      MIDITimeTableViewEditedCellData(
+        id: editedID,
+        index: MIDITimeTableCellIndex(row: 0, index: 1),
+        newRowIndex: 0,
+        newPosition: 2,
+        newDuration: 1)
+    ]
+
+    let result = MIDITimeTableCellOverlapResolver.resolveByShiftingLaterCells(
+      editedCells: edited,
+      in: rowData)
+
+    XCTAssertTrue(result.removals.isEmpty)
+    XCTAssertTrue(result.insertions.isEmpty)
+    XCTAssertEqual(result.updates.map(\.newPosition), [2, 3, 7])
+    XCTAssertEqual(result.updates.map(\.newDuration), [1, 4, 1])
+  }
+
   func testPartialLeftTrim() {
     // Other cell occupies [4, 8). Edited cell moves to [2, 6), overlapping its start.
     let rowData = [makeRow([(position: 0, duration: 4), (position: 4, duration: 4)])]

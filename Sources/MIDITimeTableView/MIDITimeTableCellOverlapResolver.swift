@@ -259,7 +259,11 @@ public enum MIDITimeTableCellOverlapResolver {
 
       var cursor = editedBlockEnd
       let candidates = working.values
-        .filter({ !editedIDSet.contains($0.id) && $0.newRowIndex == row && $0.newPosition >= editedBlockStart })
+        .filter({
+          !editedIDSet.contains($0.id) &&
+            $0.newRowIndex == row &&
+            $0.newPosition + $0.newDuration > editedBlockStart
+        })
         .sorted {
           if $0.newPosition == $1.newPosition {
             return $0.index.index < $1.index.index
