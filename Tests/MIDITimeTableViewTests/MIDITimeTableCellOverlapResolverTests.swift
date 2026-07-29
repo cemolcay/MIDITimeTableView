@@ -14,6 +14,49 @@ final class MIDITimeTableCellOverlapResolverTests: XCTestCase {
       cells: cells.map({ MIDITimeTableCellLayoutData(id: MIDITimeTableCellID(), position: $0.position, duration: $0.duration) }))
   }
 
+  private func makePublicCells(_ cells: [(position: Double, duration: Double)]) -> [MIDITimeTableViewEditedCellData] {
+    return cells.enumerated().map { offset, cell in
+      MIDITimeTableViewEditedCellData(
+        id: MIDITimeTableCellID(),
+        index: MIDITimeTableCellIndex(row: 0, index: offset),
+        newRowIndex: 0,
+        newPosition: cell.position,
+        newDuration: cell.duration)
+    }
+  }
+
+  func testPublicResolveOverlapsTrimsEarlierCells() {
+    let cells = makePublicCells([
+      (position: 0, duration: 2),
+      (position: 1.5, duration: 1),
+      (position: 2, duration: 1)
+    ])
+
+    let resolved = MIDITimeTableCellOverlapResolver.resolveOverlaps(
+      in: cells,
+      mode: .trimEarlierCells,
+      minimumDuration: 0.03)
+
+    XCTAssertEqual(resolved.count, 3)
+    XCTAssertEqual(resolved.map(\.newPosition), [0, 1.5, 2])
+    XCTAssertEqual(resolved.map(\.newDuration), [1.5, 0.5, 1])
+  }
+
+  func testPublicResolveOverlapsShiftsLaterCells() {
+    let cells = makePublicCells([
+      (position: 0, duration: 1),
+      (position: 1, duration: 1),
+      (position: 1, duration: 1),
+      (position: 2, duration: 1)
+    ])
+
+    let resolved = MIDITimeTableCellOverlapResolver.resolveOverlaps(in: cells, mode: .shiftLaterCells)
+
+    XCTAssertEqual(resolved.count, 4)
+    XCTAssertEqual(resolved.map(\.newPosition), [0, 1, 2, 3])
+    XCTAssertEqual(resolved.map(\.newDuration), [1, 1, 1, 1])
+  }
+
   func testPartialLeftTrim() {
     // Other cell occupies [4, 8). Edited cell moves to [2, 6), overlapping its start.
     let rowData = [makeRow([(position: 0, duration: 4), (position: 4, duration: 4)])]

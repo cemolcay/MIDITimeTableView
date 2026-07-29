@@ -13,6 +13,74 @@ import Foundation
 /// UIKit state: it only needs the edited cells' new geometry and a snapshot of the row data as it
 /// was immediately before the edit.
 public enum MIDITimeTableCellOverlapResolver {
+  /// Public model-level overlap resolution modes for callers that already own their data source
+  /// models and want deterministic non-overlapping layout data before handing it to the time
+  /// table.
+  public enum Mode {
+    /// Earlier cells keep their start positions and get shortened when a later cell begins before
+    /// they end. Cells shorter than `minimumDuration` after trimming are removed from the result.
+    case trimEarlierCells
+    /// Earlier cells keep their position and duration. Later cells that would overlap are moved
+    /// forward to start at the previous cell's end, preserving every cell's duration.
+    case shiftLaterCells
+  }
+
+  /// Resolves overlaps in a caller-owned model snapshot using only public layout types.
+  ///
+  /// This is useful when a host mutates its backing data directly (for example generating a
+  /// pattern or inserting a new cell in the middle) and wants to normalize overlaps before
+  /// `MIDITimeTableView.reloadData()`. Cells are resolved independently per row, in the order
+  /// supplied for each row.
+  ///
+  /// - Parameters:
+  ///   - cells: Public cell layout data to resolve.
+  ///   - mode: Resolution behavior.
+  ///   - minimumDuration: Cells shorter than this after trimming are omitted. Used only by
+  ///     `trimEarlierCells`.
+  /// - Returns: The resolved surviving cells, preserving row grouping and per-row order.
+  public static func resolveOverlaps(
+    in cells: [MIDITimeTableViewEditedCellData],
+    mode: Mode,
+    minimumDuration: Double = 0.000000001
+  ) -> [MIDITimeTableViewEditedCellData] {
+    var resolved = [MIDITimeTableViewEditedCellData]()
+    let grouped = Dictionary(grouping: cells, by: { $0.newRowIndex })
+
+    for row in grouped.keys.sorted() {
+      guard let rowCells = grouped[row] else { continue }
+      switch mode {
+      case .trimEarlierCells:
+        for cell in rowCells {
+          if let previous = resolved.indices.last(where: { resolved[$0].newRowIndex == row }) {
+            let previousEnd = resolved[previous].newPosition + resolved[previous].newDuration
+            if previousEnd > cell.newPosition {
+              resolved[previous].newDuration = max(0, cell.newPosition - resolved[previous].newPosition)
+              if resolved[previous].newDuration < minimumDuration {
+                resolved.remove(at: previous)
+              }
+            }
+          }
+
+          if cell.newDuration >= minimumDuration {
+            resolved.append(cell)
+          }
+        }
+
+      case .shiftLaterCells:
+        var previousEnd: Double?
+        for var cell in rowCells {
+          if let end = previousEnd, cell.newPosition < end {
+            cell.newPosition = end
+          }
+          previousEnd = cell.newPosition + cell.newDuration
+          resolved.append(cell)
+        }
+      }
+    }
+
+    return resolved
+  }
+
   /// Resolves the cells an edit (move or resize) now overlaps against `rowData`, a snapshot that
   /// reflects the pre-edit layout for every cell other than the ones being edited: cells fully
   /// covered by an edited cell are removed, cells partially covered are trimmed, and cells an

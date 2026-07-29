@@ -155,6 +155,19 @@ func midiTimeTableViewSnapResolution(_ midiTimeTableView: MIDITimeTableView) -> 
 * `insertions`: new split fragments created from an existing cell. Clone the model referenced by
   `sourceID`, assign the new `id`, `position` and `duration`, then insert it into `row`.
 
+If you mutate or generate your model outside the view and want to normalize overlaps before
+calling `reloadData()`, use the public model-level resolver:
+
+``` swift
+let resolved = MIDITimeTableCellOverlapResolver.resolveOverlaps(
+  in: cells,
+  mode: .shiftLaterCells)
+```
+
+Use `.shiftLaterCells` when inserted cells should make room by pushing following cells forward.
+Use `.trimEarlierCells` when later cells should keep their start positions and earlier overlaps
+should be shortened or removed.
+
 For example:
 
 ``` swift
