@@ -115,6 +115,93 @@ final class MIDITimeTableCellOverlapResolverTests: XCTestCase {
     XCTAssertEqual(result.updates.map(\.newDuration), [2, 1])
   }
 
+  func testResolveByShiftingLaterCellsTreatsMultipleEditedCellsAsSingleBlock() {
+    let rowData = [makeRow([(position: 0, duration: 1), (position: 1, duration: 1), (position: 2, duration: 1)])]
+    let firstID = rowData[0, 0].id
+    let secondID = rowData[0, 1].id
+    let edited = [
+      MIDITimeTableViewEditedCellData(
+        id: firstID,
+        index: MIDITimeTableCellIndex(row: 0, index: 0),
+        newRowIndex: 0,
+        newPosition: 0,
+        newDuration: 1),
+      MIDITimeTableViewEditedCellData(
+        id: secondID,
+        index: MIDITimeTableCellIndex(row: 0, index: 1),
+        newRowIndex: 0,
+        newPosition: 1,
+        newDuration: 2)
+    ]
+
+    let result = MIDITimeTableCellOverlapResolver.resolveByShiftingLaterCells(
+      editedCells: edited,
+      in: rowData)
+
+    XCTAssertTrue(result.removals.isEmpty)
+    XCTAssertTrue(result.insertions.isEmpty)
+    XCTAssertEqual(result.updates.map(\.newPosition), [0, 1, 3])
+    XCTAssertEqual(result.updates.map(\.newDuration), [1, 2, 1])
+  }
+
+  func testResolveByShiftingLaterCellsMovesOverlappedAndFollowingCellsOnly() {
+    let rowData = [makeRow([(position: 0, duration: 1), (position: 1, duration: 1), (position: 2, duration: 1)])]
+    let firstID = rowData[0, 0].id
+    let secondID = rowData[0, 1].id
+    let edited = [
+      MIDITimeTableViewEditedCellData(
+        id: firstID,
+        index: MIDITimeTableCellIndex(row: 0, index: 0),
+        newRowIndex: 0,
+        newPosition: 1,
+        newDuration: 1),
+      MIDITimeTableViewEditedCellData(
+        id: secondID,
+        index: MIDITimeTableCellIndex(row: 0, index: 1),
+        newRowIndex: 0,
+        newPosition: 2,
+        newDuration: 1)
+    ]
+
+    let result = MIDITimeTableCellOverlapResolver.resolveByShiftingLaterCells(
+      editedCells: edited,
+      in: rowData)
+
+    XCTAssertTrue(result.removals.isEmpty)
+    XCTAssertTrue(result.insertions.isEmpty)
+    XCTAssertEqual(result.updates.map(\.newPosition), [1, 2, 3])
+    XCTAssertEqual(result.updates.map(\.newDuration), [1, 1, 1])
+  }
+
+  func testResolveByShiftingLaterCellsDoesNotShiftCellsLeftBehindBlock() {
+    let rowData = [makeRow([(position: 0, duration: 1), (position: 2, duration: 1), (position: 3, duration: 1), (position: 5, duration: 1)])]
+    let firstID = rowData[0, 1].id
+    let secondID = rowData[0, 2].id
+    let edited = [
+      MIDITimeTableViewEditedCellData(
+        id: firstID,
+        index: MIDITimeTableCellIndex(row: 0, index: 1),
+        newRowIndex: 0,
+        newPosition: 1,
+        newDuration: 1),
+      MIDITimeTableViewEditedCellData(
+        id: secondID,
+        index: MIDITimeTableCellIndex(row: 0, index: 2),
+        newRowIndex: 0,
+        newPosition: 2,
+        newDuration: 1)
+    ]
+
+    let result = MIDITimeTableCellOverlapResolver.resolveByShiftingLaterCells(
+      editedCells: edited,
+      in: rowData)
+
+    XCTAssertTrue(result.removals.isEmpty)
+    XCTAssertTrue(result.insertions.isEmpty)
+    XCTAssertEqual(result.updates.map(\.newPosition), [1, 2])
+    XCTAssertEqual(result.updates.map(\.newDuration), [1, 1])
+  }
+
   func testPartialLeftTrim() {
     // Other cell occupies [4, 8). Edited cell moves to [2, 6), overlapping its start.
     let rowData = [makeRow([(position: 0, duration: 4), (position: 4, duration: 4)])]

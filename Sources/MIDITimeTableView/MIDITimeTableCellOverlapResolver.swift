@@ -217,9 +217,12 @@ public enum MIDITimeTableCellOverlapResolver {
   ) -> MIDITimeTableCellEditResult {
     let editedIDSet = skippingCellIDs ?? Set(editedCells.map({ $0.id }))
     var working = [MIDITimeTableCellID: MIDITimeTableViewEditedCellData]()
+    var originalCells = [MIDITimeTableCellID: MIDITimeTableCellLayoutData]()
 
     for (rowIndex, row) in rowData.enumerated() {
-      for (cellIndex, cell) in row.cells.enumerated() where !editedIDSet.contains(cell.id) {
+      for (cellIndex, cell) in row.cells.enumerated() {
+        originalCells[cell.id] = cell
+        guard !editedIDSet.contains(cell.id) else { continue }
         working[cell.id] = MIDITimeTableViewEditedCellData(
           id: cell.id,
           index: MIDITimeTableCellIndex(row: rowIndex, index: cellIndex),
@@ -230,46 +233,64 @@ public enum MIDITimeTableCellOverlapResolver {
     }
 
     for edited in editedCells {
-      guard edited.index.row >= 0,
-        edited.index.row < rowData.count,
-        edited.index.index >= 0,
-        edited.index.index < rowData[edited.index.row].cells.count
-        else {
-          working[edited.id] = edited
-          continue
-        }
-
-      let original = rowData[edited.index]
-      let originalEnd = original.position + original.duration
-      let editedEnd = edited.newPosition + edited.newDuration
-      let endShift = editedEnd - originalEnd
-
-      if endShift > 0 {
-        for (id, cell) in working where cell.newRowIndex == edited.newRowIndex && cell.newPosition >= originalEnd {
-          var shifted = cell
-          shifted.newPosition += endShift
-          working[id] = shifted
-        }
-      }
-
       working[edited.id] = edited
     }
 
-    let orderedCells = working.values.sorted {
-      if $0.newRowIndex == $1.newRowIndex {
-        if $0.newPosition == $1.newPosition {
-          let lhsEdited = editedIDSet.contains($0.id)
-          let rhsEdited = editedIDSet.contains($1.id)
-          if lhsEdited != rhsEdited { return lhsEdited }
-          return $0.index.index < $1.index.index
+    let editedByTargetRow = Dictionary(grouping: editedCells, by: { $0.newRowIndex })
+    for (row, rowEditedCells) in editedByTargetRow {
+      let originalBlockStart = rowEditedCells.compactMap({ originalCells[$0.id]?.position }).min()
+      let originalBlockEnd = rowEditedCells.compactMap({ originalCells[$0.id]?.endPosition }).max()
+      let editedBlockStart = rowEditedCells.map({ $0.newPosition }).min() ?? 0
+      let editedBlockEnd = rowEditedCells.map({ $0.newPosition + $0.newDuration }).max() ?? editedBlockStart
+
+      if let originalBlockStart, let originalBlockEnd {
+        let originalBlockDuration = originalBlockEnd - originalBlockStart
+        let editedBlockDuration = editedBlockEnd - editedBlockStart
+        let insertedDuration = max(0, editedBlockDuration - originalBlockDuration)
+
+        if insertedDuration > 0 {
+          for (id, cell) in working where !editedIDSet.contains(id) && cell.newRowIndex == row && cell.newPosition >= originalBlockEnd {
+            var shifted = cell
+            shifted.newPosition += insertedDuration
+            working[id] = shifted
+          }
         }
-        return $0.newPosition < $1.newPosition
       }
-      return $0.newRowIndex < $1.newRowIndex
+
+      var cursor = editedBlockEnd
+      let candidates = working.values
+        .filter({ !editedIDSet.contains($0.id) && $0.newRowIndex == row && $0.newPosition >= editedBlockStart })
+        .sorted {
+          if $0.newPosition == $1.newPosition {
+            return $0.index.index < $1.index.index
+          }
+          return $0.newPosition < $1.newPosition
+        }
+
+      for cell in candidates {
+        var shifted = cell
+        if shifted.newPosition < cursor {
+          shifted.newPosition = cursor
+        }
+        cursor = shifted.newPosition + shifted.newDuration
+        working[shifted.id] = shifted
+      }
     }
 
-    let resolvedCells = resolveOverlaps(in: orderedCells, mode: .shiftLaterCells)
-    let updates = resolvedCells.filter { cell in
+    let updates = working.values
+      .sorted {
+        if $0.newRowIndex == $1.newRowIndex {
+          if $0.newPosition == $1.newPosition {
+            let lhsEdited = editedIDSet.contains($0.id)
+            let rhsEdited = editedIDSet.contains($1.id)
+            if lhsEdited != rhsEdited { return lhsEdited }
+            return $0.index.index < $1.index.index
+          }
+          return $0.newPosition < $1.newPosition
+        }
+        return $0.newRowIndex < $1.newRowIndex
+      }
+      .filter { cell in
       if editedIDSet.contains(cell.id) { return true }
       guard let originalIndex = rowData.index(ofCellID: cell.id) else { return true }
       let original = rowData[originalIndex]
