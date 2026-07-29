@@ -71,6 +71,20 @@ final class MIDITimeTableCellOverlapResolverTests: XCTestCase {
     XCTAssertEqual(resolved.map(\.newDuration), [2, 1, 1])
   }
 
+  func testPublicResolveOverlapsDoesNotShiftAdjacentCells() {
+    let cells = makePublicCells([
+      (position: 0, duration: 1),
+      (position: 1.0000000001, duration: 1),
+      (position: 2, duration: 1)
+    ])
+
+    let resolved = MIDITimeTableCellOverlapResolver.resolveOverlaps(in: cells, mode: .shiftLaterCells)
+
+    XCTAssertEqual(resolved.count, 3)
+    XCTAssertEqual(resolved.map(\.newPosition), [0, 1.0000000001, 2])
+    XCTAssertEqual(resolved.map(\.newDuration), [1, 1, 1])
+  }
+
   func testResolveByShiftingLaterCellsDoesNotTrimOverlappedCell() {
     let rowData = [makeRow([(position: 0, duration: 1), (position: 1, duration: 1)])]
     let editedID = rowData[0, 0].id
@@ -222,6 +236,29 @@ final class MIDITimeTableCellOverlapResolverTests: XCTestCase {
     XCTAssertTrue(result.insertions.isEmpty)
     XCTAssertEqual(result.updates.map(\.newPosition), [2, 3, 7])
     XCTAssertEqual(result.updates.map(\.newDuration), [1, 4, 1])
+  }
+
+  func testResolveByShiftingLaterCellsDoesNotPushAdjacentCell() {
+    let rowData = [makeRow([(position: 0, duration: 1), (position: 3, duration: 1), (position: 4, duration: 1)])]
+    let editedID = rowData[0, 1].id
+    let edited = [
+      MIDITimeTableViewEditedCellData(
+        id: editedID,
+        index: MIDITimeTableCellIndex(row: 0, index: 1),
+        newRowIndex: 0,
+        newPosition: 3.0000000001,
+        newDuration: 0.9999999999)
+    ]
+
+    let result = MIDITimeTableCellOverlapResolver.resolveByShiftingLaterCells(
+      editedCells: edited,
+      in: rowData)
+
+    XCTAssertTrue(result.removals.isEmpty)
+    XCTAssertTrue(result.insertions.isEmpty)
+    XCTAssertEqual(result.updates.count, 1)
+    XCTAssertEqual(result.updates[0].newPosition, 3.0000000001, accuracy: 0.000000001)
+    XCTAssertEqual(result.updates[0].newDuration, 0.9999999999, accuracy: 0.000000001)
   }
 
   func testPartialLeftTrim() {

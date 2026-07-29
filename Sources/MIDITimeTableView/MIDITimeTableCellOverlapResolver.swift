@@ -13,6 +13,8 @@ import Foundation
 /// UIKit state: it only needs the edited cells' new geometry and a snapshot of the row data as it
 /// was immediately before the edit.
 public enum MIDITimeTableCellOverlapResolver {
+  private static let overlapTolerance = 0.000001
+
   /// Public model-level overlap resolution modes for callers that already own their data source
   /// models and want deterministic non-overlapping layout data before handing it to the time
   /// table.
@@ -72,7 +74,7 @@ public enum MIDITimeTableCellOverlapResolver {
         var previousEnd: Double?
         for var cell in rowCells {
           cell.newPosition += accumulatedShift
-          if let end = previousEnd, cell.newPosition < end {
+          if let end = previousEnd, cell.newPosition + overlapTolerance < end {
             let shift = end - cell.newPosition
             accumulatedShift += shift
             cell.newPosition = end
@@ -262,7 +264,7 @@ public enum MIDITimeTableCellOverlapResolver {
         .filter({
           !editedIDSet.contains($0.id) &&
             $0.newRowIndex == row &&
-            $0.newPosition + $0.newDuration > editedBlockStart
+            $0.newPosition + $0.newDuration > editedBlockStart + overlapTolerance
         })
         .sorted {
           if $0.newPosition == $1.newPosition {
@@ -273,7 +275,7 @@ public enum MIDITimeTableCellOverlapResolver {
 
       for cell in candidates {
         var shifted = cell
-        if shifted.newPosition < cursor {
+        if shifted.newPosition + overlapTolerance < cursor {
           shifted.newPosition = cursor
         }
         cursor = shifted.newPosition + shifted.newDuration
