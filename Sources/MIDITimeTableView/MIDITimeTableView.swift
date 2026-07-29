@@ -226,6 +226,10 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// furthest cell, so it never gets left behind as cells are added or extended. It never moves
   /// backwards on its own; dragging it manually still works as before. Defaults true.
   public var autoExtendsRangeHead: Bool = true
+  /// How interactive move/resize edits resolve overlaps. Defaults to `.trimEarlierCells`, which
+  /// preserves the original trim/split behavior. Set `.shiftLaterCells` to keep edited cells and
+  /// push later cells forward instead of trimming overlapped cells.
+  public var cellOverlapResolutionMode: MIDITimeTableCellOverlapResolver.Mode = .trimEarlierCells
 
   /// Speed of zooming by pinch gesture.
   public var zoomSpeed: CGFloat = 0.4
@@ -1179,11 +1183,20 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
     // the edited cells' own new geometry in so `result` is a complete, self-sufficient set that
     // both `applyEditResult` below and a host's edit application code can act on alone.
     let editedOverlapResult = MIDITimeTableCellOverlapResolver.resolveOverlapsAmongEditedCells(editedCells)
-    var result = MIDITimeTableCellOverlapResolver.resolve(
-      editedCells: editedOverlapResult.updates,
-      in: rowData,
-      skippingCellIDs: Set(editedCells.map({ $0.id })))
-    result.updates = editedOverlapResult.updates + result.updates
+    var result: MIDITimeTableCellEditResult
+    switch cellOverlapResolutionMode {
+    case .trimEarlierCells:
+      result = MIDITimeTableCellOverlapResolver.resolve(
+        editedCells: editedOverlapResult.updates,
+        in: rowData,
+        skippingCellIDs: Set(editedCells.map({ $0.id })))
+      result.updates = editedOverlapResult.updates + result.updates
+    case .shiftLaterCells:
+      result = MIDITimeTableCellOverlapResolver.resolveByShiftingLaterCells(
+        editedCells: editedOverlapResult.updates,
+        in: rowData,
+        skippingCellIDs: Set(editedCells.map({ $0.id })))
+    }
     result.removals = editedOverlapResult.removals + result.removals
 
     publishChange(result)

@@ -208,6 +208,79 @@ public enum MIDITimeTableCellOverlapResolver {
     return MIDITimeTableCellEditResult(updates: updates, removals: removals, insertions: insertions)
   }
 
+  /// Resolves a move/resize edit by preserving edited cells and shifting later cells forward.
+  /// Unlike `resolve`, this never trims, splits, or removes overlapped cells.
+  internal static func resolveByShiftingLaterCells(
+    editedCells: [MIDITimeTableViewEditedCellData],
+    in rowData: [MIDITimeTableRowLayoutData],
+    skippingCellIDs: Set<MIDITimeTableCellID>? = nil
+  ) -> MIDITimeTableCellEditResult {
+    let editedIDSet = skippingCellIDs ?? Set(editedCells.map({ $0.id }))
+    var working = [MIDITimeTableCellID: MIDITimeTableViewEditedCellData]()
+
+    for (rowIndex, row) in rowData.enumerated() {
+      for (cellIndex, cell) in row.cells.enumerated() where !editedIDSet.contains(cell.id) {
+        working[cell.id] = MIDITimeTableViewEditedCellData(
+          id: cell.id,
+          index: MIDITimeTableCellIndex(row: rowIndex, index: cellIndex),
+          newRowIndex: rowIndex,
+          newPosition: cell.position,
+          newDuration: cell.duration)
+      }
+    }
+
+    for edited in editedCells {
+      guard edited.index.row >= 0,
+        edited.index.row < rowData.count,
+        edited.index.index >= 0,
+        edited.index.index < rowData[edited.index.row].cells.count
+        else {
+          working[edited.id] = edited
+          continue
+        }
+
+      let original = rowData[edited.index]
+      let originalEnd = original.position + original.duration
+      let editedEnd = edited.newPosition + edited.newDuration
+      let endShift = editedEnd - originalEnd
+
+      if endShift > 0 {
+        for (id, cell) in working where cell.newRowIndex == edited.newRowIndex && cell.newPosition >= originalEnd {
+          var shifted = cell
+          shifted.newPosition += endShift
+          working[id] = shifted
+        }
+      }
+
+      working[edited.id] = edited
+    }
+
+    let orderedCells = working.values.sorted {
+      if $0.newRowIndex == $1.newRowIndex {
+        if $0.newPosition == $1.newPosition {
+          let lhsEdited = editedIDSet.contains($0.id)
+          let rhsEdited = editedIDSet.contains($1.id)
+          if lhsEdited != rhsEdited { return lhsEdited }
+          return $0.index.index < $1.index.index
+        }
+        return $0.newPosition < $1.newPosition
+      }
+      return $0.newRowIndex < $1.newRowIndex
+    }
+
+    let resolvedCells = resolveOverlaps(in: orderedCells, mode: .shiftLaterCells)
+    let updates = resolvedCells.filter { cell in
+      if editedIDSet.contains(cell.id) { return true }
+      guard let originalIndex = rowData.index(ofCellID: cell.id) else { return true }
+      let original = rowData[originalIndex]
+      return originalIndex.row != cell.newRowIndex ||
+        original.position != cell.newPosition ||
+        original.duration != cell.newDuration
+    }
+
+    return MIDITimeTableCellEditResult(updates: updates)
+  }
+
   /// Resolves overlaps within the edited selection itself. The normal resolver skips every
   /// edited id so selected cells win against non-selected cells, but a multi-cell resize can make
   /// selected neighbors overlap each other. This pass gives earlier cells in each row priority

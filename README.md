@@ -169,6 +169,14 @@ the accumulated shift carries through the row so later gaps/rests keep their spa
 Use `.trimEarlierCells` when later cells should keep their start positions and earlier overlaps
 should be shortened or removed.
 
+For user-driven move/resize edits, configure the view:
+
+``` swift
+timeTableView.cellOverlapResolutionMode = .shiftLaterCells
+```
+
+The default is `.trimEarlierCells`, which preserves the original trim/split edit behavior.
+
 For example:
 
 ``` swift
