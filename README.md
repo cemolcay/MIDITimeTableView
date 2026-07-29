@@ -164,7 +164,8 @@ let resolved = MIDITimeTableCellOverlapResolver.resolveOverlaps(
   mode: .shiftLaterCells)
 ```
 
-Use `.shiftLaterCells` when inserted cells should make room by pushing following cells forward.
+Use `.shiftLaterCells` when inserted cells should make room by pushing following cells forward;
+the accumulated shift carries through the row so later gaps/rests keep their spacing.
 Use `.trimEarlierCells` when later cells should keep their start positions and earlier overlaps
 should be shortened or removed.
 

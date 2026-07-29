@@ -21,7 +21,8 @@ public enum MIDITimeTableCellOverlapResolver {
     /// they end. Cells shorter than `minimumDuration` after trimming are removed from the result.
     case trimEarlierCells
     /// Earlier cells keep their position and duration. Later cells that would overlap are moved
-    /// forward to start at the previous cell's end, preserving every cell's duration.
+    /// forward, and that movement is carried through the rest of the row so later rests keep
+    /// their spacing. Every cell keeps its duration.
     case shiftLaterCells
   }
 
@@ -67,9 +68,13 @@ public enum MIDITimeTableCellOverlapResolver {
         }
 
       case .shiftLaterCells:
+        var accumulatedShift = 0.0
         var previousEnd: Double?
         for var cell in rowCells {
+          cell.newPosition += accumulatedShift
           if let end = previousEnd, cell.newPosition < end {
+            let shift = end - cell.newPosition
+            accumulatedShift += shift
             cell.newPosition = end
           }
           previousEnd = cell.newPosition + cell.newDuration
