@@ -206,6 +206,7 @@ class ViewController: UIViewController, MIDITimeTableViewDataSource, MIDITimeTab
         timeTableView?.timeTableDelegate = self
         timeTableView?.gridLayer.showsSubbeatLines = false
         timeTableView?.measureView.showsSubbeatLines = false
+        timeTableView?.cellOverlapResolutionMode = .shiftLaterCells
         timeTableView?.reloadData()
         history.append(rows)
         updateHistoryButtons()

@@ -31,7 +31,7 @@ public struct MIDITimeTableCellInsertion: Equatable {
 }
 
 /// Result of an edit (move or resize), including its effect on the cells it now overlaps.
-public struct MIDITimeTableCellEditResult {
+public struct MIDITimeTableCellEditResult: Equatable {
   /// Every cell whose position/duration changed: the cells that were directly moved or resized,
   /// plus any other cells trimmed because one of those edits now overlaps them.
   public var updates: [MIDITimeTableViewEditedCellData]

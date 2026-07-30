@@ -155,27 +155,59 @@ func midiTimeTableViewSnapResolution(_ midiTimeTableView: MIDITimeTableView) -> 
 * `insertions`: new split fragments created from an existing cell. Clone the model referenced by
   `sourceID`, assign the new `id`, `position` and `duration`, then insert it into `row`.
 
-If you mutate or generate your model outside the view and want to normalize overlaps before
-calling `reloadData()`, use the public model-level resolver:
+### Overlap resolution
+
+One resolver backs every path that can produce overlapping cells — interactive moves and resizes,
+a one-off batch normalization of a model you mutated directly, and a whole-track cleanup — so
+`.trimEarlierCells` and `.shiftLaterCells` mean exactly the same thing everywhere they're used.
+
+Configure it once on the view and every interactive edit funnels through it:
+
+``` swift
+timeTableView.overlapResolution = MIDITimeTableCellOverlapResolver.Options(mode: .shiftLaterCells)
+```
+
+The default is `.trimEarlierCells`, which preserves the original trim/split edit behavior. A
+`.none` mode is also available to disable resolution entirely. `Options` also exposes
+`minimumDuration` (trimmed/split pieces shorter than this are dropped), `tolerance` (boundary
+noise this close is never treated as an overlap), `splitsHostCells` (trim mode: split vs. truncate
+a cell the winner lands inside), and `minimumPosition` (a floor cells are never placed before).
+`cellOverlapResolutionMode` remains available as a shorthand for `overlapResolution.mode`.
+
+* **`.trimEarlierCells`** — the winning cell keeps its exact geometry. Any cell it overlaps is
+  trimmed; a cell it lands strictly inside is split into a trimmed left piece and a new right-piece
+  cell. Among cells of equal priority, the later-positioned one wins.
+* **`.shiftLaterCells`** — the winning cell keeps its exact geometry and position. Every cell it
+  overlaps is pushed forward just enough to clear it, and once a cell has been displaced that
+  displacement carries through the rest of the row, so later gaps/rests keep their spacing. No
+  duration ever changes, and nothing is ever trimmed, split, or removed. Among cells of equal
+  priority, the earlier-positioned one wins and keeps its spot.
+
+If you mutate or generate your model outside the view — inserting a cell in the middle, generating
+a pattern, randomizing a track — and want normalized, non-overlapping layout data before handing it
+to `MIDITimeTableView`, use the batch resolver directly:
 
 ``` swift
 let resolved = MIDITimeTableCellOverlapResolver.resolveOverlaps(
   in: cells,
-  mode: .shiftLaterCells)
+  using: timeTableView.overlapResolution,
+  priorityCellIDs: [insertedCellID])
 ```
 
-Use `.shiftLaterCells` when inserted cells should make room by pushing following cells forward;
-the accumulated shift carries through the row so later gaps/rests keep their spacing.
-Use `.trimEarlierCells` when later cells should keep their start positions and earlier overlaps
-should be shortened or removed.
+`priorityCellIDs` marks cells that must win every overlap they're part of and are never trimmed,
+split, or moved themselves — for example a cell you just inserted, so the rest of the row makes
+room for it. The result is a `MIDITimeTableCellEditResult`, same as an interactive edit produces;
+apply it the same way. Cells don't need to be pre-sorted by row or position.
 
-For user-driven move/resize edits, configure the view:
+To normalize the whole table in place — after a host-side mutation, before `reloadData()` — call:
 
 ``` swift
-timeTableView.cellOverlapResolutionMode = .shiftLaterCells
+timeTableView.resolveOverlaps()
 ```
 
-The default is `.trimEarlierCells`, which preserves the original trim/split edit behavior.
+This reads the view's own current layout, resolves it with `overlapResolution`, and routes the
+result through the same delegate/apply/history path a user-driven edit uses, so
+`midiTimeTableView(_:didChange:)` and `midiTimeTableViewShouldPushHistory(_:)` both fire as usual.
 
 For example:
 

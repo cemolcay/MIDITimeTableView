@@ -115,6 +115,11 @@ public struct MIDITimeTableViewEditedCellData: Equatable {
     self.newPosition = newPosition
     self.newDuration = newDuration
   }
+
+  /// `newPosition + newDuration`.
+  public var newEndPosition: Double {
+    return newPosition + newDuration
+  }
 }
 
 /// Delegate functions to inform about changed cells and sizing of the time table.
@@ -226,10 +231,19 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   /// furthest cell, so it never gets left behind as cells are added or extended. It never moves
   /// backwards on its own; dragging it manually still works as before. Defaults true.
   public var autoExtendsRangeHead: Bool = true
-  /// How interactive move/resize edits resolve overlaps. Defaults to `.trimEarlierCells`, which
-  /// preserves the original trim/split behavior. Set `.shiftLaterCells` to keep edited cells and
-  /// push later cells forward instead of trimming overlapped cells.
-  public var cellOverlapResolutionMode: MIDITimeTableCellOverlapResolver.Mode = .trimEarlierCells
+  /// How interactive move/resize edits — and `resolveOverlaps()` — resolve overlaps. Defaults to
+  /// `.trimEarlierCells`, which preserves the original trim/split behavior. Set `.shiftLaterCells`
+  /// to keep edited cells in place and push later cells forward instead of trimming them, or
+  /// `.none` to disable resolution entirely.
+  public var overlapResolution = MIDITimeTableCellOverlapResolver.Options()
+
+  /// Convenience accessor for `overlapResolution.mode`. Kept for source compatibility with code
+  /// written against the single-mode property; prefer setting `overlapResolution` directly when
+  /// you also want to tune `minimumDuration`, `tolerance`, or `splitsHostCells`.
+  public var cellOverlapResolutionMode: MIDITimeTableCellOverlapResolver.Mode {
+    get { return overlapResolution.mode }
+    set { overlapResolution.mode = newValue }
+  }
 
   /// Speed of zooming by pinch gesture.
   public var zoomSpeed: CGFloat = 0.4
@@ -1179,27 +1193,35 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
 
     editingCellIndices = []
 
-    // The resolver only computes what happens to the OTHER cells the edit now overlaps; fold
-    // the edited cells' own new geometry in so `result` is a complete, self-sufficient set that
-    // both `applyEditResult` below and a host's edit application code can act on alone.
-    let editedOverlapResult = MIDITimeTableCellOverlapResolver.resolveOverlapsAmongEditedCells(editedCells)
-    var result: MIDITimeTableCellEditResult
-    switch cellOverlapResolutionMode {
-    case .trimEarlierCells:
-      result = MIDITimeTableCellOverlapResolver.resolve(
-        editedCells: editedOverlapResult.updates,
-        in: rowData,
-        skippingCellIDs: Set(editedCells.map({ $0.id })))
-      result.updates = editedOverlapResult.updates + result.updates
-    case .shiftLaterCells:
-      result = MIDITimeTableCellOverlapResolver.resolveByShiftingLaterCells(
-        editedCells: editedOverlapResult.updates,
-        in: rowData,
-        skippingCellIDs: Set(editedCells.map({ $0.id })))
-    }
-    result.removals = editedOverlapResult.removals + result.removals
+    // A single funnel resolves the edited cells against each other and then against the rest of
+    // every row they touch, and always returns a complete, self-sufficient result — including
+    // the edited cells' own final geometry — so nothing needs to be assembled on top of it here.
+    let result = MIDITimeTableCellOverlapResolver.resolve(editedCells: editedCells, in: rowData, using: overlapResolution)
 
     publishChange(result)
+  }
+
+  /// Normalizes overlaps across the whole table using `overlapResolution`, without any single
+  /// edit driving it. Call this after generating a pattern or mutating your data source directly
+  /// (outside a user-driven move/resize gesture) and before `reloadData()`, so the table never
+  /// displays overlapping cells that a host-side mutation introduced. Routes through the same
+  /// delegate/apply/history path as an interactive edit, so `midiTimeTableView(_:didChange:)` and
+  /// `midiTimeTableViewShouldPushHistory(_:)` both fire as usual.
+  @discardableResult
+  public func resolveOverlaps() -> MIDITimeTableCellEditResult {
+    let allCells = rowData.enumerated().flatMap { rowIndex, row in
+      row.cells.enumerated().map { index, cell in
+        MIDITimeTableViewEditedCellData(
+          id: cell.id,
+          index: MIDITimeTableCellIndex(row: rowIndex, index: index),
+          newRowIndex: rowIndex,
+          newPosition: cell.position,
+          newDuration: cell.duration)
+      }
+    }
+    let result = MIDITimeTableCellOverlapResolver.resolveOverlaps(in: allCells, using: overlapResolution)
+    publishChange(result)
+    return result
   }
 
   private func publishChange(_ result: MIDITimeTableCellEditResult) {
@@ -1211,7 +1233,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
   }
 
   internal func effectiveChangeResult(from result: MIDITimeTableCellEditResult) -> MIDITimeTableCellEditResult {
-    let epsilon = 0.000000001
+    let epsilon = overlapResolution.tolerance
 
     let updates = result.updates.filter { update in
       guard let currentIndex = rowData.index(ofCellID: update.id),
@@ -1233,7 +1255,7 @@ open class MIDITimeTableView: UIScrollView, MIDITimeTableCellViewDelegate, MIDIT
       return insertion.row >= 0
         && insertion.row < rowData.count
         && rowData.index(ofCellID: insertion.id) == nil
-        && insertion.duration > 0
+        && insertion.duration >= overlapResolution.minimumDuration
     }
 
     return MIDITimeTableCellEditResult(updates: updates, removals: removals, insertions: insertions)
